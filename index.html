@@ -7,6 +7,7 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Hiragino Maru Gothic ProN','BIZ UDPGothic',sans-serif;background:#1a0038;color:#fff;min-height:100vh;overflow-x:hidden}
+
 /* ===== HUB ===== */
 #hub{min-height:100vh;padding:0 0 40px}
 .hub-header{background:linear-gradient(135deg,#2d0066,#6600cc,#2d0066);padding:16px 20px 10px;text-align:center;box-shadow:0 4px 20px #9900ff88}
@@ -32,6 +33,25 @@ body{font-family:'Hiragino Maru Gothic ProN','BIZ UDPGothic',sans-serif;backgrou
 .game-icon{font-size:32px;line-height:1;margin-bottom:6px}
 .game-name{font-size:11px;font-weight:700;color:#eeddff;line-height:1.3}
 .game-num{position:absolute;top:4px;left:6px;font-size:9px;color:#9966cc;font-weight:700}
+
+/* ===== CHARACTER SELECT MODAL ===== */
+#charSelectModal{display:none;position:fixed;inset:0;z-index:200;background:#000000cc;align-items:center;justify-content:center;padding:16px}
+#charSelectModal.show{display:flex}
+.char-select-box{background:linear-gradient(145deg,#1a0040,#330066);border:3px solid #9933ff;border-radius:24px;padding:20px 16px 24px;max-width:460px;width:100%;box-shadow:0 0 40px #9933ff88}
+.char-select-title{font-size:20px;font-weight:900;text-align:center;color:#ffccff;margin-bottom:6px}
+.char-select-sub{font-size:13px;text-align:center;color:#cc99ff;margin-bottom:16px}
+.char-select-game{font-size:15px;font-weight:700;text-align:center;color:#ffff88;margin-bottom:16px;background:#2a005a;border-radius:10px;padding:8px}
+.char-cards{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.char-card{border-radius:16px;padding:12px 8px 10px;text-align:center;cursor:pointer;transition:.2s;border:3px solid transparent;background:linear-gradient(145deg,#2a005a,#440077)}
+.char-card:hover{transform:scale(1.04)}
+.char-card.selected{border-width:3px;box-shadow:0 0 20px var(--glow)}
+.char-card img{width:70px;height:84px;object-fit:cover;border-radius:10px;mix-blend-mode:multiply}
+.char-card-name{font-size:11px;font-weight:900;margin-top:6px;line-height:1.3}
+.char-card-desc{font-size:10px;color:#cc99ff;margin-top:3px;line-height:1.4}
+.char-select-start{display:block;width:100%;margin-top:16px;padding:14px;background:linear-gradient(135deg,#ff66cc,#9933ff);border:none;color:#fff;font-size:18px;font-weight:900;border-radius:16px;cursor:pointer;box-shadow:0 0 16px #ff66cc88}
+.char-select-start:disabled{background:#443355;color:#776688;cursor:not-allowed;box-shadow:none}
+.char-select-cancel{display:block;width:100%;margin-top:8px;padding:8px;background:transparent;border:2px solid #6633aa;color:#cc99ff;font-size:14px;font-weight:700;border-radius:12px;cursor:pointer}
+
 /* ===== GAME SCREEN ===== */
 #gameScreen{display:none;min-height:100vh;flex-direction:column}
 .game-topbar{background:linear-gradient(135deg,#2d0066,#6600cc);padding:10px 16px;display:flex;align-items:center;gap:10px;box-shadow:0 4px 12px #9900ff66}
@@ -40,6 +60,16 @@ body{font-family:'Hiragino Maru Gothic ProN','BIZ UDPGothic',sans-serif;backgrou
 .game-title-bar{font-size:16px;font-weight:900;flex:1;text-align:center;background:linear-gradient(90deg,#ff88ff,#88ffff);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
 .score-bar{font-size:14px;font-weight:700;color:#ffff88;flex-shrink:0}
 #gameArea{flex:1;position:relative;overflow:hidden;background:#120028}
+
+/* ===== CHARACTER WIDGET ===== */
+#charWidget{position:absolute;bottom:10px;left:10px;z-index:30;display:flex;align-items:flex-end;gap:6px;pointer-events:none}
+#charWidget img{width:56px;height:67px;object-fit:cover;border-radius:10px;mix-blend-mode:multiply;cursor:pointer;pointer-events:all;transition:.15s}
+#charWidget img:hover{transform:scale(1.08)}
+#charWidget img:active{transform:scale(.95)}
+#speechBubble{background:#ffffffee;color:#220044;border-radius:16px 16px 16px 4px;padding:8px 12px;font-size:13px;font-weight:700;max-width:180px;line-height:1.5;opacity:0;transition:opacity .3s;pointer-events:none;box-shadow:0 4px 12px #00000044;position:relative}
+#speechBubble.show{opacity:1}
+#speechBubble::after{content:'';position:absolute;bottom:6px;left:-8px;border:6px solid transparent;border-right-color:#ffffffee}
+
 /* ===== GAME ENGINES ===== */
 .find-bg{width:100%;height:100%;position:absolute;top:0;left:0;display:flex;align-items:center;justify-content:center;font-size:90px;opacity:.15;user-select:none}
 .find-item{position:absolute;font-size:clamp(28px,5vw,44px);cursor:pointer;user-select:none;transition:.15s;animation:itemPop .3s ease}
@@ -47,7 +77,7 @@ body{font-family:'Hiragino Maru Gothic ProN','BIZ UDPGothic',sans-serif;backgrou
 .find-item.found{animation:scPop .4s ease forwards}
 @keyframes itemPop{from{transform:scale(0)}to{transform:scale(1)}}
 @keyframes scPop{0%{transform:scale(1)}50%{transform:scale(1.8)}100%{transform:scale(0);opacity:0}}
-.find-counter{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);background:#2a005aaa;border-radius:12px;padding:6px 18px;font-size:20px;font-weight:900}
+.find-counter{position:absolute;bottom:90px;left:50%;transform:translateX(-50%);background:#2a005aaa;border-radius:12px;padding:6px 18px;font-size:20px;font-weight:900}
 .tap-obj{position:absolute;font-size:clamp(36px,8vw,56px);cursor:pointer;user-select:none;transition:.1s}
 .tap-obj:active{transform:scale(.8)}
 .miss-flash{position:absolute;top:0;left:0;right:0;bottom:0;background:#ff000033;pointer-events:none;animation:flashFade .3s forwards}
@@ -94,7 +124,7 @@ body{font-family:'Hiragino Maru Gothic ProN','BIZ UDPGothic',sans-serif;backgrou
 .hole:active{transform:scale(.85)}
 .puzzle-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:14px;padding:14px}
 .puzzle-board{display:grid;gap:6px;background:#2a005a;padding:10px;border-radius:12px;border:3px solid #9933ff}
-.puzzle-piece{border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:clamp(24px,6vw,40px);cursor:pointer;transition:.2s;border:3px solid transparent;user-select:none}
+.puzzle-piece{border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.2s;border:3px solid transparent;user-select:none}
 .puzzle-piece.selected{border-color:#ffff44;transform:scale(1.05)}
 .puzzle-piece.empty{background:#110022;cursor:default}
 .puzzle-piece:not(.empty):hover{border-color:#aa66ff}
@@ -109,11 +139,14 @@ body{font-family:'Hiragino Maru Gothic ProN','BIZ UDPGothic',sans-serif;backgrou
 .stamp-btn{font-size:28px;background:#2a005a;border:3px solid #6633aa;border-radius:10px;padding:4px 8px;cursor:pointer;transition:.15s}
 .stamp-btn:hover,.stamp-btn.selected{border-color:#ff66cc;background:#440088;transform:scale(1.1)}
 .clear-btn{padding:6px 16px;background:#ff3366;border:3px solid #ff6699;color:#fff;border-radius:10px;cursor:pointer;font-size:13px;font-weight:700}
-.result-overlay{position:absolute;inset:0;background:#000000bb;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;z-index:50}
+.result-overlay{position:absolute;inset:0;background:#000000bb;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;z-index:50;padding:20px}
 .result-title{font-size:clamp(28px,7vw,48px);font-weight:900;background:linear-gradient(90deg,#ff88ff,#ffff44,#88ffff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-align:center}
+.result-char-wrap{display:flex;align-items:flex-end;gap:14px}
+.result-char-img{width:110px;height:132px;object-fit:cover;border-radius:14px;mix-blend-mode:multiply}
+.result-char-msg{background:#ffffffee;color:#220044;border-radius:16px 16px 16px 4px;padding:12px 16px;font-size:15px;font-weight:700;max-width:200px;line-height:1.6;box-shadow:0 4px 12px #00000044}
 .result-btn{padding:14px 36px;background:linear-gradient(135deg,#ff66cc,#9933ff);border:none;color:#fff;font-size:20px;font-weight:900;border-radius:30px;cursor:pointer;box-shadow:0 0 20px #ff66cc88}
 .result-btn:hover{transform:scale(1.05)}
-.confetti{position:absolute;width:8px;height:8px;border-radius:2px;animation:confettiFall linear forwards}
+.confetti{position:absolute;width:8px;height:8px;border-radius:2px;animation:confettiFall linear forwards;pointer-events:none}
 @keyframes confettiFall{from{transform:translateY(-10px) rotate(0deg);opacity:1}to{transform:translateY(100vh) rotate(720deg);opacity:0}}
 .float-score{position:absolute;font-size:22px;font-weight:900;color:#ffff44;pointer-events:none;animation:floatScore .8s ease forwards;z-index:10}
 @keyframes floatScore{from{transform:translateY(0);opacity:1}to{transform:translateY(-60px);opacity:0}}
@@ -123,7 +156,7 @@ body{font-family:'Hiragino Maru Gothic ProN','BIZ UDPGothic',sans-serif;backgrou
 </head>
 <body>
 
-<!-- HUB SCREEN -->
+<!-- HUB -->
 <div id="hub">
   <div class="hub-header">
     <div class="hub-title">★ 名探偵プリキュア ゲームランド ★</div>
@@ -139,6 +172,18 @@ body{font-family:'Hiragino Maru Gothic ProN','BIZ UDPGothic',sans-serif;backgrou
   <div class="games-grid" id="gamesGrid"></div>
 </div>
 
+<!-- CHARACTER SELECT MODAL -->
+<div id="charSelectModal">
+  <div class="char-select-box">
+    <div class="char-select-title">✨ なかまをえらんでね ✨</div>
+    <div class="char-select-sub">いっしょにあそぶプリキュアをえらんでね！</div>
+    <div class="char-select-game" id="modalGameName">ゲーム</div>
+    <div class="char-cards" id="charCards"></div>
+    <button class="char-select-start" id="charStartBtn" disabled onclick="confirmCharAndStart()">このこといっしょにあそぶ！</button>
+    <button class="char-select-cancel" onclick="closeCharSelect()">もどる</button>
+  </div>
+</div>
+
 <!-- GAME SCREEN -->
 <div id="gameScreen" style="display:flex;flex-direction:column">
   <div class="game-topbar">
@@ -149,96 +194,168 @@ body{font-family:'Hiragino Maru Gothic ProN','BIZ UDPGothic',sans-serif;backgrou
   <div id="gameArea"></div>
 </div>
 
+<!-- CHARACTER WIDGET -->
+<div id="charWidget" style="display:none">
+  <img id="charWidgetImg" src="" alt="" onclick="onWidgetTap()">
+  <div id="speechBubble"></div>
+</div>
+
 <script>
-// ===== CHARACTER DATA =====
-const CHAR_IMGS=['./imgs/chara01.jpg','./imgs/chara02.jpg','./imgs/chara03.jpg','./imgs/chara04.jpg'];
-const CHAR_NAMES=['キュアアンサー','キュアミスティック','キュアエクレール','キュアアルカナ・シャドウ'];
-const CHAR_GLOWS=['drop-shadow(0 0 14px #cc66ff)','drop-shadow(0 0 14px #ff66bb)','drop-shadow(0 0 14px #44ffcc)','drop-shadow(0 0 14px #aa44ff)'];
-const BG_COLORS=['#1a0033','#001a0d','#000d33','#1a0011'];
-
-function charHTML(idx,w,h,extra=''){
-  return `<img src="${CHAR_IMGS[idx]}" width="${w}" height="${h}" alt="${CHAR_NAMES[idx]}"
-    style="filter:${CHAR_GLOWS[idx]};object-fit:cover;border-radius:12px;mix-blend-mode:multiply;${extra}"
-    onerror="this.style.display='none'">`;
-}
-
-// ===== 48 GAMES =====
-const GAMES=[
-  // さがす 8
-  {id:1,cat:'さがす',icon:'🔍',name:'まちのたんてい',engine:'find',cfg:{bg:'🏙️',item:'🔍',count:5,charIdx:0}},
-  {id:2,cat:'さがす',icon:'⭐',name:'もりのかくれんぼ',engine:'find',cfg:{bg:'🌲',item:'⭐',count:6,charIdx:1}},
-  {id:3,cat:'さがす',icon:'🔑',name:'としょかんのなぞ',engine:'find',cfg:{bg:'📚',item:'🔑',count:6,charIdx:2}},
-  {id:4,cat:'さがす',icon:'🔮',name:'おしろのひみつ',engine:'find',cfg:{bg:'🏰',item:'🔮',count:7,charIdx:3}},
-  {id:5,cat:'さがす',icon:'🐟',name:'うみのたんけん',engine:'find',cfg:{bg:'🌊',item:'🐟',count:7,charIdx:0}},
-  {id:6,cat:'さがす',icon:'🌸',name:'はなばたけ',engine:'find',cfg:{bg:'🌺',item:'🌸',count:8,charIdx:1}},
-  {id:7,cat:'さがす',icon:'🍬',name:'おかしのくに',engine:'find',cfg:{bg:'🍭',item:'🍬',count:8,charIdx:2}},
-  {id:8,cat:'さがす',icon:'💫',name:'よるのほし',engine:'find',cfg:{bg:'🌙',item:'💫',count:9,charIdx:3}},
-  // タップ 8
-  {id:9,cat:'タップ',icon:'💖',name:'ハートをつかまえろ',engine:'tap',cfg:{obj:'💖',bad:'💔',speed:1200,charIdx:0}},
-  {id:10,cat:'タップ',icon:'⭐',name:'ほしをあつめよう',engine:'tap',cfg:{obj:'⭐',bad:'💀',speed:1100,charIdx:1}},
-  {id:11,cat:'タップ',icon:'🦋',name:'ちょうちょをつかまえろ',engine:'tap',cfg:{obj:'🦋',bad:'🐛',speed:1000,charIdx:2}},
-  {id:12,cat:'タップ',icon:'🍎',name:'りんごあつめ',engine:'tap',cfg:{obj:'🍎',bad:'🍄',speed:900,charIdx:3}},
-  {id:13,cat:'タップ',icon:'💎',name:'ほうせきをとれ',engine:'tap',cfg:{obj:'💎',bad:'🪨',speed:900,charIdx:0}},
-  {id:14,cat:'タップ',icon:'🍭',name:'キャンディキャッチ',engine:'tap',cfg:{obj:'🍭',bad:'🌶️',speed:850,charIdx:1}},
-  {id:15,cat:'タップ',icon:'🌸',name:'はなびらキャッチ',engine:'tap',cfg:{obj:'🌸',bad:'🍂',speed:800,charIdx:2}},
-  {id:16,cat:'タップ',icon:'✨',name:'まほうをつかまえろ',engine:'tap',cfg:{obj:'✨',bad:'🌑',speed:750,charIdx:3}},
-  // カード 4
-  {id:17,cat:'カード',icon:'🂠',name:'かんたんカード4ペア',engine:'card',cfg:{pairs:4,charIdx:0}},
-  {id:18,cat:'カード',icon:'🃏',name:'ふつうカード6ペア',engine:'card',cfg:{pairs:6,charIdx:1}},
-  {id:19,cat:'カード',icon:'🎴',name:'むずかしいカード8ペア',engine:'card',cfg:{pairs:8,charIdx:2}},
-  {id:20,cat:'カード',icon:'🀄',name:'すごいカード10ペア',engine:'card',cfg:{pairs:10,charIdx:3}},
-  // かず 4
-  {id:21,cat:'かず',icon:'🔢',name:'いくつあるかな？',engine:'count',cfg:{max:5,mode:'count',charIdx:0}},
-  {id:22,cat:'かず',icon:'🔟',name:'かずをかぞえよう',engine:'count',cfg:{max:10,mode:'count',charIdx:1}},
-  {id:23,cat:'かず',icon:'⚖️',name:'どっちがおおい？',engine:'count',cfg:{max:8,mode:'compare',charIdx:2}},
-  {id:24,cat:'かず',icon:'➕',name:'たしざんにちょうせん',engine:'count',cfg:{max:5,mode:'add',charIdx:3}},
-  // いろ 4
-  {id:25,cat:'いろ',icon:'🎨',name:'いろをあわせよう',engine:'color',cfg:{mode:'color',charIdx:0}},
-  {id:26,cat:'いろ',icon:'🔷',name:'かたちをさがせ',engine:'color',cfg:{mode:'shape',charIdx:1}},
-  {id:27,cat:'いろ',icon:'👯',name:'おなじをみつけよう',engine:'color',cfg:{mode:'same',charIdx:2}},
-  {id:28,cat:'いろ',icon:'❓',name:'ちがうのはどれ？',engine:'color',cfg:{mode:'odd',charIdx:3}},
-  // おんがく 4
-  {id:29,cat:'おんがく',icon:'🎹',name:'プリキュアピアノ',engine:'piano',cfg:{keys:5,drum:false,charIdx:0}},
-  {id:30,cat:'おんがく',icon:'🥁',name:'プリキュアドラム',engine:'piano',cfg:{keys:4,drum:true,charIdx:1}},
-  {id:31,cat:'おんがく',icon:'🎵',name:'リズムにのろう！かんたん',engine:'rhythm',cfg:{len:4,bpm:70,charIdx:2}},
-  {id:32,cat:'おんがく',icon:'🎶',name:'リズムにのろう！むずかしい',engine:'rhythm',cfg:{len:6,bpm:90,charIdx:3}},
-  // ふうせん 4
-  {id:33,cat:'ふうせん',icon:'🎈',name:'ふうせんをわれ！',engine:'balloon',cfg:{speed:4,charIdx:0}},
-  {id:34,cat:'ふうせん',icon:'🎀',name:'いろふうせん',engine:'balloon',cfg:{speed:5,colorMode:true,charIdx:1}},
-  {id:35,cat:'ふうせん',icon:'👻',name:'おばけふうせん',engine:'balloon',cfg:{speed:6,ghost:true,charIdx:2}},
-  {id:36,cat:'ふうせん',icon:'🌈',name:'にじのふうせん',engine:'balloon',cfg:{speed:7,rainbow:true,charIdx:3}},
-  // もぐら 4
-  {id:37,cat:'もぐら',icon:'🐹',name:'もぐらたたき！',engine:'whack',cfg:{speed:1200,charIdx:0}},
-  {id:38,cat:'もぐら',icon:'🐰',name:'どうぶつたたき',engine:'whack',cfg:{speed:1000,animals:true,charIdx:1}},
-  {id:39,cat:'もぐら',icon:'💗',name:'ハートたたき',engine:'whack',cfg:{speed:900,hearts:true,charIdx:2}},
-  {id:40,cat:'もぐら',icon:'⚡',name:'はやいもぐら',engine:'whack',cfg:{speed:700,charIdx:3}},
-  // パズル 4
-  {id:41,cat:'パズル',icon:'🧩',name:'かんたんパズル2×2',engine:'puzzle',cfg:{size:2,charIdx:0}},
-  {id:42,cat:'パズル',icon:'🧩',name:'ふつうパズル3×3',engine:'puzzle',cfg:{size:3,charIdx:1}},
-  {id:43,cat:'パズル',icon:'📏',name:'おおきいじゅんにならべよう',engine:'sort',cfg:{dir:'desc',charIdx:2}},
-  {id:44,cat:'パズル',icon:'📐',name:'ちいさいじゅんにならべよう',engine:'sort',cfg:{dir:'asc',charIdx:3}},
-  // その他 8
-  {id:45,cat:'その他',icon:'🖌️',name:'プリキュアスタンプ',engine:'stamp',cfg:{paint:false,charIdx:0}},
-  {id:46,cat:'その他',icon:'🎨',name:'いろをぬろう',engine:'stamp',cfg:{paint:true,charIdx:1}},
-  {id:47,cat:'その他',icon:'🔎',name:'プリキュアをさがせ！',engine:'find',cfg:{bg:'🌟',item:'💖',count:10,charIdx:2}},
-  {id:48,cat:'その他',icon:'🏆',name:'チャンピオンタップ',engine:'tap',cfg:{obj:'🏆',bad:'😈',speed:600,charIdx:3}},
+// ============================================================
+// CHARACTER DATA
+// ============================================================
+var CHARS=[
+  {
+    name:'キュアアンサー',
+    img:'./imgs/chara01.jpg',
+    color:'#cc66ff',
+    glow:'drop-shadow(0 0 14px #cc66ff)',
+    bgColor:'#1a0033',
+    desc:'クールでかしこい。\nロジカルなたんてい少女！',
+    personality:'answer',
+    msgs:{
+      start:['さあ、ロジカルにいきましょう！いっしょにこたえをみつけましょう！','わたしといっしょなら、どんなナゾもとけます。はじめましょう！','このゲームのこたえは、かならずあります。よくかんがえてね！'],
+      correct:['せいかい！すばらしい分析力ですね！','その通り！さすがです！','パーフェクト！ロジカルにとけましたね。','みごとです！わたしもびっくりです！'],
+      wrong:['おしいです。もういちどかんがえてみましょう。','だいじょうぶ。ロジカルにかんがえると…きっとわかります！','まちがいは、せいかいへのヒントです。もういちど！'],
+      hint:['ヒント：よくみてくださいね！','ちょっとかんがえてみて。こたえはちかくにあるわ。','あきらめないで！わたしがついてます。'],
+      cheer:['もうすこし！いいペースですよ！','がんばって！あなたならできます！','よくやってます！このちょうしで！'],
+      clear:['みごとです！あなたはほんとうにすばらしいたんてい！','かんぺきな分析力！わたしもほこりに思います！','よくできました！このこたえはかんぺきです！'],
+      miss:['おちついて、つぎはいけます！','だいじょうぶ、ロジカルにいきましょう！'],
+      tap:['よし！','いいです！','かしこい！']
+    }
+  },
+  {
+    name:'キュアミスティック',
+    img:'./imgs/chara02.jpg',
+    color:'#ff66bb',
+    glow:'drop-shadow(0 0 14px #ff66bb)',
+    bgColor:'#1a0022',
+    desc:'ふしぎなまほう少女。\nきらきらひみつがいっぱい！',
+    personality:'mystic',
+    msgs:{
+      start:['ふふ…まほうのじかんがはじまるわ♪ いっしょにあそびましょう！','このゲームには、ふしぎなまほうがかくれてるの。みつけてみて！','星のひかりにみちびかれて…さあ、はじめましょう♪'],
+      correct:['きらきら！まほうがひかった！','すてき！あなたにはまほうのちからがあるわ♪','ふふ、さすがね！まほうをかんじましたか？','わあ！ほしがよろこんでるわ♪'],
+      wrong:['ふしぎ…つぎはきっとまほうがつかえるわ！','だいじょうぶ、まほうはきえないの。もういちど！','ほしにきいてみて…こたえがきこえるはずよ♪'],
+      hint:['まほうのめをひらいてみて♪','ふしぎなヒント：よくみるといいことがあるわ！','しずかにして…ほしのこえがきこえる…？'],
+      cheer:['まほうをかんじて！もうすこしよ！','きらきら！いいかんじ♪','ふふ、このちょうし、このちょうし！'],
+      clear:['まほうをつかいこなしました！すばらしい！','きらきら！あなたはほんもののまほう少女ね！','ほしたちがよろこんでるわ♪ かんぺきです！'],
+      miss:['だいじょうぶ、まほうをわすれないで！','ほしはまだかがやいてるわ！'],
+      tap:['きらり！','まほう！','ふふ♪']
+    }
+  },
+  {
+    name:'キュアエクレール',
+    img:'./imgs/chara03.jpg',
+    color:'#44ffcc',
+    glow:'drop-shadow(0 0 14px #44ffcc)',
+    bgColor:'#001a22',
+    desc:'げんきいっぱい！\nあかるく元気なひまわり少女！',
+    personality:'eclair',
+    msgs:{
+      start:['やったー！ゲームはじめるよー！いっしょにがんばろう！','わーい！このゲームだいすき！ぜったいかってみせる！','レッツゴー！もりあがっていこうよー！！'],
+      correct:['やったーーー！！すごい！すごすぎる！','さいこー！！かっこよかった！！','やっほー！！げんきよくいけたね！！','すごすごすごい！！わたしおどっちゃう！！'],
+      wrong:['えー！でもだいじょうぶ！！つぎいこつぎ！','まけないよ！もいっかい！！','ドンマイドンマイ！！げんきだして！'],
+      hint:['ねねね、あそこみてみて！','もっとはやく！がんばれがんばれ！','ここここ！ちかいよ！！'],
+      cheer:['もっとがんばれー！！いけいけー！','わーすごーい！このちょうし！！','はやく！はやく！！わくわくする！！'],
+      clear:['やったーーーーーーーー！！！！クリアだーーー！！！','さいっこーーー！！！かっこよかったよ！！！','もう一回やろ！もう一回！！たのしすぎたー！！！'],
+      miss:['えー！でもドンマイ！！','つぎはぜったいいける！！'],
+      tap:['いえー！','やった！','すごい！']
+    }
+  },
+  {
+    name:'キュアアルカナ・シャドウ',
+    img:'./imgs/chara04.jpg',
+    color:'#aa44ff',
+    glow:'drop-shadow(0 0 14px #aa44ff)',
+    bgColor:'#110022',
+    desc:'クールでミステリアス。\nひかりとかげのたんてい。',
+    personality:'shadow',
+    msgs:{
+      start:['……ゲームをはじめるわ。しっかりやりなさい。','闇にひそむこたえを、みつけてみせなさい。','…わたしがいっしょだから、しんぱいしなくていいわ。'],
+      correct:['……なかなかやるわね。','まあ、よかったわ。このちょうしで。','……ふん。でもよくできたわ。みとめてあげる。','…いいわ。それでいい。'],
+      wrong:['……あわてないで。じっくりかんがえなさい。','まあ、いいわ。つぎにとりかえせばいい。','くじけないで。わたしはみてるから。'],
+      hint:['……かげをよくみなさい。ヒントがある。','しずかにして。こたえをかんじなさい。','……よくみて。かならずある。'],
+      cheer:['……このちょうし。もうすこしよ。','やりなさい。あなたならできる。','…わたしはみてるわ。がんばりなさい。'],
+      clear:['……みごと。わたしがみとめてあげる。','……やるわね。すなおにほめてあげる。','このけっかは…まあ、まずまずね。いいわ。'],
+      miss:['……あわてないで。おちついて。','くらやみをこわがらないで。'],
+      tap:['……いいわ。','まあね。','……ふん。']
+    }
+  }
 ];
 
-const CATS=['すべて','さがす','タップ','カード','かず','いろ','おんがく','ふうせん','もぐら','パズル','その他'];
-let currentCat='すべて';
-let score=0;
-let gameTimers=[];
-let currentGame=null;
+// ============================================================
+// 48 GAMES
+// ============================================================
+var GAMES=[
+  {id:1,cat:'さがす',icon:'🔍',name:'まちのたんてい',engine:'find',cfg:{bg:'🏙️',item:'🔍',count:5}},
+  {id:2,cat:'さがす',icon:'⭐',name:'もりのかくれんぼ',engine:'find',cfg:{bg:'🌲',item:'⭐',count:6}},
+  {id:3,cat:'さがす',icon:'🔑',name:'としょかんのなぞ',engine:'find',cfg:{bg:'📚',item:'🔑',count:6}},
+  {id:4,cat:'さがす',icon:'🔮',name:'おしろのひみつ',engine:'find',cfg:{bg:'🏰',item:'🔮',count:7}},
+  {id:5,cat:'さがす',icon:'🐟',name:'うみのたんけん',engine:'find',cfg:{bg:'🌊',item:'🐟',count:7}},
+  {id:6,cat:'さがす',icon:'🌸',name:'はなばたけ',engine:'find',cfg:{bg:'🌺',item:'🌸',count:8}},
+  {id:7,cat:'さがす',icon:'🍬',name:'おかしのくに',engine:'find',cfg:{bg:'🍭',item:'🍬',count:8}},
+  {id:8,cat:'さがす',icon:'💫',name:'よるのほし',engine:'find',cfg:{bg:'🌙',item:'💫',count:9}},
+  {id:9,cat:'タップ',icon:'💖',name:'ハートをつかまえろ',engine:'tap',cfg:{obj:'💖',bad:'💔',speed:1200}},
+  {id:10,cat:'タップ',icon:'⭐',name:'ほしをあつめよう',engine:'tap',cfg:{obj:'⭐',bad:'💀',speed:1100}},
+  {id:11,cat:'タップ',icon:'🦋',name:'ちょうちょをつかまえろ',engine:'tap',cfg:{obj:'🦋',bad:'🐛',speed:1000}},
+  {id:12,cat:'タップ',icon:'🍎',name:'りんごあつめ',engine:'tap',cfg:{obj:'🍎',bad:'🍄',speed:900}},
+  {id:13,cat:'タップ',icon:'💎',name:'ほうせきをとれ',engine:'tap',cfg:{obj:'💎',bad:'🪨',speed:900}},
+  {id:14,cat:'タップ',icon:'🍭',name:'キャンディキャッチ',engine:'tap',cfg:{obj:'🍭',bad:'🌶️',speed:850}},
+  {id:15,cat:'タップ',icon:'🌸',name:'はなびらキャッチ',engine:'tap',cfg:{obj:'🌸',bad:'🍂',speed:800}},
+  {id:16,cat:'タップ',icon:'✨',name:'まほうをつかまえろ',engine:'tap',cfg:{obj:'✨',bad:'🌑',speed:750}},
+  {id:17,cat:'カード',icon:'🂠',name:'かんたんカード4ペア',engine:'card',cfg:{pairs:4}},
+  {id:18,cat:'カード',icon:'🃏',name:'ふつうカード6ペア',engine:'card',cfg:{pairs:6}},
+  {id:19,cat:'カード',icon:'🎴',name:'むずかしいカード8ペア',engine:'card',cfg:{pairs:8}},
+  {id:20,cat:'カード',icon:'🀄',name:'すごいカード10ペア',engine:'card',cfg:{pairs:10}},
+  {id:21,cat:'かず',icon:'🔢',name:'いくつあるかな？',engine:'count',cfg:{max:5,mode:'count'}},
+  {id:22,cat:'かず',icon:'🔟',name:'かずをかぞえよう',engine:'count',cfg:{max:10,mode:'count'}},
+  {id:23,cat:'かず',icon:'⚖️',name:'どっちがおおい？',engine:'count',cfg:{max:8,mode:'compare'}},
+  {id:24,cat:'かず',icon:'➕',name:'たしざんにちょうせん',engine:'count',cfg:{max:5,mode:'add'}},
+  {id:25,cat:'いろ',icon:'🎨',name:'いろをあわせよう',engine:'color',cfg:{mode:'color'}},
+  {id:26,cat:'いろ',icon:'🔷',name:'かたちをさがせ',engine:'color',cfg:{mode:'shape'}},
+  {id:27,cat:'いろ',icon:'👯',name:'おなじをみつけよう',engine:'color',cfg:{mode:'same'}},
+  {id:28,cat:'いろ',icon:'❓',name:'ちがうのはどれ？',engine:'color',cfg:{mode:'odd'}},
+  {id:29,cat:'おんがく',icon:'🎹',name:'プリキュアピアノ',engine:'piano',cfg:{keys:5,drum:false}},
+  {id:30,cat:'おんがく',icon:'🥁',name:'プリキュアドラム',engine:'piano',cfg:{keys:4,drum:true}},
+  {id:31,cat:'おんがく',icon:'🎵',name:'リズムにのろう！かんたん',engine:'rhythm',cfg:{len:4,bpm:70}},
+  {id:32,cat:'おんがく',icon:'🎶',name:'リズムにのろう！むずかしい',engine:'rhythm',cfg:{len:6,bpm:90}},
+  {id:33,cat:'ふうせん',icon:'🎈',name:'ふうせんをわれ！',engine:'balloon',cfg:{speed:4}},
+  {id:34,cat:'ふうせん',icon:'🎀',name:'いろふうせん',engine:'balloon',cfg:{speed:5,colorMode:true}},
+  {id:35,cat:'ふうせん',icon:'👻',name:'おばけふうせん',engine:'balloon',cfg:{speed:6,ghost:true}},
+  {id:36,cat:'ふうせん',icon:'🌈',name:'にじのふうせん',engine:'balloon',cfg:{speed:7,rainbow:true}},
+  {id:37,cat:'もぐら',icon:'🐹',name:'もぐらたたき！',engine:'whack',cfg:{speed:1200}},
+  {id:38,cat:'もぐら',icon:'🐰',name:'どうぶつたたき',engine:'whack',cfg:{speed:1000,animals:true}},
+  {id:39,cat:'もぐら',icon:'💗',name:'ハートたたき',engine:'whack',cfg:{speed:900,hearts:true}},
+  {id:40,cat:'もぐら',icon:'⚡',name:'はやいもぐら',engine:'whack',cfg:{speed:700}},
+  {id:41,cat:'パズル',icon:'🧩',name:'かんたんパズル2×2',engine:'puzzle',cfg:{size:2}},
+  {id:42,cat:'パズル',icon:'🧩',name:'ふつうパズル3×3',engine:'puzzle',cfg:{size:3}},
+  {id:43,cat:'パズル',icon:'📏',name:'おおきいじゅんにならべよう',engine:'sort',cfg:{dir:'desc'}},
+  {id:44,cat:'パズル',icon:'📐',name:'ちいさいじゅんにならべよう',engine:'sort',cfg:{dir:'asc'}},
+  {id:45,cat:'その他',icon:'🖌️',name:'プリキュアスタンプ',engine:'stamp',cfg:{paint:false}},
+  {id:46,cat:'その他',icon:'🎨',name:'いろをぬろう',engine:'stamp',cfg:{paint:true}},
+  {id:47,cat:'その他',icon:'🔎',name:'プリキュアをさがせ！',engine:'find',cfg:{bg:'🌟',item:'💖',count:10}},
+  {id:48,cat:'その他',icon:'🏆',name:'チャンピオンタップ',engine:'tap',cfg:{obj:'🏆',bad:'😈',speed:600}}
+];
 
-function gameTimeout(fn,ms){const t=setTimeout(fn,ms);gameTimers.push(t);return t;}
-function gameInterval(fn,ms){const t=setInterval(fn,ms);gameTimers.push(t);return t;}
-function clearAllGameTimers(){gameTimers.forEach(t=>{clearTimeout(t);clearInterval(t);});gameTimers=[];}
+var CATS=['すべて','さがす','タップ','カード','かず','いろ','おんがく','ふうせん','もぐら','パズル','その他'];
+var currentCat='すべて';
+var score=0;
+var gameTimers=[];
+var currentGame=null;
+var selectedCharIdx=0;
+var pendingGameIdx=null;
 
-// ===== AUDIO =====
-const AC=new(window.AudioContext||window.webkitAudioContext)();
+function gameTimeout(fn,ms){var t=setTimeout(fn,ms);gameTimers.push(t);return t;}
+function gameInterval(fn,ms){var t=setInterval(fn,ms);gameTimers.push(t);return t;}
+function clearAllGameTimers(){gameTimers.forEach(function(t){clearTimeout(t);clearInterval(t);});gameTimers=[];}
+
+// ============================================================
+// AUDIO
+// ============================================================
+var AC=new(window.AudioContext||window.webkitAudioContext)();
 function beep(freq,dur,type,vol,delay){
   type=type||'sine';vol=vol||.3;delay=delay||0;
-  const o=AC.createOscillator(),g=AC.createGain();
+  var o=AC.createOscillator(),g=AC.createGain();
   o.connect(g);g.connect(AC.destination);
   o.type=type;o.frequency.value=freq;
   g.gain.setValueAtTime(0,AC.currentTime+delay);
@@ -252,7 +369,7 @@ function sfxComplete(){[523,659,784,1047].forEach(function(f,i){beep(f,.15,'squa
 function sfxTap(){beep(880,.05,'square',.2);}
 function sfxCard(){beep(660,.1,'sine',.3);}
 
-let bgmTimers=[];let bgmOn=false;
+var bgmTimers=[];var bgmOn=false;
 function startBGM(){
   if(bgmOn)return;bgmOn=true;
   var scale=[261,294,330,349,392,440,494,523];
@@ -263,116 +380,211 @@ function startBGM(){
 }
 function stopBGM(){bgmOn=false;bgmTimers.forEach(clearInterval);bgmTimers=[];}
 
-// ===== HUB =====
+// ============================================================
+// CHARACTER MESSAGES
+// ============================================================
+var bubbleTimer=null;
+function charMsg(type){
+  var ch=CHARS[selectedCharIdx];
+  var pool=ch.msgs[type]||ch.msgs.hint;
+  var msg=pool[Math.floor(Math.random()*pool.length)];
+  showBubble(msg);
+}
+function showBubble(msg){
+  var bubble=document.getElementById('speechBubble');
+  if(bubbleTimer)clearTimeout(bubbleTimer);
+  bubble.textContent=msg;
+  bubble.classList.add('show');
+  bubbleTimer=setTimeout(function(){bubble.classList.remove('show');},3000);
+}
+function onWidgetTap(){
+  if(AC.state==='suspended')AC.resume();
+  charMsg('hint');
+  sfxTap();
+}
+function setupWidget(){
+  var w=document.getElementById('charWidget');
+  var img=document.getElementById('charWidgetImg');
+  var ch=CHARS[selectedCharIdx];
+  img.src=ch.img;img.alt=ch.name;
+  img.style.filter=ch.glow;
+  document.getElementById('speechBubble').style.background='#ffffffee';
+  document.getElementById('speechBubble').style.color='#220044';
+  w.style.display='flex';
+}
+
+// ============================================================
+// CHARACTER SELECT
+// ============================================================
+function buildCharCards(){
+  var html='';
+  CHARS.forEach(function(ch,i){
+    html+='<div class="char-card" id="charCard'+i+'" style="--glow:'+ch.color+';border-color:'+(i===selectedCharIdx?ch.color:'transparent')+'" onclick="selectChar('+i+')">';
+    html+='<img src="'+ch.img+'" alt="'+ch.name+'" style="filter:'+ch.glow+'" onerror="this.style.display=\'none\'">';
+    html+='<div class="char-card-name" style="color:'+ch.color+'">'+ch.name+'</div>';
+    html+='<div class="char-card-desc">'+ch.desc.replace(/\n/g,'<br>')+'</div>';
+    html+='</div>';
+  });
+  document.getElementById('charCards').innerHTML=html;
+}
+function selectChar(idx){
+  selectedCharIdx=idx;
+  CHARS.forEach(function(ch,i){
+    var card=document.getElementById('charCard'+i);
+    if(card){card.style.borderColor=i===idx?ch.color:'transparent';card.style.boxShadow=i===idx?'0 0 18px '+ch.color:'';}
+  });
+  var ch=CHARS[idx];
+  document.getElementById('charStartBtn').disabled=false;
+  document.getElementById('charStartBtn').style.background='linear-gradient(135deg,'+ch.color+',#9933ff)';
+}
+function openCharSelect(gameIdx){
+  if(AC.state==='suspended')AC.resume();
+  pendingGameIdx=gameIdx;
+  document.getElementById('modalGameName').textContent=GAMES[gameIdx].icon+' '+GAMES[gameIdx].name;
+  buildCharCards();
+  selectChar(selectedCharIdx);
+  document.getElementById('charSelectModal').classList.add('show');
+}
+function closeCharSelect(){
+  document.getElementById('charSelectModal').classList.remove('show');
+}
+function confirmCharAndStart(){
+  closeCharSelect();
+  actuallyStartGame(pendingGameIdx);
+}
+
+// ============================================================
+// HUB
+// ============================================================
 function buildHub(){
   var tabsEl=document.getElementById('catTabs');
   tabsEl.innerHTML=CATS.map(function(c){return '<div class="cat-tab'+(c===currentCat?' active':'')+'" onclick="filterCat(\''+c+'\')">'+c+'</div>';}).join('');
   var gridEl=document.getElementById('gamesGrid');
   gridEl.innerHTML=GAMES.map(function(g){
     var hidden=(currentCat!=='すべて'&&g.cat!==currentCat)?' hidden':'';
-    return '<div class="game-tile'+hidden+'" onclick="startGame('+(g.id-1)+')"><div class="game-num">'+g.id+'</div><div class="game-icon">'+g.icon+'</div><div class="game-name">'+g.name+'</div></div>';
+    return '<div class="game-tile'+hidden+'" onclick="openCharSelect('+(g.id-1)+')">'
+      +'<div class="game-num">'+g.id+'</div>'
+      +'<div class="game-icon">'+g.icon+'</div>'
+      +'<div class="game-name">'+g.name+'</div></div>';
   }).join('');
 }
 function filterCat(cat){currentCat=cat;buildHub();}
 buildHub();
 
-function startGame(idx){
-  if(AC.state==='suspended')AC.resume();
+function actuallyStartGame(idx){
   currentGame=GAMES[idx];score=0;
   document.getElementById('hub').style.display='none';
   document.getElementById('gameScreen').style.display='flex';
   document.getElementById('gameTitleBar').textContent=currentGame.name;
-  document.getElementById('scoreBar').textContent='★'+score;
+  document.getElementById('scoreBar').textContent='★0';
+  setupWidget();
   startBGM();
   launchEngine(currentGame);
+  gameTimeout(function(){charMsg('start');},600);
+  // periodic cheer every 20s
+  gameInterval(function(){
+    var bubble=document.getElementById('speechBubble');
+    if(!bubble.classList.contains('show'))charMsg('cheer');
+  },20000);
 }
 
 function backToHub(){
   clearAllGameTimers();stopBGM();
+  document.getElementById('charWidget').style.display='none';
+  document.getElementById('speechBubble').classList.remove('show');
   document.getElementById('gameScreen').style.display='none';
   document.getElementById('hub').style.display='block';
   document.getElementById('gameArea').innerHTML='';
 }
-
 function addScore(n){
   score+=n;
   document.getElementById('scoreBar').textContent='★'+score;
 }
-
 function floatScoreEl(x,y,n){
-  var el=document.createElement('div');
-  el.className='float-score';el.textContent='+'+n;
+  var el=document.createElement('div');el.className='float-score';el.textContent='+'+n;
   el.style.left=x+'px';el.style.top=y+'px';
   document.getElementById('gameArea').appendChild(el);
   gameTimeout(function(){el.remove();},900);
 }
 
-function showResult(charIdx,msg){
+function showResult(msg){
   clearAllGameTimers();stopBGM();sfxComplete();
+  var ch=CHARS[selectedCharIdx];
   var area=document.getElementById('gameArea');
   for(var i=0;i<40;i++){
     var c=document.createElement('div');c.className='confetti';
     c.style.left=Math.random()*100+'%';c.style.top='-10px';
     c.style.background=['#ff66cc','#ffff44','#66ffcc','#ff9900','#44aaff'][i%5];
     c.style.animationDuration=(1.5+Math.random()*2)+'s';
-    c.style.animationDelay=(Math.random()*1)+'s';
+    c.style.animationDelay=(Math.random()*.8)+'s';
     area.appendChild(c);
   }
+  var clearMsg=ch.msgs.clear[Math.floor(Math.random()*ch.msgs.clear.length)];
   var gid=currentGame.id-1;
   var ov=document.createElement('div');ov.className='result-overlay';
-  ov.innerHTML='<div class="result-title">'+(msg||'クリア！🎉')+'</div>'+
-    charHTML(charIdx,120,144)+
-    '<div style="font-size:28px;font-weight:900;color:#ffff44">★'+score+'てん！</div>'+
-    '<button class="result-btn" onclick="backToHub()">もどる</button>'+
-    '<button class="result-btn pulsBtn" onclick="startGame('+gid+')" style="background:linear-gradient(135deg,#33cc66,#006633)">もういちど！</button>';
+  ov.innerHTML='<div class="result-title">'+(msg||'クリア！🎉')+'</div>'
+    +'<div class="result-char-wrap">'
+    +'<img class="result-char-img" src="'+ch.img+'" alt="'+ch.name+'" style="filter:'+ch.glow+'" onerror="this.style.display=\'none\'">'
+    +'<div class="result-char-msg">'+clearMsg+'</div>'
+    +'</div>'
+    +'<div style="font-size:28px;font-weight:900;color:#ffff44">★'+score+'てん！</div>'
+    +'<button class="result-btn" onclick="backToHub()">もどる</button>'
+    +'<button class="result-btn pulsBtn" onclick="actuallyStartGame('+gid+')" style="background:linear-gradient(135deg,#33cc66,#006633)">もういちど！</button>';
   area.appendChild(ov);
+  document.getElementById('charWidget').style.display='none';
 }
 
-// ===== ENGINE ROUTER =====
+// ============================================================
+// ENGINE ROUTER
+// ============================================================
 function launchEngine(g){
   var area=document.getElementById('gameArea');
   area.innerHTML='';
-  area.style.background=BG_COLORS[g.cfg.charIdx%4];
+  area.style.background=CHARS[selectedCharIdx].bgColor;
   area.style.minHeight='calc(100vh - 60px)';
   var engines={find:engFind,tap:engTap,card:engCard,count:engCount,color:engColor,piano:engPiano,rhythm:engRhythm,balloon:engBalloon,whack:engWhack,puzzle:engPuzzle,sort:engSort,stamp:engStamp};
   if(engines[g.engine])engines[g.engine](area,g.cfg);
+  // move widget into gameArea
+  var w=document.getElementById('charWidget');
+  area.appendChild(w);
+  w.style.display='flex';
 }
 
-// ===== FIND ENGINE =====
+// ============================================================
+// FIND ENGINE
+// ============================================================
 function engFind(area,cfg){
-  var bg=cfg.bg,item=cfg.item,count=cfg.count,charIdx=cfg.charIdx;
+  var bg=cfg.bg,item=cfg.item,count=cfg.count;
   var bgDiv=document.createElement('div');bgDiv.className='find-bg';bgDiv.textContent=bg;area.appendChild(bgDiv);
   var fc=document.createElement('div');fc.className='find-counter';fc.id='fc';fc.textContent='のこり：'+count;area.appendChild(fc);
-  var ch=document.createElement('div');ch.style.cssText='position:absolute;bottom:10px;right:10px;opacity:.85;';ch.innerHTML=charHTML(charIdx,80,96);area.appendChild(ch);
   var left=count,placed=[];
   function placeItem(){
     var el=document.createElement('div');el.className='find-item';el.textContent=item;
     var x,y,tries=0;
     do{x=8+Math.random()*80;y=10+Math.random()*70;tries++;}
     while(placed.some(function(p){return Math.abs(p.x-x)<10&&Math.abs(p.y-y)<10;})&&tries<30);
-    placed.push({x:x,y:y});
-    el.style.left=x+'%';el.style.top=y+'%';
+    placed.push({x:x,y:y});el.style.left=x+'%';el.style.top=y+'%';
     el.onclick=function(e){
-      if(el.dataset.found)return;
-      el.dataset.found='1';sfxSuccess();el.classList.add('found');addScore(10);
-      var r=area.getBoundingClientRect();
-      floatScoreEl(e.clientX-r.left,e.clientY-r.top,10);
+      if(el.dataset.found)return;el.dataset.found='1';sfxSuccess();el.classList.add('found');addScore(10);
+      var r=area.getBoundingClientRect();floatScoreEl(e.clientX-r.left,e.clientY-r.top,10);
       left--;document.getElementById('fc').textContent='のこり：'+left;
-      gameTimeout(function(){el.remove();if(left<=0)showResult(charIdx,'ぜんぶみつけた！🎉');},400);
+      charMsg('correct');
+      gameTimeout(function(){el.remove();if(left<=0)showResult('ぜんぶみつけた！🎉');},400);
     };
     area.appendChild(el);
   }
   for(var i=0;i<count;i++)(function(i){gameTimeout(function(){placeItem();},100+i*150);})(i);
 }
 
-// ===== TAP ENGINE =====
+// ============================================================
+// TAP ENGINE
+// ============================================================
 function engTap(area,cfg){
-  var obj=cfg.obj,bad=cfg.bad,speed=cfg.speed,charIdx=cfg.charIdx;
+  var obj=cfg.obj,bad=cfg.bad,speed=cfg.speed;
   var misses=0,maxMiss=5,running=true;
   var info=document.createElement('div');
   info.style.cssText='position:absolute;top:8px;left:50%;transform:translateX(-50%);font-size:13px;color:#cc99ff;background:#2a005aaa;padding:4px 12px;border-radius:10px;z-index:5;';
   info.textContent='×ミス：'+misses+'/'+maxMiss;area.appendChild(info);
-  var ch=document.createElement('div');ch.style.cssText='position:absolute;bottom:10px;right:10px;opacity:.8;';ch.innerHTML=charHTML(charIdx,70,84);area.appendChild(ch);
   function rnd(a,b){return a+Math.floor(Math.random()*(b-a));}
   function spawn(){
     if(!running)return;
@@ -383,31 +595,33 @@ function engTap(area,cfg){
     area.appendChild(el);
     el.onclick=function(e){
       if(!running||el.dataset.used)return;el.dataset.used='1';
-      if(isGood){sfxTap();addScore(5);var r=area.getBoundingClientRect();floatScoreEl(e.clientX-r.left,e.clientY-r.top,5);el.style.animation='scPop .3s ease forwards';}
-      else{sfxMiss();misses++;info.textContent='×ミス：'+misses+'/'+maxMiss;flashMiss();
-        if(misses>=maxMiss){running=false;showResult(charIdx,'よくがんばった！');return;}}
+      if(isGood){sfxTap();addScore(5);var r=area.getBoundingClientRect();floatScoreEl(e.clientX-r.left,e.clientY-r.top,5);el.style.animation='scPop .3s ease forwards';charMsg('tap');}
+      else{sfxMiss();misses++;info.textContent='×ミス：'+misses+'/'+maxMiss;flashMiss();charMsg('miss');
+        if(misses>=maxMiss){running=false;showResult('よくがんばった！');return;}}
       gameTimeout(function(){el.remove();},350);
     };
     var t=speed*(0.7+Math.random()*.6);
     gameTimeout(function(){
       if(el.parentNode&&isGood&&!el.dataset.used){misses++;info.textContent='×ミス：'+misses+'/'+maxMiss;
-        if(misses>=maxMiss){running=false;showResult(charIdx,'よくがんばった！');return;}}
+        if(misses>=maxMiss){running=false;showResult('よくがんばった！');return;}}
       if(el.parentNode)el.remove();if(running)spawn();},t);
   }
   function flashMiss(){var f=document.createElement('div');f.className='miss-flash';area.appendChild(f);gameTimeout(function(){f.remove();},350);}
   for(var i=0;i<3;i++)(function(i){gameTimeout(spawn,i*400);})(i);
 }
 
-// ===== CARD ENGINE =====
+// ============================================================
+// CARD ENGINE
+// ============================================================
 function engCard(area,cfg){
-  var pairs=cfg.pairs,charIdx=cfg.charIdx;
+  var pairs=cfg.pairs;
   var EMOJIS=['🌸','🌟','💖','🦋','🍭','🎵','🌈','💎','🏆','🦄'];
   var pool=EMOJIS.slice(0,pairs);
   var deck=pool.concat(pool).sort(function(){return Math.random()-.5;});
   var flipped=[],matched=0,locked=false;
   area.style.display='flex';area.style.flexDirection='column';area.style.justifyContent='center';
   var grid=document.createElement('div');grid.className='card-grid';
-  deck.forEach(function(em,i){
+  deck.forEach(function(em){
     var card=document.createElement('div');card.className='card';card.dataset.em=em;
     card.innerHTML='<div class="card-back">✨</div><div class="card-front">'+em+'</div>';
     card.onclick=function(){
@@ -417,10 +631,10 @@ function engCard(area,cfg){
         locked=true;
         if(flipped[0].dataset.em===flipped[1].dataset.em){
           sfxSuccess();flipped.forEach(function(c){c.classList.add('matched');});addScore(20);
-          matched++;flipped=[];locked=false;
-          if(matched===pairs)gameTimeout(function(){showResult(charIdx,'ぜんぶそろった！🎉');},400);
+          matched++;flipped=[];locked=false;charMsg('correct');
+          if(matched===pairs)gameTimeout(function(){showResult('ぜんぶそろった！🎉');},400);
         }else{
-          var f=flipped.slice();
+          var f=flipped.slice();charMsg('wrong');
           gameTimeout(function(){f.forEach(function(c){c.classList.remove('flipped');});flipped=[];locked=false;},900);
         }
       }
@@ -430,15 +644,18 @@ function engCard(area,cfg){
   area.appendChild(grid);
 }
 
-// ===== COUNT ENGINE =====
+// ============================================================
+// COUNT ENGINE
+// ============================================================
 function engCount(area,cfg){
-  var maxN=cfg.max,mode=cfg.mode,charIdx=cfg.charIdx;
+  var maxN=cfg.max,mode=cfg.mode;
   var POOL=['🍎','🌸','⭐','🍭','🦋','💎','🔮','🎵'];
   var qNum=0,totalQ=8;
   area.style.display='flex';area.style.flexDirection='column';area.style.justifyContent='center';
   function nextQ(){
     area.innerHTML='';
-    if(qNum>=totalQ){showResult(charIdx,'てんさいだね！🎉');return;}
+    if(document.getElementById('charWidget'))area.appendChild(document.getElementById('charWidget'));
+    if(qNum>=totalQ){showResult('てんさいだね！🎉');return;}
     qNum++;
     var em=POOL[Math.floor(Math.random()*POOL.length)];
     var wrap=document.createElement('div');wrap.className='count-stage';
@@ -448,6 +665,17 @@ function engCount(area,cfg){
       emojisHTML=em.repeat(n);question=em+'はいくつ？';correct=n;
       choices=[n];while(choices.length<4){var r=1+Math.floor(Math.random()*maxN);if(choices.indexOf(r)===-1)choices.push(r);}
       choices.sort(function(){return Math.random()-.5;});
+      wrap.innerHTML='<div style="font-size:12px;color:#cc99ff">'+qNum+'/'+totalQ+'</div><div class="count-emojis">'+emojisHTML+'</div><div class="count-question">'+question+'</div><div class="count-choices" id="cc"></div>';
+      area.appendChild(wrap);
+      var cc=document.getElementById('cc');
+      choices.forEach(function(ch){
+        var btn=document.createElement('button');btn.className='count-btn';btn.textContent=ch;
+        btn.onclick=function(){
+          if(ch===correct){sfxSuccess();btn.classList.add('correct');addScore(15);charMsg('correct');gameTimeout(nextQ,600);}
+          else{sfxMiss();btn.classList.add('wrong');charMsg('wrong');gameTimeout(function(){btn.classList.remove('wrong');},400);}
+        };
+        cc.appendChild(btn);
+      });
     }else if(mode==='compare'){
       var a2=1+Math.floor(Math.random()*(maxN-1));var b2=a2+1+Math.floor(Math.random()*(maxN-a2));
       var em2=POOL[(POOL.indexOf(em)+1)%POOL.length];
@@ -457,40 +685,42 @@ function engCount(area,cfg){
       choices.sort(function(){return Math.random()-.5;});
       wrap.innerHTML='<div style="font-size:12px;color:#cc99ff">'+qNum+'/'+totalQ+'</div><div class="count-emojis">'+emojisHTML+'</div><div class="count-question">'+question+'</div><div class="count-choices" id="cc"></div>';
       area.appendChild(wrap);
-      var cc=document.getElementById('cc');
+      var cc2=document.getElementById('cc');
       choices.forEach(function(ch){
-        var btn=document.createElement('button');btn.className='count-btn';btn.style.fontSize='18px';btn.style.width='auto';btn.style.padding='8px 14px';btn.style.borderRadius='12px';btn.textContent=ch.label;
+        var btn=document.createElement('button');btn.className='count-btn';btn.style.fontSize='16px';btn.style.width='auto';btn.style.padding='8px 12px';btn.style.borderRadius='12px';btn.textContent=ch.label;
         btn.onclick=function(){
-          if(ch.val===correct){sfxSuccess();btn.classList.add('correct');addScore(15);gameTimeout(nextQ,600);}
-          else{sfxMiss();btn.classList.add('wrong');gameTimeout(function(){btn.classList.remove('wrong');},400);}
+          if(ch.val===correct){sfxSuccess();btn.classList.add('correct');addScore(15);charMsg('correct');gameTimeout(nextQ,600);}
+          else{sfxMiss();btn.classList.add('wrong');charMsg('wrong');gameTimeout(function(){btn.classList.remove('wrong');},400);}
         };
-        cc.appendChild(btn);
+        cc2.appendChild(btn);
       });
-      return;
     }else{
       var a3=1+Math.floor(Math.random()*maxN);var b3=1+Math.floor(Math.random()*maxN);
       emojisHTML=em.repeat(a3)+' + '+em.repeat(b3);question='あわせていくつ？';correct=a3+b3;
       choices=[a3+b3];while(choices.length<4){var r2=1+Math.floor(Math.random()*(maxN*2+1));if(choices.indexOf(r2)===-1)choices.push(r2);}
       choices.sort(function(){return Math.random()-.5;});
+      wrap.innerHTML='<div style="font-size:12px;color:#cc99ff">'+qNum+'/'+totalQ+'</div><div class="count-emojis">'+emojisHTML+'</div><div class="count-question">'+question+'</div><div class="count-choices" id="cc"></div>';
+      area.appendChild(wrap);
+      var cc3=document.getElementById('cc');
+      choices.forEach(function(ch){
+        var btn=document.createElement('button');btn.className='count-btn';btn.textContent=ch;
+        btn.onclick=function(){
+          if(ch===correct){sfxSuccess();btn.classList.add('correct');addScore(15);charMsg('correct');gameTimeout(nextQ,600);}
+          else{sfxMiss();btn.classList.add('wrong');charMsg('wrong');gameTimeout(function(){btn.classList.remove('wrong');},400);}
+        };
+        cc3.appendChild(btn);
+      });
     }
-    wrap.innerHTML='<div style="font-size:12px;color:#cc99ff">'+qNum+'/'+totalQ+'</div><div class="count-emojis">'+emojisHTML+'</div><div class="count-question">'+question+'</div><div class="count-choices" id="cc"></div>';
-    area.appendChild(wrap);
-    var cc2=document.getElementById('cc');
-    choices.forEach(function(ch){
-      var btn=document.createElement('button');btn.className='count-btn';btn.textContent=ch;
-      btn.onclick=function(){
-        if(ch===correct){sfxSuccess();btn.classList.add('correct');addScore(15);gameTimeout(nextQ,600);}
-        else{sfxMiss();btn.classList.add('wrong');gameTimeout(function(){btn.classList.remove('wrong');},400);}
-      };
-      cc2.appendChild(btn);
-    });
+    if(document.getElementById('charWidget'))area.appendChild(document.getElementById('charWidget'));
   }
   nextQ();
 }
 
-// ===== COLOR ENGINE =====
+// ============================================================
+// COLOR ENGINE
+// ============================================================
 function engColor(area,cfg){
-  var mode=cfg.mode,charIdx=cfg.charIdx;
+  var mode=cfg.mode;
   var COLORS=['#ff4488','#4488ff','#44ff88','#ffaa00','#cc44ff','#ff8844'];
   var SHAPES=['🔵','🟥','🟡','🟢','🟣','🟠','🔴','🔷'];
   var FRUITS=['🍎','🍊','🍋','🍇','🍓','🍑','🍍','🥝'];
@@ -498,118 +728,117 @@ function engColor(area,cfg){
   area.style.display='flex';area.style.flexDirection='column';area.style.justifyContent='center';
   function nextQ(){
     area.innerHTML='';
-    if(qNum>=totalQ){showResult(charIdx,'いろのてんさい！🎉');return;}
+    if(document.getElementById('charWidget'))area.appendChild(document.getElementById('charWidget'));
+    if(qNum>=totalQ){showResult('いろのてんさい！🎉');return;}
     qNum++;
     var wrap=document.createElement('div');wrap.className='color-stage';
+    function mkBtn(label,isCorrect,isEmoji){
+      var btn=document.createElement(isEmoji?'button':'div');
+      if(isEmoji){btn.className='count-btn';btn.style.fontSize='36px';btn.textContent=label;}
+      else{btn.className='color-btn';btn.style.background=label;}
+      btn.onclick=function(){
+        if(isCorrect){sfxSuccess();addScore(15);charMsg('correct');gameTimeout(nextQ,600);}
+        else{sfxMiss();charMsg('wrong');}
+      };
+      return btn;
+    }
     if(mode==='color'){
       var ti=Math.floor(Math.random()*COLORS.length);
       var ci=[ti];while(ci.length<4){var r=Math.floor(Math.random()*COLORS.length);if(ci.indexOf(r)===-1)ci.push(r);}
       ci.sort(function(){return Math.random()-.5;});
-      var correctI=ci.indexOf(ti);
-      wrap.innerHTML='<div style="font-size:12px;color:#cc99ff">'+qNum+'/'+totalQ+'</div><div class="color-target" style="background:'+COLORS[ti]+'"></div><div class="color-question">このいろはどれ？</div><div class="color-choices" id="cc"></div>';
-      area.appendChild(wrap);
-      var cc=document.getElementById('cc');
-      ci.forEach(function(ci2,k){
-        var btn=document.createElement('div');btn.className='color-btn';btn.style.background=COLORS[ci2];
-        btn.onclick=function(){
-          if(k===correctI){sfxSuccess();btn.style.boxShadow='0 0 20px #fff';addScore(15);gameTimeout(nextQ,600);}
-          else{sfxMiss();}
-        };
-        cc.appendChild(btn);
-      });
+      wrap.innerHTML='<div style="font-size:12px;color:#cc99ff">'+qNum+'/'+totalQ+'</div><div class="color-target" style="background:'+COLORS[ti]+'"></div><div class="color-question">このいろはどれ？</div>';
+      var cc=document.createElement('div');cc.className='color-choices';
+      ci.forEach(function(c2){cc.appendChild(mkBtn(COLORS[c2],c2===ti,false));});
+      wrap.appendChild(cc);
     }else if(mode==='shape'){
       var ti2=Math.floor(Math.random()*SHAPES.length);
       var si=[ti2];while(si.length<4){var r2=Math.floor(Math.random()*SHAPES.length);if(si.indexOf(r2)===-1)si.push(r2);}
-      si.sort(function(){return Math.random()-.5;});var correctI2=si.indexOf(ti2);
-      wrap.innerHTML='<div style="font-size:12px;color:#cc99ff">'+qNum+'/'+totalQ+'</div><div style="font-size:80px;text-align:center">'+SHAPES[ti2]+'</div><div class="color-question">このかたちをさがせ！</div><div class="count-choices" id="cc"></div>';
-      area.appendChild(wrap);
-      var cc2=document.getElementById('cc');
-      si.forEach(function(si2,k){
-        var btn=document.createElement('button');btn.className='count-btn';btn.style.fontSize='32px';btn.textContent=SHAPES[si2];
-        btn.onclick=function(){
-          if(k===correctI2){sfxSuccess();btn.classList.add('correct');addScore(15);gameTimeout(nextQ,600);}
-          else{sfxMiss();btn.classList.add('wrong');gameTimeout(function(){btn.classList.remove('wrong');},400);}
-        };
-        cc2.appendChild(btn);
-      });
+      si.sort(function(){return Math.random()-.5;});
+      wrap.innerHTML='<div style="font-size:12px;color:#cc99ff">'+qNum+'/'+totalQ+'</div><div style="font-size:80px;text-align:center">'+SHAPES[ti2]+'</div><div class="color-question">このかたちをさがせ！</div>';
+      var cc2=document.createElement('div');cc2.className='count-choices';
+      si.forEach(function(s2){cc2.appendChild(mkBtn(SHAPES[s2],s2===ti2,true));});
+      wrap.appendChild(cc2);
     }else if(mode==='same'){
       var em=FRUITS[Math.floor(Math.random()*FRUITS.length)];
       var others=FRUITS.filter(function(f){return f!==em;}).sort(function(){return Math.random()-.5;}).slice(0,2);
       var items=[em,em,others[0],others[1]].sort(function(){return Math.random()-.5;});
-      wrap.innerHTML='<div style="font-size:12px;color:#cc99ff">'+qNum+'/'+totalQ+'</div><div class="color-question">おなじものをふたつえらんで！</div><div class="count-choices" id="cc"></div>';
-      area.appendChild(wrap);
-      var cc3=document.getElementById('cc');var picked=[];
-      items.forEach(function(f,k){
+      wrap.innerHTML='<div style="font-size:12px;color:#cc99ff">'+qNum+'/'+totalQ+'</div><div class="color-question">おなじものをふたつえらんで！</div>';
+      var cc3=document.createElement('div');cc3.className='count-choices';var picked=[];
+      items.forEach(function(f){
         var btn=document.createElement('button');btn.className='count-btn';btn.style.fontSize='36px';btn.dataset.f=f;btn.textContent=f;
         btn.onclick=function(){
           if(btn.dataset.picked)return;btn.dataset.picked='1';picked.push(btn);btn.style.border='4px solid #fff';
           if(picked.length===2){
-            if(picked[0].dataset.f===picked[1].dataset.f){sfxSuccess();picked.forEach(function(b){b.classList.add('correct');});addScore(15);gameTimeout(nextQ,700);}
-            else{sfxMiss();picked.forEach(function(b){b.classList.add('wrong');delete b.dataset.picked;b.style.border='4px solid #9933ff';});picked=[];}
+            if(picked[0].dataset.f===picked[1].dataset.f){sfxSuccess();picked.forEach(function(b){b.classList.add('correct');});addScore(15);charMsg('correct');gameTimeout(nextQ,700);}
+            else{sfxMiss();charMsg('wrong');picked.forEach(function(b){b.classList.add('wrong');delete b.dataset.picked;b.style.border='4px solid #9933ff';});picked=[];}
           }
         };
         cc3.appendChild(btn);
       });
+      wrap.appendChild(cc3);
     }else{
       var pool=FRUITS.slice(0,6).sort(function(){return Math.random()-.5;}).slice(0,4);
       var ti3=Math.floor(Math.random()*4);
       var ref=pool[ti3===0?1:0];
       var items2=pool.map(function(f,i){return i===ti3?pool[(ti3+2)%4]:ref;});
-      wrap.innerHTML='<div style="font-size:12px;color:#cc99ff">'+qNum+'/'+totalQ+'</div><div class="color-question">ちがうのはどれ？</div><div class="count-choices" id="cc"></div>';
-      area.appendChild(wrap);
-      var cc4=document.getElementById('cc');
+      wrap.innerHTML='<div style="font-size:12px;color:#cc99ff">'+qNum+'/'+totalQ+'</div><div class="color-question">ちがうのはどれ？</div>';
+      var cc4=document.createElement('div');cc4.className='count-choices';
       items2.forEach(function(f,k){
         var btn=document.createElement('button');btn.className='count-btn';btn.style.fontSize='36px';btn.textContent=f;
         btn.onclick=function(){
-          if(k===ti3){sfxSuccess();btn.classList.add('correct');addScore(15);gameTimeout(nextQ,600);}
-          else{sfxMiss();btn.classList.add('wrong');gameTimeout(function(){btn.classList.remove('wrong');},400);}
+          if(k===ti3){sfxSuccess();btn.classList.add('correct');addScore(15);charMsg('correct');gameTimeout(nextQ,600);}
+          else{sfxMiss();btn.classList.add('wrong');charMsg('wrong');gameTimeout(function(){btn.classList.remove('wrong');},400);}
         };
         cc4.appendChild(btn);
       });
+      wrap.appendChild(cc4);
     }
+    area.appendChild(wrap);
+    if(document.getElementById('charWidget'))area.appendChild(document.getElementById('charWidget'));
   }
   nextQ();
 }
 
-// ===== PIANO ENGINE =====
+// ============================================================
+// PIANO ENGINE
+// ============================================================
 function engPiano(area,cfg){
-  var keys=cfg.keys,drum=cfg.drum,charIdx=cfg.charIdx;
+  var keys=cfg.keys,drum=cfg.drum;
   var NOTES=drum
     ?[{freq:80,label:'ドン',color:'#ff4444'},{freq:200,label:'タン',color:'#ff8844'},{freq:300,label:'ポン',color:'#ffcc44'},{freq:500,label:'チン',color:'#44ff88'}]
     :[{freq:261,label:'ど',color:'#ff88cc'},{freq:294,label:'れ',color:'#ffaa44'},{freq:330,label:'み',color:'#ffff44'},{freq:349,label:'ふぁ',color:'#88ff88'},{freq:392,label:'そ',color:'#44aaff'}];
   var display=NOTES.slice(0,keys);
   area.style.display='flex';area.style.flexDirection='column';area.style.justifyContent='center';
   var wrap=document.createElement('div');wrap.className='piano-wrap';
-  var keysHTML=display.map(function(n,i){
-    return '<div class="pkey" style="background:linear-gradient(180deg,'+n.color+',#440088)" data-i="'+i+'">'+n.label+'</div>';
-  }).join('');
-  wrap.innerHTML='<div style="text-align:center">'+charHTML(charIdx,70,84)+'</div>'+
-    '<div class="piano-hint">'+(drum?'たたいてあそぼう！🥁':'ひいてあそぼう！🎹')+'</div>'+
-    '<div id="pianoMsg" style="font-size:16px;color:#cc99ff;text-align:center;min-height:24px">♪</div>'+
-    '<div class="piano-keys">'+keysHTML+'</div>'+
-    '<div style="font-size:12px;color:#9966cc;text-align:center">★'+score+'てん</div>';
+  var keysHTML=display.map(function(n,i){return '<div class="pkey" style="background:linear-gradient(180deg,'+n.color+',#440088)" data-i="'+i+'">'+n.label+'</div>';}).join('');
+  wrap.innerHTML='<div class="piano-hint">'+(drum?'たたいてあそぼう！🥁':'ひいてあそぼう！🎹')+'</div>'
+    +'<div id="pianoMsg" style="font-size:16px;color:#cc99ff;text-align:center;min-height:24px">♪</div>'
+    +'<div class="piano-keys">'+keysHTML+'</div>'
+    +'<div style="font-size:12px;color:#9966cc;text-align:center">★'+score+'てん</div>';
   area.appendChild(wrap);
   wrap.querySelectorAll('.pkey').forEach(function(k,i){
     k.addEventListener('pointerdown',function(){
       beep(display[i].freq,.4,'sine',.4);addScore(2);k.classList.add('pressed');
       document.getElementById('pianoMsg').textContent='♪ '+display[i].label;
+      charMsg('tap');
       gameTimeout(function(){k.classList.remove('pressed');},200);
     });
   });
 }
 
-// ===== RHYTHM ENGINE =====
+// ============================================================
+// RHYTHM ENGINE
+// ============================================================
 function engRhythm(area,cfg){
-  var len=cfg.len,bpm=cfg.bpm,charIdx=cfg.charIdx;
+  var len=cfg.len,bpm=cfg.bpm;
   var ms=60000/bpm;
   var TARGETS=[{em:'💖',freq:440},{em:'⭐',freq:550},{em:'🌸',freq:660},{em:'✨',freq:880}];
   var pattern=[],playerSeq=[],showing=false,round=0;
   area.style.display='flex';area.style.flexDirection='column';area.style.justifyContent='center';
   var wrap=document.createElement('div');wrap.className='rhythm-wrap';
-  wrap.innerHTML='<div class="rhythm-info" id="rhInfo">みてまね！リズムゲーム🎵</div>'+
-    '<div style="font-size:13px;color:#cc99ff;text-align:center" id="rhSeq">まもなくはじまります…</div>'+
-    '<div class="rhythm-targets">'+TARGETS.map(function(t,i){return '<div class="rh-target" data-i="'+i+'">'+t.em+'</div>';}).join('')+'</div>'+
-    '<div style="text-align:center">'+charHTML(charIdx,70,84)+'</div>';
+  wrap.innerHTML='<div class="rhythm-info" id="rhInfo">みてまね！リズムゲーム🎵</div>'
+    +'<div style="font-size:13px;color:#cc99ff;text-align:center" id="rhSeq">まもなくはじまります…</div>'
+    +'<div class="rhythm-targets">'+TARGETS.map(function(t,i){return '<div class="rh-target" data-i="'+i+'">'+t.em+'</div>';}).join('')+'</div>';
   area.appendChild(wrap);
   function lightUp(i,cb){
     var el=wrap.querySelectorAll('.rh-target')[i];
@@ -617,8 +846,7 @@ function engRhythm(area,cfg){
     gameTimeout(function(){el.classList.remove('lit');if(cb)gameTimeout(cb,ms*.3);},ms*.5);
   }
   function showPattern(){
-    showing=true;playerSeq=[];
-    document.getElementById('rhInfo').textContent='みてね！👀';
+    showing=true;playerSeq=[];document.getElementById('rhInfo').textContent='みてね！👀';
     var i=0;
     function next(){
       if(i>=pattern.length){showing=false;document.getElementById('rhInfo').textContent='おなじじゅんにおして！';return;}
@@ -627,26 +855,26 @@ function engRhythm(area,cfg){
     gameTimeout(next,500);
   }
   function nextRound(){
-    round++;
-    pattern=[];for(var i=0;i<Math.min(len,round+1);i++)pattern.push(Math.floor(Math.random()*TARGETS.length));
+    round++;pattern=[];for(var i=0;i<Math.min(len,round+1);i++)pattern.push(Math.floor(Math.random()*TARGETS.length));
     showPattern();
   }
   wrap.querySelectorAll('.rh-target').forEach(function(el,i){
     el.addEventListener('pointerdown',function(){
-      if(showing)return;
-      lightUp(i,null);playerSeq.push(i);
+      if(showing)return;lightUp(i,null);playerSeq.push(i);
       var idx=playerSeq.length-1;
-      if(playerSeq[idx]!==pattern[idx]){sfxMiss();document.getElementById('rhInfo').textContent='ざんねん！もういちど！';gameTimeout(showPattern,800);playerSeq=[];return;}
-      if(playerSeq.length===pattern.length){sfxSuccess();addScore(20);document.getElementById('rhInfo').textContent='すごい！🎉';
-        if(round>=4)gameTimeout(function(){showResult(charIdx,'リズムマスター！🎶');},600);else gameTimeout(nextRound,800);}
+      if(playerSeq[idx]!==pattern[idx]){sfxMiss();charMsg('wrong');document.getElementById('rhInfo').textContent='ざんねん！もういちど！';gameTimeout(showPattern,800);playerSeq=[];return;}
+      if(playerSeq.length===pattern.length){sfxSuccess();addScore(20);charMsg('correct');document.getElementById('rhInfo').textContent='すごい！🎉';
+        if(round>=4)gameTimeout(function(){showResult('リズムマスター！🎶');},600);else gameTimeout(nextRound,800);}
     });
   });
   gameTimeout(nextRound,800);
 }
 
-// ===== BALLOON ENGINE =====
+// ============================================================
+// BALLOON ENGINE
+// ============================================================
 function engBalloon(area,cfg){
-  var speed=cfg.speed,colorMode=cfg.colorMode,ghost=cfg.ghost,rainbow=cfg.rainbow,charIdx=cfg.charIdx;
+  var speed=cfg.speed,colorMode=cfg.colorMode,ghost=cfg.ghost,rainbow=cfg.rainbow;
   var popped=0,target=15;
   var BALLOONS=ghost?['👻','💀','😱']:rainbow?['🎈','🎀','🎊','🎉','🌈']:colorMode?['🔴','🟡','🟢','🔵','🟣']:['🎈','🎀','🎊'];
   var info=document.createElement('div');
@@ -663,18 +891,21 @@ function engBalloon(area,cfg){
       var r=area.getBoundingClientRect();floatScoreEl(e.clientX-r.left,e.clientY-r.top,5);
       el.style.animation='scPop .3s ease forwards';
       gameTimeout(function(){el.remove();},350);
-      if(popped>=target)showResult(charIdx,'ぜんぶわった！🎈');
+      if(popped%5===0)charMsg('cheer');
+      if(popped>=target)showResult('ぜんぶわった！🎈');
     };
-    gameTimeout(function(){if(el.parentNode)el.remove();},( parseFloat(dur)+.5)*1000);
+    gameTimeout(function(){if(el.parentNode)el.remove();},(parseFloat(dur)+.5)*1000);
   }
   gameInterval(spawn,600);
 }
 
-// ===== WHACK ENGINE =====
+// ============================================================
+// WHACK ENGINE
+// ============================================================
 function engWhack(area,cfg){
-  var speed=cfg.speed,animals=cfg.animals,hearts=cfg.hearts,charIdx=cfg.charIdx;
+  var speed=cfg.speed,animals=cfg.animals,hearts=cfg.hearts;
   var MOLES=hearts?['💗','💖','💕','💝']:animals?['🐰','🐹','🐭','🐱']:['🐹','😊','⭐','💎'];
-  var misses=0,maxMiss=10,running=true;
+  var misses=0,maxMiss=10,running=true,hits=0;
   var info=document.createElement('div');
   info.style.cssText='position:absolute;top:8px;left:50%;transform:translateX(-50%);font-size:14px;color:#ffff88;background:#2a005aaa;padding:4px 12px;border-radius:10px;z-index:5;';
   info.textContent='×'+misses+'/'+maxMiss;area.appendChild(info);
@@ -682,7 +913,6 @@ function engWhack(area,cfg){
   var holes=[];
   for(var i=0;i<9;i++){var h=document.createElement('div');h.className='hole';holes.push(h);grid.appendChild(h);}
   area.appendChild(grid);
-  var ch=document.createElement('div');ch.style.cssText='position:absolute;bottom:5px;right:10px;opacity:.8;';ch.innerHTML=charHTML(charIdx,60,72);area.appendChild(ch);
   function show(){
     if(!running)return;
     var avail=holes.filter(function(h){return !h.classList.contains('active');});
@@ -692,14 +922,15 @@ function engWhack(area,cfg){
       var hRef=h;
       hRef.onclick=function(){
         if(!hRef.classList.contains('active'))return;
-        sfxTap();addScore(10);hRef.classList.remove('active');hRef.textContent='';
+        sfxTap();addScore(10);hRef.classList.remove('active');hRef.textContent='';hits++;
         var r=area.getBoundingClientRect(),hr=hRef.getBoundingClientRect();
         floatScoreEl(hr.left-r.left+30,hr.top-r.top,10);
+        if(hits%5===0)charMsg('cheer');
       };
       gameTimeout(function(){
         if(hRef.classList.contains('active')){hRef.classList.remove('active');hRef.textContent='';
           misses++;info.textContent='×'+misses+'/'+maxMiss;
-          if(misses>=maxMiss){running=false;showResult(charIdx,'よくがんばった！💪');}}
+          if(misses>=maxMiss){running=false;showResult('よくがんばった！💪');}}
       },speed);
     }
     if(running)gameTimeout(show,300+Math.random()*400);
@@ -707,9 +938,11 @@ function engWhack(area,cfg){
   show();
 }
 
-// ===== PUZZLE ENGINE =====
+// ============================================================
+// PUZZLE ENGINE
+// ============================================================
 function engPuzzle(area,cfg){
-  var size=cfg.size,charIdx=cfg.charIdx;
+  var size=cfg.size;
   var n=size*size;
   var EMOJIS=['🌸','⭐','💖','🦋','🍭','🌈','🎵','💎','🏆'];
   var tiles=[];for(var i=0;i<n;i++)tiles.push(i);
@@ -735,7 +968,8 @@ function engPuzzle(area,cfg){
           if(val===0)return;
           if(selected===null){selected=idx;}
           else{var tmp2=tiles[selected];tiles[selected]=tiles[idx];tiles[idx]=tmp2;selected=null;sfxCard();
-            if(tiles.every(function(v,j){return v===j;})){sfxComplete();gameTimeout(function(){showResult(charIdx,'パズルかんせい！🧩');},400);}
+            charMsg('correct');
+            if(tiles.every(function(v,j){return v===j;})){sfxComplete();gameTimeout(function(){showResult('パズルかんせい！🧩');},400);}
           }
           render();
         };
@@ -746,10 +980,11 @@ function engPuzzle(area,cfg){
   render();
 }
 
-// ===== SORT ENGINE =====
+// ============================================================
+// SORT ENGINE
+// ============================================================
 function engSort(area,cfg){
-  var dir=cfg.dir,charIdx=cfg.charIdx;
-  var count=5;
+  var dir=cfg.dir;
   var sizes=[40,56,68,80,96];
   var items=sizes.slice().sort(function(){return Math.random()-.5;});
   var goal=dir==='asc'?sizes.slice().sort(function(a,b){return a-b;}):sizes.slice().sort(function(a,b){return b-a;});
@@ -774,23 +1009,20 @@ function engSort(area,cfg){
       el.addEventListener('dragover',function(e){e.preventDefault();});
       el.addEventListener('drop',function(){
         if(dragSrc===null||dragSrc===i)return;
-        var tmp=items[dragSrc];items[dragSrc]=items[i];items[i]=tmp;dragSrc=null;sfxCard();
-        if(JSON.stringify(items)===JSON.stringify(goal)){sfxComplete();gameTimeout(function(){showResult(charIdx,'ならべかたマスター！🏆');},400);}
+        var tmp=items[dragSrc];items[dragSrc]=items[i];items[i]=tmp;dragSrc=null;sfxCard();charMsg('correct');
+        if(JSON.stringify(items)===JSON.stringify(goal)){sfxComplete();gameTimeout(function(){showResult('ならべかたマスター！🏆');},400);}
         else render();
       });
-      // touch support
       var ts=null;
-      el.addEventListener('touchstart',function(e){ts=i;},{passive:true});
+      el.addEventListener('touchstart',function(){ts=i;},{passive:true});
       el.addEventListener('touchend',function(e){
         var ex=e.changedTouches[0].clientX,ey=e.changedTouches[0].clientY;
         var tgt=document.elementFromPoint(ex,ey);if(tgt)tgt=tgt.closest('.sort-item');
         if(tgt&&tgt!==el){
-          var ti=parseInt(tgt.dataset.i);
-          var tmp2=items[ts];items[ts]=items[ti];items[ti]=tmp2;sfxCard();
-          if(JSON.stringify(items)===JSON.stringify(goal)){sfxComplete();gameTimeout(function(){showResult(charIdx,'ならべかたマスター！🏆');},400);}
+          var ti=parseInt(tgt.dataset.i);var tmp2=items[ts];items[ts]=items[ti];items[ti]=tmp2;sfxCard();charMsg('correct');
+          if(JSON.stringify(items)===JSON.stringify(goal)){sfxComplete();gameTimeout(function(){showResult('ならべかたマスター！🏆');},400);}
           else render();
-        }
-        ts=null;
+        }ts=null;
       });
       itemsEl.appendChild(el);
     });
@@ -798,29 +1030,28 @@ function engSort(area,cfg){
   render();
 }
 
-// ===== STAMP ENGINE =====
+// ============================================================
+// STAMP ENGINE
+// ============================================================
 function engStamp(area,cfg){
-  var paint=cfg.paint,charIdx=cfg.charIdx;
+  var paint=cfg.paint;
   var STAMPS=paint?['🖌️','✏️','🖊️','🎨']:['🌸','⭐','💖','🦋','🍭','🌈','🎵','💎'];
   var currentStamp=STAMPS[0];
   area.style.display='flex';area.style.flexDirection='column';
   var wrap=document.createElement('div');wrap.className='stamp-wrap';
   var palHTML=STAMPS.map(function(s,i){return '<div class="stamp-btn'+(i===0?' selected':'')+'" data-s="'+s+'">'+s+'</div>';}).join('');
-  wrap.innerHTML='<div class="stamp-palette">'+palHTML+'<button class="clear-btn" id="clearBtn">けす</button></div>'+
-    '<div class="stamp-canvas" id="stampCanvas"><canvas id="stampCv" style="position:absolute;top:0;left:0;width:100%;height:100%"></canvas></div>'+
-    '<div style="font-size:13px;color:#cc99ff;text-align:center">すきなところにおしてかこう！</div>';
+  wrap.innerHTML='<div class="stamp-palette">'+palHTML+'<button class="clear-btn" id="clearBtn">けす</button></div>'
+    +'<div class="stamp-canvas"><canvas id="stampCv" style="position:absolute;top:0;left:0;width:100%;height:100%"></canvas></div>'
+    +'<div style="font-size:13px;color:#cc99ff;text-align:center">すきなところにおしてかこう！</div>';
   area.appendChild(wrap);
   var canvas=document.getElementById('stampCv');var ctx=canvas.getContext('2d');
   function resize(){canvas.width=canvas.offsetWidth||300;canvas.height=canvas.offsetHeight||200;}
   resize();
   wrap.querySelectorAll('.stamp-btn').forEach(function(btn){
-    btn.onclick=function(){
-      currentStamp=btn.dataset.s;
-      wrap.querySelectorAll('.stamp-btn').forEach(function(b){b.classList.remove('selected');});
-      btn.classList.add('selected');
-    };
+    btn.onclick=function(){currentStamp=btn.dataset.s;wrap.querySelectorAll('.stamp-btn').forEach(function(b){b.classList.remove('selected');});btn.classList.add('selected');};
   });
   document.getElementById('clearBtn').onclick=function(){ctx.clearRect(0,0,canvas.width,canvas.height);};
+  var drawCount=0;
   function drawStamp(ex,ey){
     var r=canvas.getBoundingClientRect();
     var sx=canvas.width/r.width,sy=canvas.height/r.height;
@@ -828,12 +1059,15 @@ function engStamp(area,cfg){
     ctx.font='40px serif';ctx.textAlign='center';ctx.textBaseline='middle';
     ctx.fillText(currentStamp,x,y);sfxTap();addScore(1);
     document.getElementById('scoreBar').textContent='★'+score;
+    drawCount++;if(drawCount%8===0)charMsg('cheer');
   }
   canvas.addEventListener('click',function(e){drawStamp(e.clientX,e.clientY);});
   canvas.addEventListener('touchstart',function(e){e.preventDefault();drawStamp(e.touches[0].clientX,e.touches[0].clientY);},{passive:false});
 }
 
-// ===== INIT =====
+// ============================================================
+// INIT
+// ============================================================
 document.addEventListener('visibilitychange',function(){if(document.hidden)stopBGM();});
 </script>
 </body>
