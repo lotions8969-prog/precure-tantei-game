@@ -3,89 +3,65 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>名探偵プリキュア てがかりさがしゲーム</title>
+  <title>名探偵プリキュア！ てがかりさがしゲーム</title>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
+    * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
     body {
-      width: 100vw; height: 100vh; overflow: hidden;
-      font-family: 'Hiragino Maru Gothic Pro', 'M PLUS Rounded 1c', 'Comic Sans MS', sans-serif;
-      background: #1a1a2e; cursor: none; touch-action: none;
+      width:100vw; height:100vh; overflow:hidden; cursor:none; touch-action:none;
+      font-family:'Hiragino Maru Gothic Pro','M PLUS Rounded 1c','Comic Sans MS',sans-serif;
+      background:#1a1a2e;
     }
+    #cursor { position:fixed; width:44px; height:44px; pointer-events:none; z-index:9999; font-size:32px; transform:translate(-30%,-30%); }
 
-    #cursor {
-      position: fixed; width: 44px; height: 44px; pointer-events: none;
-      z-index: 9999; font-size: 32px; transform: translate(-30%, -30%);
-      transition: transform 0.05s;
-    }
-
-    /* ===== TITLE SCREEN ===== */
+    /* ===== TITLE ===== */
     #title-screen {
-      position: absolute; inset: 0; display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      background: linear-gradient(160deg, #ff6eb4 0%, #c44dff 45%, #4d79ff 100%);
-      overflow: hidden;
+      position:absolute; inset:0; display:flex; flex-direction:column;
+      align-items:center; justify-content:center; overflow:hidden;
+      background:linear-gradient(160deg,#cc44ff 0%,#ff44aa 40%,#ffaa00 100%);
     }
+    .t-stars { position:absolute; inset:0; pointer-events:none; }
+    .t-star { position:absolute; opacity:0; animation:twinkle var(--d) var(--dl) ease-in-out infinite; }
+    @keyframes twinkle { 0%,100%{opacity:0;transform:scale(.3)} 50%{opacity:1;transform:scale(1.4)} }
 
-    .t-stars { position: absolute; inset: 0; pointer-events: none; }
-    .t-star {
-      position: absolute; opacity: 0;
-      animation: twinkle var(--d) var(--dl) ease-in-out infinite;
-    }
-    @keyframes twinkle {
-      0%,100% { opacity:0; transform:scale(0.3); }
-      50% { opacity:1; transform:scale(1.4); }
-    }
+    .logo-wrap { text-align:center; z-index:10; animation:floatY 3s ease-in-out infinite; margin-bottom:8px; }
+    @keyframes floatY { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+    .logo-sub { font-size:clamp(13px,3vw,20px); color:#ffe135; font-weight:900; text-shadow:1px 1px 0 #996600; letter-spacing:2px; }
+    .logo-main { font-size:clamp(28px,6.5vw,52px); color:white; font-weight:900; text-shadow:3px 3px 0 #990066,6px 6px 0 rgba(0,0,0,.2); letter-spacing:3px; }
+    .logo-game { font-size:clamp(12px,2.5vw,18px); color:white; margin-top:6px; text-shadow:1px 1px 0 rgba(0,0,0,.4); }
 
-    .logo-wrap { text-align:center; z-index:10; animation: floatY 3s ease-in-out infinite; }
-    @keyframes floatY { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
-
-    .logo-sub { font-size:clamp(14px,3.5vw,22px); color:#ffe135; font-weight:bold;
-      text-shadow:1px 1px 0 #cc8800; letter-spacing:2px; margin-bottom:4px; }
-    .logo-main { font-size:clamp(32px,7vw,58px); color:white; font-weight:900;
-      text-shadow:3px 3px 0 #cc1188, 6px 6px 0 rgba(0,0,0,.25); letter-spacing:4px; }
-    .logo-game { font-size:clamp(13px,3vw,20px); color:white; margin-top:8px;
-      text-shadow:1px 1px 0 rgba(0,0,0,.4); letter-spacing:1px; }
-
-    .chars-row { display:flex; gap:24px; margin:24px 0; z-index:10; }
-    .char-bounce { animation: charB 2s ease-in-out infinite; }
-    .char-bounce:nth-child(2) { animation-delay:.4s; }
-    @keyframes charB {
-      0%,100%{transform:translateY(0) rotate(0deg)}
-      30%{transform:translateY(-10px) rotate(-4deg)}
-      70%{transform:translateY(-6px) rotate(4deg)}
-    }
+    .chars-row { display:flex; gap:clamp(6px,2vw,18px); margin:12px 0; z-index:10; align-items:flex-end; }
+    .char-t { animation:charB 2s ease-in-out infinite; }
+    .char-t:nth-child(2){animation-delay:.3s}
+    .char-t:nth-child(3){animation-delay:.6s}
+    .char-t:nth-child(4){animation-delay:.9s}
+    @keyframes charB { 0%,100%{transform:translateY(0) rotate(0deg)} 30%{transform:translateY(-9px) rotate(-3deg)} 70%{transform:translateY(-5px) rotate(3deg)} }
 
     .btn-start {
-      padding:18px 52px; font-size:clamp(20px,4.5vw,28px); font-weight:900;
+      padding:16px 48px; font-size:clamp(18px,4vw,26px); font-weight:900;
       background:linear-gradient(135deg,#ffe135,#ff8c00); border:none; border-radius:60px;
       color:white; text-shadow:1px 1px 0 rgba(0,0,0,.3); cursor:pointer; z-index:10;
-      box-shadow:0 6px 24px rgba(0,0,0,.3), 0 0 40px rgba(255,220,0,.4);
+      box-shadow:0 6px 24px rgba(0,0,0,.3),0 0 40px rgba(255,220,0,.4);
       animation:pulsBtn 1.6s ease-in-out infinite; font-family:inherit;
     }
     @keyframes pulsBtn {
-      0%,100%{transform:scale(1); box-shadow:0 6px 24px rgba(0,0,0,.3),0 0 40px rgba(255,220,0,.4)}
-      50%{transform:scale(1.06); box-shadow:0 8px 32px rgba(0,0,0,.4),0 0 60px rgba(255,220,0,.7)}
+      0%,100%{transform:scale(1);box-shadow:0 6px 24px rgba(0,0,0,.3),0 0 40px rgba(255,220,0,.4)}
+      50%{transform:scale(1.06);box-shadow:0 8px 32px rgba(0,0,0,.4),0 0 60px rgba(255,220,0,.7)}
     }
 
-    /* ===== GAME SCREEN ===== */
+    /* ===== GAME ===== */
     #game-screen { position:absolute; inset:0; display:none; }
-
-    #stage-bg {
-      position:absolute; inset:0;
-      transition: background 0.8s;
-    }
+    #stage-bg { position:absolute; inset:0; }
     .bg-town {
-      background:
-        linear-gradient(180deg, #87CEEB 0%, #87CEEB 55%, #6abf5e 55%, #5aaf4e 65%, #228B22 65%, #1a6b1a 100%);
+      background:linear-gradient(180deg,#87CEEB 0%,#87CEEB 55%,#6abf5e 55%,#5aaf4e 65%,#228B22 65%,#1a6b1a 100%);
     }
     .bg-forest {
-      background:
-        linear-gradient(180deg, #c8f0b0 0%, #7dcc50 35%, #3d9e20 55%, #1a6b0a 70%, #0d4505 100%);
+      background:linear-gradient(180deg,#c8f0b0 0%,#7dcc50 35%,#3d9e20 55%,#1a6b0a 70%,#0d4505 100%);
+    }
+    .bg-library {
+      background:linear-gradient(180deg,#f5deb3 0%,#daa520 25%,#c8941a 50%,#8b6010 70%,#4a3005 100%);
     }
     .bg-castle {
-      background:
-        radial-gradient(ellipse at 50% 0%, #4a1888 0%, #1a0a3e 60%, #0d0522 100%);
+      background:radial-gradient(ellipse at 50% 0%,#4a1888 0%,#1a0a3e 60%,#0d0522 100%);
     }
 
     #decorations { position:absolute; inset:0; pointer-events:none; }
@@ -96,505 +72,497 @@
       padding:8px 16px; display:flex; justify-content:space-between; align-items:center;
       background:rgba(255,255,255,.18); backdrop-filter:blur(8px);
     }
-    #stage-label { font-size:clamp(12px,2.5vw,17px); color:white; font-weight:bold;
-      text-shadow:1px 1px 0 rgba(0,0,0,.5); }
-    #counter-row { display:flex; gap:6px; }
-    .ci {
-      font-size:clamp(20px,4vw,28px); opacity:.25;
-      transition:opacity .3s, transform .4s cubic-bezier(.175,.885,.32,1.275);
-    }
+    #stage-label { font-size:clamp(11px,2.5vw,16px); color:white; font-weight:bold; text-shadow:1px 1px 0 rgba(0,0,0,.5); }
+    #counter-row { display:flex; gap:5px; }
+    .ci { font-size:clamp(18px,4vw,26px); opacity:.25; transition:opacity .3s,transform .4s cubic-bezier(.175,.885,.32,1.275); }
     .ci.got { opacity:1; transform:scale(1.35); }
 
     /* Guide */
-    #guide { position:absolute; bottom:10px; left:14px; z-index:100; display:flex; align-items:flex-end; gap:8px; }
+    #guide { position:absolute; bottom:10px; left:12px; z-index:100; display:flex; align-items:flex-end; gap:8px; }
     #bubble {
-      background:white; border-radius:18px; padding:9px 14px; max-width:190px;
-      font-size:clamp(12px,2.3vw,15px); color:#333; box-shadow:0 3px 12px rgba(0,0,0,.2);
-      position:relative; margin-bottom:16px; line-height:1.5;
+      background:white; border-radius:18px; padding:8px 13px; max-width:170px;
+      font-size:clamp(11px,2.2vw,14px); color:#333; box-shadow:0 3px 12px rgba(0,0,0,.2);
+      position:relative; margin-bottom:14px; line-height:1.5;
     }
-    #bubble::after {
-      content:''; position:absolute; bottom:-9px; left:18px;
-      border:9px solid transparent; border-top-color:white; border-bottom:0;
-    }
+    #bubble::after { content:''; position:absolute; bottom:-9px; left:16px; border:9px solid transparent; border-top-color:white; border-bottom:0; }
+    #guide-svg-wrap svg { display:block; }
 
-    /* Hint button */
     #hint-btn {
       position:absolute; bottom:14px; right:14px; z-index:100;
       padding:10px 18px; font-size:clamp(13px,2.5vw,16px); font-weight:bold;
       background:linear-gradient(135deg,#ff6eb4,#c44dff); border:none; border-radius:40px;
-      color:white; cursor:pointer; font-family:inherit;
-      box-shadow:0 4px 14px rgba(0,0,0,.25);
+      color:white; cursor:pointer; font-family:inherit; box-shadow:0 4px 14px rgba(0,0,0,.25);
     }
 
-    /* Items */
     .item {
-      position:absolute; font-size:clamp(32px,5vw,44px); cursor:pointer;
-      user-select:none; z-index:50; padding:10px;
+      position:absolute; font-size:clamp(30px,5vw,42px); cursor:pointer;
+      user-select:none; z-index:50; padding:10px; touch-action:none;
       filter:drop-shadow(1px 1px 3px rgba(0,0,0,.25));
-      transition:filter .3s, opacity .3s, transform .2s;
-      touch-action: none;
+      transition:filter .3s,opacity .3s,transform .2s;
     }
     .item.hidden { opacity:.22; filter:blur(.4px) drop-shadow(0 0 2px rgba(0,0,0,.15)); }
-    .item.hint-show { opacity:.55; filter:drop-shadow(0 0 8px gold); }
+    .item.hint-show { opacity:.6; filter:drop-shadow(0 0 8px gold); }
     .item:hover { transform:scale(1.15); filter:drop-shadow(0 0 10px gold) brightness(1.3); }
     .item.found { animation:itemPop .5s ease-out forwards; pointer-events:none; }
     @keyframes itemPop {
-      0%{transform:scale(1); opacity:1;}
-      50%{transform:scale(2.2); opacity:1; filter:brightness(2.5) drop-shadow(0 0 20px gold);}
-      100%{transform:scale(0); opacity:0;}
+      0%{transform:scale(1);opacity:1}
+      50%{transform:scale(2.2);opacity:1;filter:brightness(2.5) drop-shadow(0 0 20px gold)}
+      100%{transform:scale(0);opacity:0}
     }
 
-    /* Stage clear overlay */
     #stage-clear {
       position:absolute; inset:0; display:none; align-items:center; justify-content:center;
-      flex-direction:column; z-index:300;
-      background:rgba(255,255,255,.08); backdrop-filter:blur(6px);
+      flex-direction:column; z-index:300; background:rgba(255,255,255,.08); backdrop-filter:blur(6px);
     }
     .sc-box {
       text-align:center; animation:scPop .5s cubic-bezier(.175,.885,.32,1.275);
-      background:rgba(255,255,255,.15); border-radius:30px; padding:30px 50px;
-      box-shadow:0 8px 40px rgba(0,0,0,.3);
+      background:rgba(255,255,255,.15); border-radius:30px; padding:28px 44px; box-shadow:0 8px 40px rgba(0,0,0,.3);
     }
-    @keyframes scPop {0%{transform:scale(0);opacity:0}100%{transform:scale(1);opacity:1}}
-    .sc-title { font-size:clamp(36px,8vw,60px); font-weight:900; color:#ffe135;
-      text-shadow:3px 3px 0 #cc8800, 6px 6px 0 rgba(0,0,0,.3); }
-    .sc-msg { font-size:clamp(16px,3.5vw,22px); color:white; margin:12px 0 20px;
-      text-shadow:1px 1px 0 rgba(0,0,0,.4); }
+    @keyframes scPop { 0%{transform:scale(0);opacity:0} 100%{transform:scale(1);opacity:1} }
+    .sc-title { font-size:clamp(32px,7.5vw,56px); font-weight:900; color:#ffe135; text-shadow:3px 3px 0 #cc8800,6px 6px 0 rgba(0,0,0,.3); }
+    .sc-msg { font-size:clamp(14px,3.2vw,20px); color:white; margin:10px 0 18px; text-shadow:1px 1px 0 rgba(0,0,0,.4); }
+    .sc-char { display:flex; justify-content:center; margin-bottom:14px; }
     .btn-next {
-      padding:14px 40px; font-size:clamp(18px,3.5vw,24px); font-weight:900;
+      padding:13px 38px; font-size:clamp(16px,3.2vw,22px); font-weight:900;
       background:linear-gradient(135deg,#ff6eb4,#c44dff); border:none; border-radius:50px;
       color:white; cursor:pointer; font-family:inherit;
       box-shadow:0 6px 20px rgba(0,0,0,.3); animation:pulsBtn 1.6s ease-in-out infinite;
     }
 
-    /* Achievement toast */
     #toast {
       position:fixed; top:60px; right:-300px; z-index:1000;
       background:linear-gradient(135deg,#ffe135,#ff8c00); border-radius:16px;
-      padding:10px 20px; color:white; font-weight:bold; font-size:16px;
+      padding:9px 18px; color:white; font-weight:bold; font-size:15px;
       box-shadow:0 4px 20px rgba(0,0,0,.3); transition:right .45s cubic-bezier(.175,.885,.32,1.275);
     }
     #toast.show { right:16px; }
 
-    /* ===== VICTORY SCREEN ===== */
+    /* ===== VICTORY ===== */
     #victory-screen {
       position:absolute; inset:0; display:none; flex-direction:column;
-      align-items:center; justify-content:center;
-      background:linear-gradient(160deg,#ff6eb4,#c44dff,#4d79ff);
-      overflow:hidden;
+      align-items:center; justify-content:center; overflow:hidden;
+      background:linear-gradient(160deg,#cc44ff,#ff44aa,#ffaa00);
     }
     #confetti-wrap { position:absolute; inset:0; pointer-events:none; }
-    .cf {
-      position:absolute;
-      animation:cfFall var(--d) var(--dl) linear infinite;
-    }
-    @keyframes cfFall {
-      0%{transform:translateY(-30px) rotate(0deg); opacity:1;}
-      100%{transform:translateY(110vh) rotate(720deg); opacity:.5;}
-    }
-
+    .cf { position:absolute; animation:cfFall var(--d) var(--dl) linear infinite; }
+    @keyframes cfFall { 0%{transform:translateY(-30px) rotate(0deg);opacity:1} 100%{transform:translateY(110vh) rotate(720deg);opacity:.5} }
     .v-box { text-align:center; z-index:10; }
-    .v-title { font-size:clamp(34px,7.5vw,58px); font-weight:900; color:#ffe135;
-      text-shadow:3px 3px 0 #cc8800, 6px 6px 0 rgba(0,0,0,.3);
-      animation:scPop .8s cubic-bezier(.175,.885,.32,1.275); margin-bottom:12px; }
-    .v-msg { font-size:clamp(16px,3.5vw,22px); color:white; margin-bottom:24px;
-      text-shadow:1px 1px 0 rgba(0,0,0,.4); line-height:1.7; }
-    .v-chars { display:flex; justify-content:center; gap:20px; margin-bottom:24px; }
+    .v-title { font-size:clamp(30px,7vw,52px); font-weight:900; color:#ffe135; text-shadow:3px 3px 0 #cc8800,6px 6px 0 rgba(0,0,0,.3); animation:scPop .8s cubic-bezier(.175,.885,.32,1.275); margin-bottom:10px; }
+    .v-msg { font-size:clamp(14px,3.2vw,20px); color:white; margin-bottom:18px; text-shadow:1px 1px 0 rgba(0,0,0,.4); line-height:1.7; }
+    .v-chars { display:flex; justify-content:center; gap:clamp(6px,2vw,16px); margin-bottom:20px; align-items:flex-end; }
     .v-char { animation:charB 1.2s ease-in-out infinite; }
-    .v-char:nth-child(2) { animation-delay:.5s; }
+    .v-char:nth-child(2){animation-delay:.3s}
+    .v-char:nth-child(3){animation-delay:.6s}
+    .v-char:nth-child(4){animation-delay:.9s}
     .btn-replay {
-      padding:14px 40px; font-size:clamp(18px,3.5vw,24px); font-weight:900;
+      padding:13px 38px; font-size:clamp(16px,3.2vw,22px); font-weight:900;
       background:linear-gradient(135deg,#ffe135,#ff8c00); border:none; border-radius:50px;
       color:white; cursor:pointer; font-family:inherit;
       box-shadow:0 6px 20px rgba(0,0,0,.3); animation:pulsBtn 1.6s ease-in-out infinite;
     }
 
-    /* Floating sparkle animation for scene */
-    @keyframes floatSpk {
-      0%,100%{transform:translateY(0) scale(1); opacity:.7;}
-      50%{transform:translateY(-15px) scale(1.3); opacity:1;}
-    }
+    @keyframes floatSpk { 0%,100%{transform:translateY(0) scale(1);opacity:.7} 50%{transform:translateY(-14px) scale(1.3);opacity:1} }
   </style>
 </head>
 <body>
 
-<!-- cursor -->
 <div id="cursor">🔍</div>
 
-<!-- ===== TITLE SCREEN ===== -->
+<!-- ===== TITLE ===== -->
 <div id="title-screen">
   <div class="t-stars" id="t-stars"></div>
   <div class="logo-wrap">
     <div class="logo-sub">✨ めいたんてい ✨</div>
-    <div class="logo-main">プリキュア</div>
+    <div class="logo-main">プリキュア！</div>
     <div class="logo-game">てがかりさがしゲーム</div>
   </div>
-
-  <div class="chars-row">
-    <!-- キュアミステリー (Pink) -->
-    <svg class="char-bounce" width="110" height="150" viewBox="0 0 100 150" xmlns="http://www.w3.org/2000/svg">
-      <!-- Body -->
-      <ellipse cx="50" cy="118" rx="26" ry="32" fill="#ff6eb4"/>
-      <ellipse cx="50" cy="123" rx="23" ry="27" fill="#ff9fd0"/>
-      <!-- Skirt -->
-      <path d="M24 105 Q50 118 76 105 L80 130 Q50 145 20 130 Z" fill="#e0006a" opacity=".45"/>
-      <!-- Arms -->
-      <ellipse cx="22" cy="100" rx="9" ry="20" fill="#ffd4e8" transform="rotate(-22,22,100)"/>
-      <ellipse cx="78" cy="100" rx="9" ry="20" fill="#ffd4e8" transform="rotate(22,78,100)"/>
-      <!-- Magnifying glass in right hand -->
-      <circle cx="88" cy="115" r="10" stroke="#ffe135" stroke-width="3" fill="rgba(255,255,150,.3)"/>
-      <line x1="95" y1="122" x2="101" y2="130" stroke="#ffe135" stroke-width="3.5" stroke-linecap="round"/>
-      <!-- Head -->
-      <circle cx="50" cy="56" r="30" fill="#ffd4e8"/>
-      <!-- Hair back -->
-      <ellipse cx="50" cy="38" rx="32" ry="19" fill="#ff1493"/>
-      <ellipse cx="25" cy="60" rx="11" ry="22" fill="#ff1493"/>
-      <ellipse cx="75" cy="60" rx="11" ry="22" fill="#ff1493"/>
-      <!-- Pigtails -->
-      <ellipse cx="18" cy="42" rx="8" ry="14" fill="#ff1493" transform="rotate(-20,18,42)"/>
-      <ellipse cx="82" cy="42" rx="8" ry="14" fill="#ff1493" transform="rotate(20,82,42)"/>
-      <!-- Detective hat -->
-      <rect x="22" y="27" width="56" height="9" rx="5" fill="#7a0038"/>
-      <rect x="27" y="14" width="46" height="16" rx="6" fill="#b80055"/>
-      <!-- Hat star -->
-      <text x="39" y="24" font-size="12" fill="#ffe135" text-anchor="middle">★</text>
-      <!-- Eyes -->
-      <circle cx="40" cy="57" r="6" fill="white"/>
-      <circle cx="60" cy="57" r="6" fill="white"/>
-      <circle cx="41" cy="58" r="3.5" fill="#e03090"/>
-      <circle cx="61" cy="58" r="3.5" fill="#e03090"/>
-      <circle cx="41.8" cy="57" r="1.8" fill="#6e0030"/>
-      <circle cx="61.8" cy="57" r="1.8" fill="#6e0030"/>
-      <circle cx="40.5" cy="55.5" r="1" fill="white" opacity=".9"/>
-      <circle cx="60.5" cy="55.5" r="1" fill="white" opacity=".9"/>
-      <!-- Smile -->
-      <path d="M42 68 Q50 76 58 68" stroke="#ff3380" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-      <!-- Cheeks -->
-      <circle cx="35" cy="64" r="8" fill="#ffb0cc" opacity=".5"/>
-      <circle cx="65" cy="64" r="8" fill="#ffb0cc" opacity=".5"/>
-      <!-- Eyelashes -->
-      <line x1="36" y1="53" x2="34" y2="50" stroke="#ff1493" stroke-width="1.5"/>
-      <line x1="40" y1="52" x2="39" y2="49" stroke="#ff1493" stroke-width="1.5"/>
-      <line x1="44" y1="52" x2="44" y2="49" stroke="#ff1493" stroke-width="1.5"/>
-    </svg>
-
-    <!-- キュアエビデンス (Blue) -->
-    <svg class="char-bounce" width="110" height="150" viewBox="0 0 100 150" xmlns="http://www.w3.org/2000/svg">
-      <ellipse cx="50" cy="118" rx="26" ry="32" fill="#4a90d9"/>
-      <ellipse cx="50" cy="123" rx="23" ry="27" fill="#7ab8f5"/>
-      <path d="M24 105 Q50 118 76 105 L80 130 Q50 145 20 130 Z" fill="#1a5cb0" opacity=".45"/>
-      <ellipse cx="22" cy="100" rx="9" ry="20" fill="#d4eaff" transform="rotate(-22,22,100)"/>
-      <ellipse cx="78" cy="100" rx="9" ry="20" fill="#d4eaff" transform="rotate(22,78,100)"/>
-      <!-- Notebook in right hand -->
-      <rect x="72" y="103" width="20" height="26" rx="3" fill="white" stroke="#1a5cb0" stroke-width="1.5"/>
-      <line x1="74" y1="110" x2="90" y2="110" stroke="#1a5cb0" stroke-width="1"/>
-      <line x1="74" y1="115" x2="90" y2="115" stroke="#1a5cb0" stroke-width="1"/>
-      <line x1="74" y1="120" x2="90" y2="120" stroke="#1a5cb0" stroke-width="1"/>
-      <!-- Head -->
-      <circle cx="50" cy="56" r="30" fill="#d4eaff"/>
-      <ellipse cx="50" cy="38" rx="32" ry="19" fill="#1a5cb0"/>
-      <ellipse cx="25" cy="60" rx="11" ry="22" fill="#1a5cb0"/>
-      <ellipse cx="75" cy="60" rx="11" ry="22" fill="#1a5cb0"/>
-      <ellipse cx="18" cy="42" rx="8" ry="14" fill="#1a5cb0" transform="rotate(-20,18,42)"/>
-      <ellipse cx="82" cy="42" rx="8" ry="14" fill="#1a5cb0" transform="rotate(20,82,42)"/>
-      <!-- Hat -->
-      <rect x="22" y="27" width="56" height="9" rx="5" fill="#0a2060"/>
-      <rect x="27" y="14" width="46" height="16" rx="6" fill="#1840a0"/>
-      <text x="39" y="24" font-size="12" fill="#ffe135" text-anchor="middle">★</text>
-      <!-- Eyes -->
-      <circle cx="40" cy="57" r="6" fill="white"/>
-      <circle cx="60" cy="57" r="6" fill="white"/>
-      <circle cx="41" cy="58" r="3.5" fill="#1a5cb0"/>
-      <circle cx="61" cy="58" r="3.5" fill="#1a5cb0"/>
-      <circle cx="41.8" cy="57" r="1.8" fill="#0a1a50"/>
-      <circle cx="61.8" cy="57" r="1.8" fill="#0a1a50"/>
-      <circle cx="40.5" cy="55.5" r="1" fill="white" opacity=".9"/>
-      <circle cx="60.5" cy="55.5" r="1" fill="white" opacity=".9"/>
-      <path d="M42 68 Q50 76 58 68" stroke="#3080cc" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-      <circle cx="35" cy="64" r="8" fill="#a0c8ff" opacity=".5"/>
-      <circle cx="65" cy="64" r="8" fill="#a0c8ff" opacity=".5"/>
-      <line x1="36" y1="53" x2="34" y2="50" stroke="#1a5cb0" stroke-width="1.5"/>
-      <line x1="40" y1="52" x2="39" y2="49" stroke="#1a5cb0" stroke-width="1.5"/>
-      <line x1="44" y1="52" x2="44" y2="49" stroke="#1a5cb0" stroke-width="1.5"/>
-    </svg>
-  </div>
-
+  <div class="chars-row" id="title-chars"></div>
   <button class="btn-start" onclick="startGame()">🔍 ゲームをはじめる！</button>
 </div>
 
-<!-- ===== GAME SCREEN ===== -->
+<!-- ===== GAME ===== -->
 <div id="game-screen">
   <div id="stage-bg"></div>
   <div id="decorations"></div>
   <div id="items-wrap"></div>
-
   <div id="hud">
     <div id="stage-label">ステージ 1</div>
     <div id="counter-row"></div>
   </div>
-
-  <!-- Guide character -->
   <div id="guide">
     <div id="bubble">てがかりをさがしてね！</div>
-    <svg width="58" height="80" viewBox="0 0 100 150" xmlns="http://www.w3.org/2000/svg">
-      <ellipse cx="50" cy="118" rx="26" ry="32" fill="#ff6eb4"/>
-      <ellipse cx="50" cy="123" rx="23" ry="27" fill="#ff9fd0"/>
-      <circle cx="50" cy="56" r="30" fill="#ffd4e8"/>
-      <ellipse cx="50" cy="38" rx="32" ry="19" fill="#ff1493"/>
-      <ellipse cx="25" cy="60" rx="11" ry="22" fill="#ff1493"/>
-      <ellipse cx="75" cy="60" rx="11" ry="22" fill="#ff1493"/>
-      <rect x="22" y="27" width="56" height="9" rx="5" fill="#7a0038"/>
-      <rect x="27" y="14" width="46" height="16" rx="6" fill="#b80055"/>
-      <text x="39" y="24" font-size="12" fill="#ffe135" text-anchor="middle">★</text>
-      <circle cx="40" cy="57" r="6" fill="white"/>
-      <circle cx="60" cy="57" r="6" fill="white"/>
-      <circle cx="41" cy="58" r="3.5" fill="#e03090"/>
-      <circle cx="61" cy="58" r="3.5" fill="#e03090"/>
-      <circle cx="41.8" cy="57" r="1.8" fill="#6e0030"/>
-      <circle cx="61.8" cy="57" r="1.8" fill="#6e0030"/>
-      <path d="M42 68 Q50 76 58 68" stroke="#ff3380" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-      <circle cx="35" cy="64" r="8" fill="#ffb0cc" opacity=".5"/>
-      <circle cx="65" cy="64" r="8" fill="#ffb0cc" opacity=".5"/>
-    </svg>
+    <div id="guide-svg-wrap"></div>
   </div>
-
   <button id="hint-btn" onclick="showHint()">💡 ヒント！</button>
-
-  <!-- Stage clear -->
   <div id="stage-clear">
     <div class="sc-box">
       <div class="sc-title">🌟 すごい！ 🌟</div>
+      <div class="sc-char" id="sc-char"></div>
       <div class="sc-msg" id="sc-msg">てがかりをぜんぶみつけた！</div>
       <button class="btn-next" id="btn-next" onclick="nextStage()">つぎへ ➡️</button>
     </div>
   </div>
 </div>
 
-<!-- ===== VICTORY SCREEN ===== -->
+<!-- ===== VICTORY ===== -->
 <div id="victory-screen">
   <div id="confetti-wrap"></div>
   <div class="v-box">
     <div class="v-title">🎉 ゲームクリア！ 🎉</div>
-    <div class="v-msg">ぜんぶのなぞをといた！<br>きみはさいこうの めいたんてい！</div>
-    <div class="v-chars">
-      <svg class="v-char" width="90" height="120" viewBox="0 0 100 150" xmlns="http://www.w3.org/2000/svg">
-        <ellipse cx="50" cy="118" rx="26" ry="32" fill="#ff6eb4"/>
-        <ellipse cx="50" cy="123" rx="23" ry="27" fill="#ff9fd0"/>
-        <circle cx="50" cy="56" r="30" fill="#ffd4e8"/>
-        <ellipse cx="50" cy="38" rx="32" ry="19" fill="#ff1493"/>
-        <ellipse cx="25" cy="60" rx="11" ry="22" fill="#ff1493"/>
-        <ellipse cx="75" cy="60" rx="11" ry="22" fill="#ff1493"/>
-        <rect x="22" y="27" width="56" height="9" rx="5" fill="#7a0038"/>
-        <rect x="27" y="14" width="46" height="16" rx="6" fill="#b80055"/>
-        <text x="39" y="24" font-size="12" fill="#ffe135" text-anchor="middle">★</text>
-        <circle cx="40" cy="57" r="6" fill="white"/>
-        <circle cx="60" cy="57" r="6" fill="white"/>
-        <circle cx="41" cy="58" r="3.5" fill="#e03090"/>
-        <circle cx="61" cy="58" r="3.5" fill="#e03090"/>
-        <circle cx="41.8" cy="57" r="1.8" fill="#6e0030"/>
-        <circle cx="61.8" cy="57" r="1.8" fill="#6e0030"/>
-        <path d="M42 68 Q50 76 58 68" stroke="#ff3380" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-        <circle cx="35" cy="64" r="8" fill="#ffb0cc" opacity=".5"/>
-        <circle cx="65" cy="64" r="8" fill="#ffb0cc" opacity=".5"/>
-        <text x="50" y="8" font-size="22" text-anchor="middle" fill="#ffe135">✦</text>
-      </svg>
-      <svg class="v-char" width="90" height="120" viewBox="0 0 100 150" xmlns="http://www.w3.org/2000/svg">
-        <ellipse cx="50" cy="118" rx="26" ry="32" fill="#4a90d9"/>
-        <ellipse cx="50" cy="123" rx="23" ry="27" fill="#7ab8f5"/>
-        <circle cx="50" cy="56" r="30" fill="#d4eaff"/>
-        <ellipse cx="50" cy="38" rx="32" ry="19" fill="#1a5cb0"/>
-        <ellipse cx="25" cy="60" rx="11" ry="22" fill="#1a5cb0"/>
-        <ellipse cx="75" cy="60" rx="11" ry="22" fill="#1a5cb0"/>
-        <rect x="22" y="27" width="56" height="9" rx="5" fill="#0a2060"/>
-        <rect x="27" y="14" width="46" height="16" rx="6" fill="#1840a0"/>
-        <text x="39" y="24" font-size="12" fill="#ffe135" text-anchor="middle">★</text>
-        <circle cx="40" cy="57" r="6" fill="white"/>
-        <circle cx="60" cy="57" r="6" fill="white"/>
-        <circle cx="41" cy="58" r="3.5" fill="#1a5cb0"/>
-        <circle cx="61" cy="58" r="3.5" fill="#1a5cb0"/>
-        <circle cx="41.8" cy="57" r="1.8" fill="#0a1a50"/>
-        <circle cx="61.8" cy="57" r="1.8" fill="#0a1a50"/>
-        <path d="M42 68 Q50 76 58 68" stroke="#3080cc" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-        <circle cx="35" cy="64" r="8" fill="#a0c8ff" opacity=".5"/>
-        <circle cx="65" cy="64" r="8" fill="#a0c8ff" opacity=".5"/>
-        <text x="50" y="8" font-size="22" text-anchor="middle" fill="#ffe135">✦</text>
-      </svg>
-    </div>
+    <div class="v-msg">４つのなぞをぜんぶといた！<br>きみはさいこうの めいたんてい！</div>
+    <div class="v-chars" id="v-chars"></div>
     <button class="btn-replay" onclick="replayGame()">🔍 もういちど！</button>
   </div>
 </div>
 
-<!-- Achievement toast -->
 <div id="toast"><span id="toast-txt">✨ みつけた！</span></div>
 
 <script>
 // ============================================================
-// AUDIO ENGINE
+// CHARACTER SVGs — 4 official characters
 // ============================================================
-let AC = null;
-let bgmOn = false;
-let bgmTimer = null;
-
-function initAudio() {
-  if (!AC) AC = new (window.AudioContext || window.webkitAudioContext)();
-  if (AC.state === 'suspended') AC.resume();
+function makeSVG(w, h, inner) {
+  return `<svg width="${w}" height="${h}" viewBox="0 0 100 155" xmlns="http://www.w3.org/2000/svg">${inner}</svg>`;
 }
 
+// キュアアンサー — Purple, twin buns, yellow ribbon, teal eyes
+const SVG_ANSWER = (w,h) => makeSVG(w,h,`
+  <!-- Body -->
+  <ellipse cx="50" cy="122" rx="27" ry="33" fill="#8844cc"/>
+  <ellipse cx="50" cy="127" rx="23" ry="28" fill="#aa66ee"/>
+  <!-- Yellow ribbon on chest -->
+  <ellipse cx="50" cy="96" rx="9" ry="6" fill="#ffe135"/>
+  <ellipse cx="50" cy="98" rx="6" ry="4" fill="#cc9900"/>
+  <!-- Cape -->
+  <path d="M23 90 Q50 108 77 90 L81 128 Q50 142 19 128 Z" fill="#6622aa" opacity=".5"/>
+  <!-- Arms -->
+  <ellipse cx="20" cy="104" rx="9" ry="20" fill="#ffd4e8" transform="rotate(-22,20,104)"/>
+  <ellipse cx="80" cy="104" rx="9" ry="20" fill="#ffd4e8" transform="rotate(22,80,104)"/>
+  <!-- Magnifying glass -->
+  <circle cx="87" cy="118" r="9" stroke="#ffe135" stroke-width="3" fill="rgba(255,255,150,.3)"/>
+  <line x1="93" y1="125" x2="99" y2="132" stroke="#ffe135" stroke-width="3.5" stroke-linecap="round"/>
+  <!-- Head -->
+  <circle cx="50" cy="58" r="29" fill="#ffd4e8"/>
+  <!-- Hair backdrop (purple) -->
+  <ellipse cx="50" cy="42" rx="31" ry="17" fill="#5500bb"/>
+  <ellipse cx="23" cy="62" rx="11" ry="22" fill="#5500bb"/>
+  <ellipse cx="77" cy="62" rx="11" ry="22" fill="#5500bb"/>
+  <!-- Twin buns (お団子) — big round buns -->
+  <circle cx="23" cy="38" r="14" fill="#7733dd"/>
+  <circle cx="77" cy="38" r="14" fill="#7733dd"/>
+  <!-- Pink gradient highlights on buns -->
+  <circle cx="18" cy="31" r="7" fill="#ff88cc" opacity=".6"/>
+  <circle cx="72" cy="31" r="7" fill="#ff88cc" opacity=".6"/>
+  <!-- Bun detail rings -->
+  <circle cx="23" cy="38" r="14" fill="none" stroke="#9955ff" stroke-width="1.5" opacity=".5"/>
+  <circle cx="77" cy="38" r="14" fill="none" stroke="#9955ff" stroke-width="1.5" opacity=".5"/>
+  <!-- Ahoge -->
+  <path d="M50 30 Q54 18 49 11" stroke="#6622bb" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <circle cx="49" cy="11" r="2.5" fill="#8844dd"/>
+  <!-- Hat brim over buns -->
+  <rect x="16" y="48" width="68" height="8" rx="5" fill="#3300aa"/>
+  <!-- Face -->
+  <circle cx="40" cy="60" r="6" fill="white"/>
+  <circle cx="60" cy="60" r="6" fill="white"/>
+  <circle cx="41" cy="61" r="3.5" fill="#00ccbb"/>
+  <circle cx="61" cy="61" r="3.5" fill="#00ccbb"/>
+  <circle cx="41.8" cy="60" r="1.8" fill="#005544"/>
+  <circle cx="61.8" cy="60" r="1.8" fill="#005544"/>
+  <!-- Heart highlight in eyes -->
+  <path d="M40 58.5 Q40.5 57.5 41 58.5 Q41.5 57.5 42 58.5" stroke="white" stroke-width="1" fill="none" opacity=".8"/>
+  <path d="M60 58.5 Q60.5 57.5 61 58.5 Q61.5 57.5 62 58.5" stroke="white" stroke-width="1" fill="none" opacity=".8"/>
+  <circle cx="40" cy="57.5" r=".9" fill="white" opacity=".9"/>
+  <circle cx="60" cy="57.5" r=".9" fill="white" opacity=".9"/>
+  <!-- Smile -->
+  <path d="M43 70 Q50 78 57 70" stroke="#cc44aa" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <!-- Cheeks -->
+  <circle cx="34" cy="66" r="7" fill="#ddaacc" opacity=".5"/>
+  <circle cx="66" cy="66" r="7" fill="#ddaacc" opacity=".5"/>
+  <!-- Eyelashes -->
+  <line x1="37" y1="55" x2="35" y2="52" stroke="#5500bb" stroke-width="1.5"/>
+  <line x1="40" y1="54" x2="39" y2="51" stroke="#5500bb" stroke-width="1.5"/>
+  <line x1="43.5" y1="54" x2="43.5" y2="51" stroke="#5500bb" stroke-width="1.5"/>
+  <!-- Name label -->
+  <text x="50" y="152" font-size="8" fill="white" text-anchor="middle" font-weight="bold" opacity=".9">キュアアンサー</text>
+`);
+
+// キュアミスティック — Pink, triple braid pigtails, purple eyes
+const SVG_MYSTIC = (w,h) => makeSVG(w,h,`
+  <!-- Body -->
+  <ellipse cx="50" cy="122" rx="27" ry="33" fill="#ff77cc"/>
+  <ellipse cx="50" cy="127" rx="23" ry="28" fill="#ffaadd"/>
+  <!-- Cape -->
+  <path d="M23 90 Q50 108 77 90 L81 128 Q50 142 19 128 Z" fill="#dd5599" opacity=".5"/>
+  <!-- Light purple glove detail -->
+  <ellipse cx="20" cy="115" rx="7" ry="5" fill="#cc99ee"/>
+  <ellipse cx="80" cy="115" rx="7" ry="5" fill="#cc99ee"/>
+  <!-- Arms -->
+  <ellipse cx="20" cy="104" rx="9" ry="20" fill="#ffd4e8" transform="rotate(-22,20,104)"/>
+  <ellipse cx="80" cy="104" rx="9" ry="20" fill="#ffd4e8" transform="rotate(22,80,104)"/>
+  <!-- Notebook -->
+  <rect x="71" y="105" width="18" height="23" rx="3" fill="white" stroke="#dd55aa" stroke-width="1.5"/>
+  <line x1="73" y1="112" x2="87" y2="112" stroke="#dd55aa" stroke-width="1"/>
+  <line x1="73" y1="117" x2="87" y2="117" stroke="#dd55aa" stroke-width="1"/>
+  <line x1="73" y1="122" x2="87" y2="122" stroke="#dd55aa" stroke-width="1"/>
+  <!-- Head -->
+  <circle cx="50" cy="58" r="29" fill="#ffd4e8"/>
+  <!-- Hair backdrop (pink) -->
+  <ellipse cx="50" cy="42" rx="31" ry="17" fill="#ee2288"/>
+  <ellipse cx="25" cy="58" rx="10" ry="20" fill="#ee2288"/>
+  <ellipse cx="75" cy="58" rx="10" ry="20" fill="#ee2288"/>
+  <!-- Braided pigtails (三つ編み) — long braids with zigzag pattern -->
+  <!-- Left braid -->
+  <path d="M18 55 Q14 65 17 75 Q13 85 16 95 Q12 105 15 115" stroke="#ee2288" stroke-width="10" fill="none" stroke-linecap="round"/>
+  <path d="M18 55 Q22 65 19 75 Q23 85 20 95 Q24 105 21 115" stroke="#ff55aa" stroke-width="5" fill="none" stroke-linecap="round" opacity=".6"/>
+  <!-- Right braid -->
+  <path d="M82 55 Q86 65 83 75 Q87 85 84 95 Q88 105 85 115" stroke="#ee2288" stroke-width="10" fill="none" stroke-linecap="round"/>
+  <path d="M82 55 Q78 65 81 75 Q77 85 80 95 Q76 105 79 115" stroke="#ff55aa" stroke-width="5" fill="none" stroke-linecap="round" opacity=".6"/>
+  <!-- Braid ends (light purple gradient) -->
+  <ellipse cx="15" cy="118" rx="6" ry="8" fill="#cc88ff"/>
+  <ellipse cx="85" cy="118" rx="6" ry="8" fill="#cc88ff"/>
+  <!-- Pink ribbon ties -->
+  <circle cx="20" cy="55" r="5" fill="#ff1188"/>
+  <circle cx="80" cy="55" r="5" fill="#ff1188"/>
+  <!-- Detective hat brim -->
+  <rect x="20" y="34" width="60" height="8" rx="5" fill="#bb0066"/>
+  <rect x="26" y="22" width="48" height="14" rx="6" fill="#ee1188"/>
+  <text x="50" y="32" font-size="8" fill="#ffe135" text-anchor="middle">★</text>
+  <!-- Face -->
+  <circle cx="40" cy="60" r="6" fill="white"/>
+  <circle cx="60" cy="60" r="6" fill="white"/>
+  <circle cx="41" cy="61" r="3.5" fill="#9933cc"/>
+  <circle cx="61" cy="61" r="3.5" fill="#9933cc"/>
+  <circle cx="41.8" cy="60" r="1.8" fill="#440077"/>
+  <circle cx="61.8" cy="60" r="1.8" fill="#440077"/>
+  <circle cx="40.2" cy="58.5" r=".9" fill="white" opacity=".9"/>
+  <circle cx="60.2" cy="58.5" r=".9" fill="white" opacity=".9"/>
+  <!-- Smile — brighter and wider -->
+  <path d="M42 70 Q50 79 58 70" stroke="#ee1188" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <!-- Cheeks -->
+  <circle cx="34" cy="66" r="7" fill="#ffaabb" opacity=".55"/>
+  <circle cx="66" cy="66" r="7" fill="#ffaabb" opacity=".55"/>
+  <!-- Eyelashes -->
+  <line x1="37" y1="55" x2="35" y2="52" stroke="#ee2288" stroke-width="1.5"/>
+  <line x1="40" y1="54" x2="39" y2="51" stroke="#ee2288" stroke-width="1.5"/>
+  <line x1="43.5" y1="54" x2="43.5" y2="51" stroke="#ee2288" stroke-width="1.5"/>
+  <text x="50" y="152" font-size="8" fill="white" text-anchor="middle" font-weight="bold" opacity=".9">キュアミスティック</text>
+`);
+
+// キュアエクレール — Teal, greenish ponytail with drill ends, mini hat
+const SVG_ECLAIR = (w,h) => makeSVG(w,h,`
+  <!-- Body — teal, asymmetric crop top style -->
+  <ellipse cx="50" cy="122" rx="27" ry="33" fill="#20c0a0"/>
+  <ellipse cx="50" cy="127" rx="23" ry="28" fill="#44ddb8"/>
+  <!-- Asymmetric skirt detail -->
+  <path d="M23 108 Q40 118 50 110 L50 140 Q35 148 23 135 Z" fill="#0daa88" opacity=".6"/>
+  <path d="M77 108 Q60 118 50 110 L50 140 Q65 148 77 135 Z" fill="#15bba0" opacity=".4"/>
+  <!-- Wide sleeves detail -->
+  <ellipse cx="20" cy="100" rx="9" ry="20" fill="#d4fff5" transform="rotate(-22,20,100)"/>
+  <ellipse cx="80" cy="100" rx="9" ry="20" fill="#d4fff5" transform="rotate(22,80,100)"/>
+  <ellipse cx="16" cy="114" rx="11" ry="5" fill="#88eecc" opacity=".7"/>
+  <ellipse cx="84" cy="114" rx="11" ry="5" fill="#88eecc" opacity=".7"/>
+  <!-- Head -->
+  <circle cx="50" cy="58" r="29" fill="#ffd4e8"/>
+  <!-- Hair backdrop (teal-green) -->
+  <ellipse cx="50" cy="44" rx="30" ry="15" fill="#18a888"/>
+  <ellipse cx="24" cy="62" rx="10" ry="20" fill="#18a888"/>
+  <ellipse cx="76" cy="62" rx="10" ry="22" fill="#18a888"/>
+  <!-- Ponytail going to right/back -->
+  <path d="M74 48 Q88 44 90 55 Q95 68 88 80" stroke="#18a888" stroke-width="12" fill="none" stroke-linecap="round"/>
+  <!-- Drill curls at ponytail ends -->
+  <path d="M88 80 Q96 88 90 96 Q84 104 90 110 Q96 116 88 122" stroke="#18a888" stroke-width="8" fill="none" stroke-linecap="round"/>
+  <path d="M88 80 Q92 88 88 96 Q84 104 88 110 Q92 116 88 122" stroke="#40e0c0" stroke-width="4" fill="none" stroke-linecap="round" opacity=".7"/>
+  <!-- Yellow-green gradient at tips -->
+  <circle cx="88" cy="122" r="6" fill="#90ee60" opacity=".8"/>
+  <circle cx="86" cy="120" r="3" fill="#c0ff80" opacity=".7"/>
+  <!-- Ponytail tie -->
+  <circle cx="76" cy="48" r="5" fill="#0daa88"/>
+  <ellipse cx="76" cy="48" rx="7" ry="4" fill="#ffe135" opacity=".8"/>
+  <!-- Mini detective hat — tilted left -->
+  <ellipse cx="38" cy="34" rx="24" ry="7" fill="#0a6655" transform="rotate(-10,38,34)"/>
+  <rect x="20" y="22" width="36" height="14" rx="5" fill="#0e8870" transform="rotate(-10,38,29)"/>
+  <rect x="16" y="30" width="44" height="7" rx="4" fill="#0a6655" transform="rotate(-10,38,34)"/>
+  <circle cx="38" cy="24" r="3" fill="#ffe135"/>
+  <!-- Face -->
+  <circle cx="40" cy="60" r="6" fill="white"/>
+  <circle cx="60" cy="60" r="6" fill="white"/>
+  <circle cx="41" cy="61" r="3.5" fill="#10a888"/>
+  <circle cx="61" cy="61" r="3.5" fill="#10a888"/>
+  <circle cx="41.8" cy="60" r="1.8" fill="#005540"/>
+  <circle cx="61.8" cy="60" r="1.8" fill="#005540"/>
+  <circle cx="40.2" cy="58.5" r=".9" fill="white" opacity=".9"/>
+  <circle cx="60.2" cy="58.5" r=".9" fill="white" opacity=".9"/>
+  <!-- Smile — confident -->
+  <path d="M43 70 Q50 78 57 70" stroke="#0daa88" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <!-- Cheeks -->
+  <circle cx="34" cy="66" r="7" fill="#aaeedd" opacity=".5"/>
+  <circle cx="66" cy="66" r="7" fill="#aaeedd" opacity=".5"/>
+  <!-- Eyelashes -->
+  <line x1="37" y1="55" x2="35" y2="52" stroke="#0d8870" stroke-width="1.5"/>
+  <line x1="40" y1="54" x2="39" y2="51" stroke="#0d8870" stroke-width="1.5"/>
+  <line x1="43.5" y1="54" x2="43.5" y2="51" stroke="#0d8870" stroke-width="1.5"/>
+  <text x="50" y="152" font-size="7" fill="white" text-anchor="middle" font-weight="bold" opacity=".9">キュアエクレール</text>
+`);
+
+// キュアアルカナ・シャドウ — Black/dark purple, mysterious, phantom thief
+const SVG_ARCANA = (w,h) => makeSVG(w,h,`
+  <!-- Body — dark, phantom thief cape -->
+  <ellipse cx="50" cy="122" rx="27" ry="33" fill="#220044"/>
+  <ellipse cx="50" cy="127" rx="23" ry="28" fill="#330066"/>
+  <!-- Dramatic cape -->
+  <path d="M16 85 Q50 75 84 85 L92 142 Q50 155 8 142 Z" fill="#110022" opacity=".85"/>
+  <path d="M16 85 Q50 75 84 85" stroke="#8800cc" stroke-width="2" fill="none"/>
+  <!-- Purple inner lining of cape -->
+  <path d="M22 92 Q50 84 78 92 L82 130 Q50 140 18 130 Z" fill="#440088" opacity=".4"/>
+  <!-- Arms — dark -->
+  <ellipse cx="20" cy="104" rx="9" ry="20" fill="#e8d0f0" transform="rotate(-22,20,104)"/>
+  <ellipse cx="80" cy="104" rx="9" ry="20" fill="#e8d0f0" transform="rotate(22,80,104)"/>
+  <!-- Playing card / phantom thief tool -->
+  <rect x="71" y="103" width="16" height="22" rx="2" fill="white" stroke="#220044" stroke-width="1.5"/>
+  <text x="79" y="117" font-size="12" fill="#cc0033" text-anchor="middle">♦</text>
+  <!-- Head -->
+  <circle cx="50" cy="58" r="29" fill="#f0d8ee"/>
+  <!-- Hair — very dark purple/black, long flowing -->
+  <ellipse cx="50" cy="40" rx="32" ry="18" fill="#110022"/>
+  <ellipse cx="22" cy="62" rx="11" ry="26" fill="#110022"/>
+  <ellipse cx="78" cy="62" rx="11" ry="26" fill="#110022"/>
+  <!-- Long flowing hair strands -->
+  <path d="M22 72 Q15 90 18 110 Q16 125 20 135" stroke="#220044" stroke-width="8" fill="none" stroke-linecap="round"/>
+  <path d="M78 72 Q85 90 82 110 Q84 125 80 135" stroke="#220044" stroke-width="8" fill="none" stroke-linecap="round"/>
+  <!-- Purple highlight on hair -->
+  <path d="M28 40 Q25 55 22 65" stroke="#8800cc" stroke-width="2" fill="none" opacity=".5"/>
+  <path d="M72 40 Q75 55 78 65" stroke="#8800cc" stroke-width="2" fill="none" opacity=".5"/>
+  <!-- Dark detective hat with purple band -->
+  <rect x="20" y="33" width="60" height="9" rx="5" fill="#0a0015"/>
+  <rect x="26" y="20" width="48" height="15" rx="6" fill="#1a0035"/>
+  <rect x="26" y="30" width="48" height="6" rx="0" fill="#6600cc" opacity=".5"/>
+  <text x="50" y="31" font-size="7" fill="#cc88ff" text-anchor="middle">✦</text>
+  <!-- Face — mysterious expression -->
+  <circle cx="40" cy="60" r="6" fill="white"/>
+  <circle cx="60" cy="60" r="6" fill="white"/>
+  <!-- Purple glowing eyes -->
+  <circle cx="41" cy="61" r="3.5" fill="#bb44ff"/>
+  <circle cx="61" cy="61" r="3.5" fill="#bb44ff"/>
+  <circle cx="41.8" cy="60" r="1.8" fill="#6600cc"/>
+  <circle cx="61.8" cy="60" r="1.8" fill="#6600cc"/>
+  <!-- Glowing highlight -->
+  <circle cx="40.2" cy="58.5" r="1" fill="white" opacity=".95"/>
+  <circle cx="60.2" cy="58.5" r="1" fill="white" opacity=".95"/>
+  <!-- Slight smirk (mysterious) -->
+  <path d="M44 70 Q50 76 57 71" stroke="#9922cc" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <!-- Cheeks — subtle -->
+  <circle cx="34" cy="66" r="6" fill="#ddaaee" opacity=".3"/>
+  <circle cx="66" cy="66" r="6" fill="#ddaaee" opacity=".3"/>
+  <!-- Eyelashes — dramatic -->
+  <line x1="36" y1="55" x2="33" y2="51" stroke="#220044" stroke-width="2"/>
+  <line x1="40" y1="54" x2="39" y2="50" stroke="#220044" stroke-width="2"/>
+  <line x1="44" y1="54" x2="44" y2="50" stroke="#220044" stroke-width="2"/>
+  <line x1="56" y1="54" x2="56" y2="50" stroke="#220044" stroke-width="2"/>
+  <line x1="60" y1="54" x2="61" y2="50" stroke="#220044" stroke-width="2"/>
+  <line x1="64" y1="55" x2="67" y2="51" stroke="#220044" stroke-width="2"/>
+  <text x="50" y="152" font-size="7" fill="white" text-anchor="middle" font-weight="bold" opacity=".9">キュアアルカナ・シャドウ</text>
+`);
+
+const CHAR_FUNCS = [SVG_ANSWER, SVG_MYSTIC, SVG_ECLAIR, SVG_ARCANA];
+
+// ============================================================
+// AUDIO
+// ============================================================
+let AC = null, bgmOn = false, bgmTimer = null;
+function initAudio() {
+  if (!AC) AC = new (window.AudioContext || window.webkitAudioContext)();
+  if (AC.state==='suspended') AC.resume();
+}
 const Hz = {
   C4:261.63,D4:293.66,E4:329.63,F4:349.23,G4:392.00,A4:440.00,B4:493.88,
   C5:523.25,D5:587.33,E5:659.25,F5:698.46,G5:783.99,A5:880.00,B5:987.77,
   C6:1046.50,D6:1174.66,E6:1318.51
 };
-
-// Magical girl anime-style melody (original, not from any copyrighted source)
 const MELODY = [
-  // Phrase 1 — bright opening
   {n:'E5',d:.25},{n:'G5',d:.25},{n:'A5',d:.25},{n:'G5',d:.25},
   {n:'E5',d:.25},{n:'C5',d:.25},{n:'D5',d:.5},
-  // Phrase 2
   {n:'G5',d:.25},{n:'A5',d:.25},{n:'C6',d:.25},{n:'B5',d:.25},
   {n:'A5',d:.25},{n:'G5',d:.5},{n:'E5',d:.25},
-  // Phrase 3 — rise
   {n:'A5',d:.25},{n:'G5',d:.25},{n:'E5',d:.25},{n:'D5',d:.25},
   {n:'C5',d:.25},{n:'E5',d:.25},{n:'G5',d:.5},
-  // Phrase 4 — resolution
   {n:'A5',d:.25},{n:'G5',d:.25},{n:'E5',d:.25},{n:'D5',d:.25},
   {n:'C5',d:.5},{n:'E5',d:.25},{n:'G5',d:.25},
-  // Phrase 5 — sparkle ascending
   {n:'E5',d:.125},{n:'G5',d:.125},{n:'A5',d:.125},{n:'C6',d:.125},
   {n:'D6',d:.5},{n:'C6',d:.25},{n:'B5',d:.25},
-  // Phrase 6 — triumph
   {n:'A5',d:.25},{n:'C6',d:.25},{n:'E6',d:.5},
   {n:'D6',d:.25},{n:'C6',d:.25},{n:'B5',d:.25},{n:'A5',d:.25},
-  // Phrase 7 — gentle
   {n:'G5',d:.25},{n:'E5',d:.25},{n:'C5',d:.25},{n:'D5',d:.25},
   {n:'E5',d:.25},{n:'G5',d:.25},{n:'A5',d:.5},
-  // Phrase 8 — close
   {n:'E5',d:.25},{n:'D5',d:.25},{n:'C5',d:.5},{n:'G4',d:.25},{n:'C5',d:.75}
 ];
-
 const BASS = [
-  {n:'C4',d:.5},{n:'G4',d:.5},  {n:'C4',d:.5},{n:'E4',d:.5},
-  {n:'F4',d:.5},{n:'C4',d:.5},  {n:'G4',d:.5},{n:'D4',d:.5},
-  {n:'A4',d:.5},{n:'E4',d:.5},  {n:'F4',d:.5},{n:'C4',d:.5},
-  {n:'G4',d:.5},{n:'E4',d:.5},  {n:'C4',d:.5},{n:'G4',d:.5},
-  {n:'A4',d:.5},{n:'E4',d:.5},  {n:'F4',d:.5},{n:'A4',d:.5},
-  {n:'G4',d:.5},{n:'D4',d:.5},  {n:'G4',d:.5},{n:'B4',d:.5},
-  {n:'E4',d:.5},{n:'G4',d:.5},  {n:'C4',d:.5},{n:'G4',d:.5},
-  {n:'F4',d:.5},{n:'C4',d:.5},  {n:'G4',d:.5},{n:'C4',d:.5}
+  {n:'C4',d:.5},{n:'G4',d:.5},{n:'C4',d:.5},{n:'E4',d:.5},
+  {n:'F4',d:.5},{n:'C4',d:.5},{n:'G4',d:.5},{n:'D4',d:.5},
+  {n:'A4',d:.5},{n:'E4',d:.5},{n:'F4',d:.5},{n:'C4',d:.5},
+  {n:'G4',d:.5},{n:'E4',d:.5},{n:'C4',d:.5},{n:'G4',d:.5},
+  {n:'A4',d:.5},{n:'E4',d:.5},{n:'F4',d:.5},{n:'A4',d:.5},
+  {n:'G4',d:.5},{n:'D4',d:.5},{n:'G4',d:.5},{n:'B4',d:.5},
+  {n:'E4',d:.5},{n:'G4',d:.5},{n:'C4',d:.5},{n:'G4',d:.5},
+  {n:'F4',d:.5},{n:'C4',d:.5},{n:'G4',d:.5},{n:'C4',d:.5}
 ];
-
-const BPM = 148;
-const BEAT = 60 / BPM;
-
-function playTone(freq, t, dur, type='triangle', vol=0.15) {
-  if (!AC || !freq) return;
-  const osc = AC.createOscillator();
-  const g = AC.createGain();
-  osc.connect(g); g.connect(AC.destination);
-  osc.type = type; osc.frequency.value = freq;
-  g.gain.setValueAtTime(0, t);
-  g.gain.linearRampToValueAtTime(vol, t + 0.015);
-  g.gain.exponentialRampToValueAtTime(0.001, t + dur - 0.01);
-  osc.start(t); osc.stop(t + dur);
+const BPM=148, BEAT=60/BPM;
+function playTone(f,t,dur,type='triangle',vol=0.15){
+  if(!AC||!f)return;
+  const o=AC.createOscillator(),g=AC.createGain();
+  o.connect(g);g.connect(AC.destination);
+  o.type=type;o.frequency.value=f;
+  g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol,t+.015);g.gain.exponentialRampToValueAtTime(.001,t+dur-.01);
+  o.start(t);o.stop(t+dur);
 }
-
-function playNoise(t, dur, vol=0.15, highpass=false) {
-  if (!AC) return;
-  const buf = AC.createBuffer(1, AC.sampleRate * dur, AC.sampleRate);
-  const d = buf.getChannelData(0);
-  for (let i=0; i<d.length; i++) d[i] = (Math.random()*2-1)*(1-i/d.length);
-  const src = AC.createBufferSource(); src.buffer = buf;
-  const g = AC.createGain();
-  if (highpass) {
-    const f = AC.createBiquadFilter(); f.type='highpass'; f.frequency.value=6000;
-    src.connect(f); f.connect(g);
-  } else { src.connect(g); }
-  g.connect(AC.destination);
-  g.gain.setValueAtTime(vol, t);
-  g.gain.exponentialRampToValueAtTime(0.001, t+dur*0.8);
-  src.start(t); src.stop(t+dur);
+function playNoise(t,dur,vol=.15,hp=false){
+  if(!AC)return;
+  const buf=AC.createBuffer(1,AC.sampleRate*dur,AC.sampleRate),d=buf.getChannelData(0);
+  for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*(1-i/d.length);
+  const src=AC.createBufferSource();src.buffer=buf;
+  const g=AC.createGain();
+  if(hp){const f=AC.createBiquadFilter();f.type='highpass';f.frequency.value=6000;src.connect(f);f.connect(g);}
+  else src.connect(g);
+  g.connect(AC.destination);g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.001,t+dur*.8);
+  src.start(t);src.stop(t+dur);
 }
-
-function playKick(t) {
-  if (!AC) return;
-  const o = AC.createOscillator(); const g = AC.createGain();
-  o.connect(g); g.connect(AC.destination);
-  o.frequency.setValueAtTime(150, t);
-  o.frequency.exponentialRampToValueAtTime(40, t+0.12);
-  g.gain.setValueAtTime(0.5, t);
-  g.gain.exponentialRampToValueAtTime(0.001, t+0.22);
-  o.start(t); o.stop(t+0.22);
+function playKick(t){
+  if(!AC)return;
+  const o=AC.createOscillator(),g=AC.createGain();o.connect(g);g.connect(AC.destination);
+  o.frequency.setValueAtTime(150,t);o.frequency.exponentialRampToValueAtTime(40,t+.12);
+  g.gain.setValueAtTime(.5,t);g.gain.exponentialRampToValueAtTime(.001,t+.22);o.start(t);o.stop(t+.22);
 }
-
-function scheduleBGM() {
-  if (!AC || !bgmOn) return;
-  const start = AC.currentTime + 0.05;
-  const bd = BEAT * 2; // beat duration in seconds
-
-  // Melody
-  let mt = start;
-  MELODY.forEach(n => { const dur=n.d*bd*2; playTone(Hz[n.n],mt,dur*0.88,'triangle',0.14); mt+=dur; });
-  const totalDur = mt - start;
-
-  // Bass
-  let bt = start;
-  BASS.forEach(n => { const dur=n.d*bd*2; playTone(Hz[n.n],bt,dur*0.85,'sine',0.11); bt+=dur; });
-
-  // Chord pads (simple)
-  const chords = [
-    [Hz.C4, Hz.E4, Hz.G4], [Hz.F4, Hz.A4, Hz.C5],
-    [Hz.G4, Hz.B4, Hz.D5], [Hz.A4, Hz.C5, Hz.E5],
-    [Hz.F4, Hz.A4, Hz.C5], [Hz.G4, Hz.B4, Hz.D5],
-    [Hz.E4, Hz.G4, Hz.B4], [Hz.C4, Hz.E4, Hz.G4]
-  ];
-  chords.forEach((chord, i) => {
-    chord.forEach(f => playTone(f, start + i*bd*4, bd*3.8, 'sine', 0.05));
-  });
-
-  // Drums
-  const bars = 16;
-  for (let b=0; b<bars; b++) {
-    const bs = start + b * bd * 4;
-    playKick(bs);
-    playKick(bs + bd*2);
-    playNoise(bs + bd, 0.1, 0.18, false);
-    playNoise(bs + bd*3, 0.1, 0.18, false);
-    for (let h=0; h<8; h++) playNoise(bs + h*bd*0.5, 0.05, 0.06, true);
-  }
-
-  bgmTimer = setTimeout(scheduleBGM, (totalDur - 0.15) * 1000);
+function scheduleBGM(){
+  if(!AC||!bgmOn)return;
+  const s=AC.currentTime+.05,bd=BEAT*2;
+  let mt=s;
+  MELODY.forEach(n=>{const d=n.d*bd*2;playTone(Hz[n.n],mt,d*.88,'triangle',.14);mt+=d;});
+  const total=mt-s;
+  let bt=s;
+  BASS.forEach(n=>{const d=n.d*bd*2;playTone(Hz[n.n],bt,d*.85,'sine',.11);bt+=d;});
+  const chords=[[Hz.C4,Hz.E4,Hz.G4],[Hz.F4,Hz.A4,Hz.C5],[Hz.G4,Hz.B4,Hz.D5],[Hz.A4,Hz.C5,Hz.E5],
+    [Hz.F4,Hz.A4,Hz.C5],[Hz.G4,Hz.B4,Hz.D5],[Hz.E4,Hz.G4,Hz.B4],[Hz.C4,Hz.E4,Hz.G4]];
+  chords.forEach((c,i)=>c.forEach(f=>playTone(f,s+i*bd*4,bd*3.8,'sine',.05)));
+  for(let b=0;b<16;b++){const bs=s+b*bd*4;playKick(bs);playKick(bs+bd*2);playNoise(bs+bd,.1,.18);playNoise(bs+bd*3,.1,.18);for(let h=0;h<8;h++)playNoise(bs+h*bd*.5,.05,.06,true);}
+  bgmTimer=setTimeout(scheduleBGM,(total-.15)*1000);
 }
-
-function startBGM() { if (bgmOn) return; bgmOn=true; scheduleBGM(); }
-function stopBGM() {
-  bgmOn = false;
-  if (bgmTimer) { clearTimeout(bgmTimer); bgmTimer=null; }
+function startBGM(){if(bgmOn)return;bgmOn=true;scheduleBGM();}
+function stopBGM(){bgmOn=false;if(bgmTimer){clearTimeout(bgmTimer);bgmTimer=null;}}
+function sfxFound(){
+  if(!AC)return;const t=AC.currentTime;
+  [Hz.C5,Hz.E5,Hz.G5,Hz.C6].forEach((f,i)=>playTone(f,t+i*.07,.22,'triangle',.3));
+  for(let i=0;i<6;i++)playTone(600+Math.random()*1000,t+i*.03,.08,'sine',.08);
 }
-
-// SFX
-function sfxFound() {
-  if (!AC) return;
-  const t = AC.currentTime;
-  [Hz.C5,Hz.E5,Hz.G5,Hz.C6].forEach((f,i) => playTone(f,t+i*0.07,0.22,'triangle',0.3));
-  for (let i=0;i<6;i++) playTone(600+Math.random()*1000,t+i*0.03,0.08,'sine',0.08);
-}
-function sfxClear() {
-  if (!AC) return;
-  const t = AC.currentTime;
+function sfxClear(){
+  if(!AC)return;const t=AC.currentTime;
   [[Hz.C5,0],[Hz.E5,.1],[Hz.G5,.2],[Hz.C6,.35],[Hz.E6,.55],[Hz.G5,.75],[Hz.C6,.95]].forEach(([f,d])=>{
-    playTone(f,t+d,0.28,'triangle',0.38);
-    playTone(f*.5,t+d,0.28,'sine',0.15);
+    playTone(f,t+d,.28,'triangle',.38);playTone(f*.5,t+d,.28,'sine',.15);
   });
 }
-function sfxVictory() {
-  if (!AC) return;
-  const t = AC.currentTime;
-  const notes = [Hz.C5,Hz.E5,Hz.G5,Hz.C6,Hz.E6,Hz.G5,Hz.C6,Hz.E6,Hz.G6||Hz.E6*Math.pow(2,1/6)];
-  notes.forEach((f,i) => {
-    playTone(f,t+i*0.12,0.35,'triangle',0.4);
-    playTone(f*.5,t+i*0.12,0.35,'sine',0.2);
-    if (i%2===0) playNoise(t+i*0.12,0.1,0.15,true);
+function sfxVictory(){
+  if(!AC)return;const t=AC.currentTime;
+  [Hz.C5,Hz.E5,Hz.G5,Hz.C6,Hz.E6,Hz.G5,Hz.C6,Hz.E6].forEach((f,i)=>{
+    playTone(f,t+i*.12,.35,'triangle',.4);playTone(f*.5,t+i*.12,.35,'sine',.2);
+    if(i%2===0)playNoise(t+i*.12,.1,.15,true);
   });
 }
 
@@ -603,298 +571,200 @@ function sfxVictory() {
 // ============================================================
 const STAGES = [
   {
-    name:'ステージ 1：まちのなぞ', bg:'bg-town',
-    item:'🔍', count:5,
-    msg:'まちのなかに てがかりが ５つ かくれているよ！',
-    clearMsg:'まちのなぞを ときあかした！',
-    decor:'town'
+    name:'ステージ 1：まちのなぞ', bg:'bg-town', item:'🔍', count:5,
+    msg:'まちに てがかりが ５つ かくれているよ！',
+    clearMsg:'まちのなぞを ときあかした！', decor:'town', charIdx:0
   },
   {
-    name:'ステージ 2：もりのなぞ', bg:'bg-forest',
-    item:'⭐', count:5,
-    msg:'もりのなかに ほしが ５つ かくれているよ！',
-    clearMsg:'もりのなぞを ときあかした！',
-    decor:'forest'
+    name:'ステージ 2：もりのなぞ', bg:'bg-forest', item:'⭐', count:5,
+    msg:'もりに ほしが ５つ かくれているよ！',
+    clearMsg:'もりのなぞを ときあかした！', decor:'forest', charIdx:1
   },
   {
-    name:'ステージ 3：おしろのなぞ', bg:'bg-castle',
-    item:'💎', count:6,
-    msg:'おしろのなかに ほうせきが ６つ かくれているよ！',
-    clearMsg:'おしろのなぞを ときあかした！',
-    decor:'castle'
+    name:'ステージ 3：としょかんのなぞ', bg:'bg-library', item:'🔑', count:6,
+    msg:'としょかんに かぎが ６つ かくれているよ！',
+    clearMsg:'としょかんのなぞを ときあかした！', decor:'library', charIdx:2
+  },
+  {
+    name:'ステージ 4：おしろのなぞ', bg:'bg-castle', item:'🔮', count:6,
+    msg:'おしろに まほうのたまが ６つ かくれているよ！',
+    clearMsg:'おしろのなぞを ときあかした！', decor:'castle', charIdx:3
   }
 ];
-
-const PRAISE = [
-  'やったね！','すごい！','さすが！','きみはえらい！',
-  'めいたんてい！','もっとさがして！','かしこいな！'
-];
-
-let stage = 0;
-let found = 0;
-let total = 0;
-let hintActive = false;
+const PRAISE=['やったね！','すごい！','さすが！','めいたんてい！','かしこい！','ナイス！'];
+let stage=0, found=0, total=0, hintActive=false;
 
 // ============================================================
-// GAME FUNCTIONS
+// INIT UI
 // ============================================================
-function startGame() {
-  initAudio();
-  stage = 0;
-  document.getElementById('title-screen').style.display = 'none';
-  document.getElementById('game-screen').style.display = 'block';
-  startBGM();
-  loadStage();
+function buildTitleChars(){
+  const wrap=document.getElementById('title-chars');
+  CHAR_FUNCS.forEach(fn=>{
+    const d=document.createElement('div');d.className='char-t';
+    d.innerHTML=fn(72,98);wrap.appendChild(d);
+  });
 }
-
-function loadStage() {
-  const s = STAGES[stage];
-  found = 0; total = s.count; hintActive = false;
-  document.getElementById('stage-label').textContent = s.name;
-  document.getElementById('stage-bg').className = 'stage-bg ' + s.bg;
-  document.getElementById('stage-clear').style.display = 'none';
-  document.getElementById('bubble').textContent = s.msg;
-  buildDecor(s.decor);
-  buildItems(s);
-  buildCounter(s);
-}
-
-function buildCounter(s) {
-  const row = document.getElementById('counter-row');
-  row.innerHTML = '';
-  for (let i=0; i<s.count; i++) {
-    const sp = document.createElement('span');
-    sp.className = 'ci'; sp.textContent = s.item; sp.id = 'ci-'+i;
-    row.appendChild(sp);
-  }
-}
-
-function buildDecor(theme) {
-  const c = document.getElementById('decorations');
-  c.innerHTML = '';
-  const add = (emoji, style) => {
-    const d = document.createElement('div');
-    d.style.cssText = 'position:absolute;pointer-events:none;' + style;
-    d.textContent = emoji; c.appendChild(d);
-  };
-
-  if (theme === 'town') {
-    // Sky
-    ['☁️','☁️','☁️','🌤️'].forEach((e,i)=>add(e,`top:${8+i*6}%;left:${8+i*23}%;font-size:${30+i*8}px;opacity:.85;`));
-    // Sun
-    add('☀️','top:5%;right:8%;font-size:55px;');
-    // Buildings
-    ['🏠','🏪','🏦','🏬','🏫','🏠'].forEach((e,i)=>add(e,`bottom:16%;left:${4+i*16}%;font-size:${42+((i%3)-1)*8}px;`));
-    // Ground layer
-    ['🌳','🚗','🌳','🌸','🌲','🚲'].forEach((e,i)=>add(e,`bottom:6%;left:${3+i*17}%;font-size:28px;`));
-    // Birds
-    add('🐦','top:18%;left:40%;font-size:20px;');
-    add('🐦','top:22%;left:55%;font-size:16px;');
-  } else if (theme === 'forest') {
-    // Sky glow
-    for (let i=0;i<12;i++) add('✦',`top:${3+Math.random()*30}%;left:${Math.random()*90}%;font-size:${8+Math.random()*14}px;color:rgba(255,255,200,.6);animation:floatSpk ${2+Math.random()*2}s ${Math.random()}s ease-in-out infinite;`);
-    // Big trees back
-    for (let i=0;i<10;i++) add(['🌲','🌳'][i%2],`bottom:${Math.random()*20}%;left:${i*10+Math.random()*6}%;font-size:${44+Math.random()*36}px;opacity:${.5+Math.random()*.5};`);
-    // Animals
-    ['🦋','🐰','🦊','🌸','🍄','🦔'].forEach((e,i)=>add(e,`bottom:${16+i*5}%;left:${10+i*16}%;font-size:26px;animation:floatSpk ${2.5+i*.4}s ${i*.3}s ease-in-out infinite;`));
-    // Flowers
-    for (let i=0;i<14;i++) add(['🌸','🌼','🌺','🌷'][i%4],`bottom:${2+Math.random()*12}%;left:${Math.random()*90}%;font-size:${14+Math.random()*16}px;`);
-  } else if (theme === 'castle') {
-    // Stars
-    for (let i=0;i<25;i++) add(['✦','✧','⭐'][i%3],`top:${Math.random()*55}%;left:${Math.random()*90}%;font-size:${7+Math.random()*16}px;color:${['white','#ffe135','#c0d0ff'][i%3]};opacity:${.3+Math.random()*.7};animation:floatSpk ${1.5+Math.random()*2}s ${Math.random()*2}s ease-in-out infinite;`);
-    // Moon
-    add('🌙','top:6%;right:10%;font-size:65px;');
-    // Castle big
-    add('🏰','bottom:14%;left:50%;transform:translateX(-50%);font-size:110px;opacity:.55;');
-    // Magic items
-    ['🔮','✨','🪄','🌟','🔱'].forEach((e,i)=>add(e,`bottom:${8+i*6}%;left:${5+i*22}%;font-size:30px;animation:floatSpk ${2+i*.5}s ${i*.2}s ease-in-out infinite;`));
-    // Clouds of magic
-    for (let i=0;i<5;i++) add('☁️',`top:${35+i*8}%;left:${i*22}%;font-size:40px;opacity:.2;`);
-  }
-}
-
-function buildItems(s) {
-  const wrap = document.getElementById('items-wrap');
-  wrap.innerHTML = '';
-  const positions = [];
-  let tries = 0;
-  while (positions.length < s.count && tries < 600) {
-    tries++;
-    // Safe zone: avoid guide (bottom-left) and HUD (top)
-    const x = 12 + Math.random() * 72;
-    const y = 14 + Math.random() * 62;
-    // Avoid overlap
-    const ok = positions.every(p => {
-      const dx=x-p.x, dy=y-p.y;
-      return Math.sqrt(dx*dx+dy*dy) > 14;
-    });
-    if (ok) positions.push({x,y});
-  }
-
-  positions.forEach((pos, i) => {
-    const el = document.createElement('div');
-    el.className = 'item hidden';
-    el.style.left = pos.x + '%';
-    el.style.top = pos.y + '%';
-    el.textContent = s.item;
-    el.dataset.idx = i;
-    const rot = (Math.random()-0.5)*25;
-    el.style.transform = `rotate(${rot}deg)`;
-
-    const onFind = (e) => {
-      e.preventDefault(); e.stopPropagation();
-      if (el.classList.contains('found') || el.classList.contains('hidden') && !hintActive) {
-        // still hidden - but click counts
-        if (!el.classList.contains('found')) foundItem(el, i);
-      } else if (!el.classList.contains('found')) {
-        foundItem(el, i);
-      }
-    };
-    // Always register click regardless of hidden state (for 5yo friendliness)
-    el.addEventListener('click', e => { if (!el.classList.contains('found')) foundItem(el, i); });
-    el.addEventListener('touchstart', e => { e.preventDefault(); if (!el.classList.contains('found')) foundItem(el, i); }, {passive:false});
-
-    wrap.appendChild(el);
+function buildVictoryChars(){
+  const wrap=document.getElementById('v-chars');wrap.innerHTML='';
+  CHAR_FUNCS.forEach(fn=>{
+    const d=document.createElement('div');d.className='v-char';
+    d.innerHTML=fn(68,90);wrap.appendChild(d);
   });
 }
 
-function foundItem(el, idx) {
-  initAudio();
-  el.classList.remove('hidden','hint-show');
-  el.classList.add('found');
-  found++;
-  sfxFound();
-  spawnSparkles(el);
-
-  // Update counter
-  const ci = document.getElementById('ci-'+  (found-1));
-  if (ci) ci.classList.add('got');
-
-  // Praise
-  const praise = PRAISE[Math.floor(Math.random()*PRAISE.length)];
-  document.getElementById('bubble').textContent = praise + ' ' + found + '/' + total + ' みつけた！';
-  showToast('✨ みつけた！ ' + found + '/' + total);
-
-  if (found >= total) setTimeout(stageClear, 700);
+// ============================================================
+// GAME
+// ============================================================
+function startGame(){
+  initAudio(); stage=0;
+  document.getElementById('title-screen').style.display='none';
+  document.getElementById('game-screen').style.display='block';
+  startBGM(); loadStage();
 }
-
-function showHint() {
-  hintActive = true;
-  document.querySelectorAll('.item.hidden').forEach(el => el.classList.add('hint-show'));
-  document.getElementById('bubble').textContent = 'ここにかくれているよ！ みつけてね！';
-  setTimeout(() => {
-    hintActive = false;
-    document.querySelectorAll('.item.hint-show').forEach(el => el.classList.remove('hint-show'));
-  }, 2500);
+function loadStage(){
+  const s=STAGES[stage]; found=0; total=s.count; hintActive=false;
+  document.getElementById('stage-label').textContent=s.name;
+  document.getElementById('stage-bg').className='stage-bg '+s.bg;
+  document.getElementById('stage-clear').style.display='none';
+  document.getElementById('bubble').textContent=s.msg;
+  // Guide character
+  document.getElementById('guide-svg-wrap').innerHTML=CHAR_FUNCS[s.charIdx](56,76);
+  buildDecor(s.decor); buildItems(s); buildCounter(s);
 }
-
-function spawnSparkles(el) {
-  const rect = el.getBoundingClientRect();
-  const cx = rect.left + rect.width/2;
-  const cy = rect.top + rect.height/2;
-  const emojis = ['✨','⭐','💫','🌟','💖','✦'];
-  for (let i=0;i<10;i++) {
-    const sp = document.createElement('div');
-    const angle = (i/10)*Math.PI*2;
-    const dist = 35 + Math.random()*40;
-    const tx = Math.cos(angle)*dist, ty = Math.sin(angle)*dist;
-    const dur = 0.6 + Math.random()*0.3;
-    sp.style.cssText = `position:fixed;left:${cx}px;top:${cy}px;font-size:${12+Math.random()*18}px;
-      pointer-events:none;z-index:500;transform-origin:center;`;
-    sp.textContent = emojis[Math.floor(Math.random()*emojis.length)];
-    const anim = sp.animate([
-      {transform:'translate(0,0) scale(0) rotate(0deg)', opacity:1},
-      {transform:`translate(${tx}px,${ty}px) scale(1.6) rotate(${Math.random()*360}deg)`, opacity:0}
-    ], {duration: dur*1000, easing:'ease-out'});
-    document.body.appendChild(sp);
-    anim.onfinish = () => sp.remove();
+function buildCounter(s){
+  const row=document.getElementById('counter-row');row.innerHTML='';
+  for(let i=0;i<s.count;i++){const sp=document.createElement('span');sp.className='ci';sp.textContent=s.item;sp.id='ci-'+i;row.appendChild(sp);}
+}
+function buildDecor(theme){
+  const c=document.getElementById('decorations');c.innerHTML='';
+  const add=(emoji,style)=>{const d=document.createElement('div');d.style.cssText='position:absolute;pointer-events:none;'+style;d.textContent=emoji;c.appendChild(d);};
+  if(theme==='town'){
+    ['☁️','☁️','☁️','🌤️'].forEach((e,i)=>add(e,`top:${8+i*6}%;left:${8+i*23}%;font-size:${30+i*8}px;opacity:.85;`));
+    add('☀️','top:5%;right:8%;font-size:55px;');
+    ['🏠','🏪','🏦','🏬','🏫','🏠'].forEach((e,i)=>add(e,`bottom:16%;left:${4+i*16}%;font-size:${42+((i%3)-1)*8}px;`));
+    ['🌳','🚗','🌳','🌸','🌲','🚲'].forEach((e,i)=>add(e,`bottom:6%;left:${3+i*17}%;font-size:28px;`));
+    add('🐦','top:18%;left:40%;font-size:20px;');add('🐦','top:22%;left:55%;font-size:16px;');
+  } else if(theme==='forest'){
+    for(let i=0;i<12;i++)add('✦',`top:${3+Math.random()*30}%;left:${Math.random()*90}%;font-size:${8+Math.random()*14}px;color:rgba(255,255,200,.6);animation:floatSpk ${2+Math.random()*2}s ${Math.random()}s ease-in-out infinite;`);
+    for(let i=0;i<10;i++)add(['🌲','🌳'][i%2],`bottom:${Math.random()*20}%;left:${i*10+Math.random()*6}%;font-size:${44+Math.random()*36}px;opacity:${.5+Math.random()*.5};`);
+    ['🦋','🐰','🦊','🌸','🍄','🦔'].forEach((e,i)=>add(e,`bottom:${16+i*5}%;left:${10+i*16}%;font-size:26px;animation:floatSpk ${2.5+i*.4}s ${i*.3}s ease-in-out infinite;`));
+    for(let i=0;i<14;i++)add(['🌸','🌼','🌺','🌷'][i%4],`bottom:${2+Math.random()*12}%;left:${Math.random()*90}%;font-size:${14+Math.random()*16}px;`);
+  } else if(theme==='library'){
+    // Warm library scene
+    add('🕰️','top:8%;left:5%;font-size:50px;animation:floatSpk 3s ease-in-out infinite;');
+    add('🕯️','top:8%;right:8%;font-size:45px;animation:floatSpk 2.5s .5s ease-in-out infinite;');
+    ['📚','📖','📕','📗','📘','📙'].forEach((e,i)=>add(e,`bottom:22%;left:${6+i*16}%;font-size:${36+i%2*8}px;`));
+    ['🗝️','🔭','📜','🏺','🧩','🎩'].forEach((e,i)=>add(e,`bottom:${35+i*4}%;left:${8+i*18}%;font-size:26px;animation:floatSpk ${2+i*.4}s ${i*.2}s ease-in-out infinite;`));
+    ['📚','📚','📚'].forEach((e,i)=>add(e,`bottom:12%;left:${5+i*42}%;font-size:55px;opacity:.5;`));
+    add('🪔','bottom:35%;right:5%;font-size:38px;animation:floatSpk 2s ease-in-out infinite;');
+    add('🔎','top:15%;left:45%;font-size:40px;opacity:.3;animation:floatSpk 4s ease-in-out infinite;');
+  } else if(theme==='castle'){
+    for(let i=0;i<25;i++)add(['✦','✧','⭐'][i%3],`top:${Math.random()*55}%;left:${Math.random()*90}%;font-size:${7+Math.random()*16}px;color:${['white','#ffe135','#cc88ff'][i%3]};opacity:${.3+Math.random()*.7};animation:floatSpk ${1.5+Math.random()*2}s ${Math.random()*2}s ease-in-out infinite;`);
+    add('🌙','top:6%;right:10%;font-size:65px;');
+    add('🏰','bottom:14%;left:50%;transform:translateX(-50%);font-size:110px;opacity:.55;');
+    ['🔮','✨','🪄','🌟','🔱','💀'].forEach((e,i)=>add(e,`bottom:${8+i*6}%;left:${5+i*18}%;font-size:30px;animation:floatSpk ${2+i*.5}s ${i*.2}s ease-in-out infinite;`));
+    for(let i=0;i<5;i++)add('☁️',`top:${35+i*8}%;left:${i*22}%;font-size:40px;opacity:.15;`);
   }
 }
-
-function showToast(txt) {
-  const t = document.getElementById('toast');
-  document.getElementById('toast-txt').textContent = txt;
-  t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),1800);
+function buildItems(s){
+  const wrap=document.getElementById('items-wrap');wrap.innerHTML='';
+  const positions=[];let tries=0;
+  while(positions.length<s.count&&tries<600){
+    tries++;
+    const x=12+Math.random()*72, y=14+Math.random()*62;
+    if(positions.every(p=>{const dx=x-p.x,dy=y-p.y;return Math.sqrt(dx*dx+dy*dy)>14;}))positions.push({x,y});
+  }
+  positions.forEach((pos,i)=>{
+    const el=document.createElement('div');
+    el.className='item hidden'; el.style.left=pos.x+'%'; el.style.top=pos.y+'%';
+    el.textContent=s.item; el.dataset.idx=i;
+    el.style.transform=`rotate(${(Math.random()-.5)*25}deg)`;
+    el.addEventListener('click',e=>{if(!el.classList.contains('found'))foundItem(el,i);});
+    el.addEventListener('touchstart',e=>{e.preventDefault();if(!el.classList.contains('found'))foundItem(el,i);},{passive:false});
+    wrap.appendChild(el);
+  });
 }
-
-function stageClear() {
-  sfxClear();
-  const s = STAGES[stage];
-  document.getElementById('sc-msg').textContent = s.clearMsg;
-  const last = stage >= STAGES.length - 1;
-  document.getElementById('btn-next').textContent = last ? '🎉 ゲームクリア！' : 'つぎへ ➡️';
-  const clearEl = document.getElementById('stage-clear');
-  clearEl.style.display = 'flex';
+function foundItem(el,idx){
+  initAudio(); el.classList.remove('hidden','hint-show'); el.classList.add('found');
+  found++; sfxFound(); spawnSparkles(el);
+  const ci=document.getElementById('ci-'+(found-1));if(ci)ci.classList.add('got');
+  const praise=PRAISE[Math.floor(Math.random()*PRAISE.length)];
+  document.getElementById('bubble').textContent=praise+' '+found+'/'+total+' みつけた！';
+  showToast('✨ みつけた！ '+found+'/'+total);
+  if(found>=total)setTimeout(stageClear,700);
 }
-
-function nextStage() {
-  stage++;
-  if (stage >= STAGES.length) { showVictory(); return; }
-  loadStage();
+function showHint(){
+  hintActive=true;
+  document.querySelectorAll('.item.hidden').forEach(el=>el.classList.add('hint-show'));
+  document.getElementById('bubble').textContent='ここにかくれているよ！ みつけてね！';
+  setTimeout(()=>{hintActive=false;document.querySelectorAll('.item.hint-show').forEach(el=>el.classList.remove('hint-show'));},2500);
 }
-
-function showVictory() {
+function spawnSparkles(el){
+  const rect=el.getBoundingClientRect(),cx=rect.left+rect.width/2,cy=rect.top+rect.height/2;
+  const emojis=['✨','⭐','💫','🌟','💖','✦'];
+  for(let i=0;i<10;i++){
+    const sp=document.createElement('div');
+    const angle=(i/10)*Math.PI*2,dist=35+Math.random()*40;
+    const tx=Math.cos(angle)*dist,ty=Math.sin(angle)*dist;
+    sp.style.cssText=`position:fixed;left:${cx}px;top:${cy}px;font-size:${12+Math.random()*18}px;pointer-events:none;z-index:500;`;
+    sp.textContent=emojis[Math.floor(Math.random()*emojis.length)];
+    const anim=sp.animate([{transform:'translate(0,0) scale(0) rotate(0deg)',opacity:1},{transform:`translate(${tx}px,${ty}px) scale(1.6) rotate(${Math.random()*360}deg)`,opacity:0}],{duration:(0.6+Math.random()*.3)*1000,easing:'ease-out'});
+    document.body.appendChild(sp);anim.onfinish=()=>sp.remove();
+  }
+}
+function showToast(txt){
+  const t=document.getElementById('toast');document.getElementById('toast-txt').textContent=txt;
+  t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1800);
+}
+function stageClear(){
+  sfxClear();const s=STAGES[stage];
+  document.getElementById('sc-msg').textContent=s.clearMsg;
+  document.getElementById('sc-char').innerHTML=CHAR_FUNCS[s.charIdx](70,90);
+  const last=stage>=STAGES.length-1;
+  document.getElementById('btn-next').textContent=last?'🎉 ゲームクリア！':'つぎへ ➡️';
+  document.getElementById('stage-clear').style.display='flex';
+}
+function nextStage(){
+  stage++;if(stage>=STAGES.length){showVictory();return;}loadStage();
+}
+function showVictory(){
   stopBGM();
-  document.getElementById('game-screen').style.display = 'none';
-  const vs = document.getElementById('victory-screen');
-  vs.style.display = 'flex';
-  sfxVictory();
-  spawnConfetti();
+  document.getElementById('game-screen').style.display='none';
+  document.getElementById('victory-screen').style.display='flex';
+  sfxVictory();buildVictoryChars();spawnConfetti();
 }
-
-function spawnConfetti() {
-  const wrap = document.getElementById('confetti-wrap');
-  wrap.innerHTML = '';
-  const emojis=['🌟','⭐','💖','🎉','✨','💫','🌸','🏅','💎'];
-  const colors=['#ff6eb4','#c44dff','#4d79ff','#ffe135','#ff8c00','#4CAF50'];
-  for (let i=0;i<60;i++) {
-    const el = document.createElement('div');
-    el.className = 'cf';
-    const isEmoji = Math.random()>.5;
-    if (isEmoji) {
-      el.textContent = emojis[Math.floor(Math.random()*emojis.length)];
-      el.style.fontSize = (12+Math.random()*20)+'px';
-    } else {
-      el.style.background = colors[Math.floor(Math.random()*colors.length)];
-      el.style.width = (8+Math.random()*12)+'px'; el.style.height=(8+Math.random()*12)+'px';
-      el.style.borderRadius = Math.random()>.5?'50%':'3px';
-    }
-    el.style.left = Math.random()*100+'%';
-    el.style.setProperty('--d',(2+Math.random()*3)+'s');
-    el.style.setProperty('--dl',(Math.random()*2)+'s');
+function spawnConfetti(){
+  const wrap=document.getElementById('confetti-wrap');wrap.innerHTML='';
+  const emojis=['🌟','⭐','💖','🎉','✨','💫','🌸','🏅','💎','🔮'];
+  const colors=['#cc44ff','#ff44aa','#ffaa00','#ffe135','#4CAF50','#4488ff'];
+  for(let i=0;i<70;i++){
+    const el=document.createElement('div');el.className='cf';
+    if(Math.random()>.5){el.textContent=emojis[Math.floor(Math.random()*emojis.length)];el.style.fontSize=(12+Math.random()*20)+'px';}
+    else{el.style.background=colors[Math.floor(Math.random()*colors.length)];el.style.width=(8+Math.random()*12)+'px';el.style.height=(8+Math.random()*12)+'px';el.style.borderRadius=Math.random()>.5?'50%':'3px';}
+    el.style.left=Math.random()*100+'%';
+    el.style.setProperty('--d',(2+Math.random()*3)+'s');el.style.setProperty('--dl',(Math.random()*2)+'s');
     wrap.appendChild(el);
   }
 }
-
-function replayGame() {
-  document.getElementById('victory-screen').style.display = 'none';
-  document.getElementById('title-screen').style.display = 'flex';
-  stopBGM();
+function replayGame(){
+  document.getElementById('victory-screen').style.display='none';
+  document.getElementById('title-screen').style.display='flex';stopBGM();
 }
 
 // ============================================================
-// CURSOR & TITLE INIT
+// CURSOR & INIT
 // ============================================================
-document.addEventListener('mousemove', e => {
-  const c = document.getElementById('cursor');
-  c.style.left = e.clientX+'px'; c.style.top = e.clientY+'px';
-});
+document.addEventListener('mousemove',e=>{const c=document.getElementById('cursor');c.style.left=e.clientX+'px';c.style.top=e.clientY+'px';});
 
-// Title stars
-(function() {
-  const wrap = document.getElementById('t-stars');
-  const arr = ['⭐','✨','💫','🌟','✦','💖'];
-  for (let i=0;i<35;i++) {
-    const s = document.createElement('div');
-    s.className = 't-star';
-    s.style.left = Math.random()*95+'%';
-    s.style.top  = Math.random()*95+'%';
-    s.style.fontSize = (10+Math.random()*18)+'px';
-    s.style.setProperty('--d',(1.5+Math.random()*2.5)+'s');
-    s.style.setProperty('--dl',(Math.random()*3)+'s');
-    s.textContent = arr[Math.floor(Math.random()*arr.length)];
-    wrap.appendChild(s);
+(function initTitle(){
+  buildTitleChars();
+  const wrap=document.getElementById('t-stars'),arr=['⭐','✨','💫','🌟','✦','💖','🔮'];
+  for(let i=0;i<35;i++){
+    const s=document.createElement('div');s.className='t-star';
+    s.style.left=Math.random()*95+'%';s.style.top=Math.random()*95+'%';
+    s.style.fontSize=(10+Math.random()*18)+'px';
+    s.style.setProperty('--d',(1.5+Math.random()*2.5)+'s');s.style.setProperty('--dl',(Math.random()*3)+'s');
+    s.textContent=arr[Math.floor(Math.random()*arr.length)];wrap.appendChild(s);
   }
 })();
 </script>
