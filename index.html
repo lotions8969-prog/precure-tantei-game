@@ -6,26 +6,79 @@
 <title>名探偵プリキュア ゲームランド</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Hiragino Maru Gothic ProN','BIZ UDPGothic',sans-serif;background:#1a0038;color:#fff;min-height:100vh;overflow-x:hidden}
+body{font-family:'Hiragino Maru Gothic ProN','BIZ UDPGothic',sans-serif;
+  background:#090018;
+  background-image:radial-gradient(#ffffff09 1px,transparent 1px),radial-gradient(#ffffff05 1px,transparent 1px);
+  background-size:28px 28px,56px 56px;background-position:0 0,14px 14px;
+  color:#fff;min-height:100vh;overflow-x:hidden}
 
 /* ===== キャラ画像共通 ===== */
-/* 白背景ラッパー + mix-blend-mode:multiply で JPEG白抜き */
 .ci-wrap{display:inline-block;background:#fff;border-radius:12px;overflow:hidden;line-height:0;vertical-align:bottom}
 .ci-wrap img{display:block;object-fit:cover;mix-blend-mode:multiply}
 
+/* ===== 魔法パーティクル ===== */
+.hub-sparkle{position:fixed;pointer-events:none;z-index:0;animation-name:floatSparkle;animation-timing-function:linear;animation-fill-mode:forwards}
+@keyframes floatSparkle{from{transform:translateY(0)rotate(0deg);opacity:.85}to{transform:translateY(-110vh)rotate(540deg);opacity:0}}
+
 /* ===== HUB ===== */
-#hub{min-height:100vh;padding:0 0 40px}
-.hub-header{background:linear-gradient(135deg,#2d0066,#6600cc,#2d0066);padding:16px 20px 12px;text-align:center;box-shadow:0 4px 20px #9900ff88}
-.hub-title{font-size:clamp(18px,5vw,34px);font-weight:900;background:linear-gradient(90deg,#ff88ff,#88ffff,#ffff88,#ff88ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-size:200%;animation:gradMove 3s linear infinite}
-@keyframes gradMove{to{background-position:200%}}
-.hub-subtitle{font-size:13px;color:#cc99ff;margin-top:4px}
-.hub-chars{display:flex;justify-content:center;gap:10px;margin-top:12px}
-.hub-char-wrap{display:inline-block;background:#fff;border-radius:12px;overflow:hidden;line-height:0;border:2px solid #9966ff;filter:drop-shadow(0 0 8px #aa66ff);animation:charB 2s ease-in-out infinite}
-.hub-char-wrap:nth-child(2){animation-delay:.3s}
-.hub-char-wrap:nth-child(3){animation-delay:.6s}
-.hub-char-wrap:nth-child(4){animation-delay:.9s}
-.hub-char-wrap img{width:60px;height:72px;object-fit:cover;mix-blend-mode:multiply;display:block}
-@keyframes charB{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+#hub{min-height:100vh;padding:0 0 40px;position:relative;z-index:1}
+.hub-header{
+  background:linear-gradient(180deg,#100035 0%,#2a0075 30%,#4a00aa 58%,#220060 100%);
+  padding:20px 16px 28px;text-align:center;
+  box-shadow:0 6px 40px #9900ffcc;
+  position:relative;overflow:hidden;z-index:2;
+}
+/* 背景魔法陣リング */
+.hub-header::before{
+  content:'';position:absolute;width:360px;height:360px;
+  left:50%;top:50%;transform:translate(-50%,-50%);border-radius:50%;
+  border:1px solid #ff66cc33;
+  box-shadow:0 0 0 18px #aa33ff0d,0 0 0 36px #ff66cc09,0 0 0 60px #aa33ff05,0 0 80px 80px #6600cc22 inset;
+  animation:ringPulse 5s ease-in-out infinite;pointer-events:none;
+}
+@keyframes ringPulse{0%,100%{opacity:.5;transform:translate(-50%,-50%)scale(1)}50%{opacity:1;transform:translate(-50%,-50%)scale(1.05)}}
+/* 下部装飾ライン */
+.hub-header::after{
+  content:'✦  💖  ✦  💫  ✦  🌟  ✦  💫  ✦  💖  ✦';
+  position:absolute;bottom:6px;left:0;right:0;
+  text-align:center;font-size:10px;color:#ff88cc55;letter-spacing:3px;pointer-events:none;
+}
+.hub-badge{
+  display:inline-block;
+  background:linear-gradient(135deg,#ff44bb,#9922ff);
+  border-radius:24px;padding:5px 22px;font-size:13px;font-weight:900;
+  color:#fff;margin-bottom:10px;
+  box-shadow:0 0 18px #ff66ccaa,0 2px 6px #00000055;
+  letter-spacing:1px;position:relative;z-index:1;
+}
+.hub-title{
+  font-size:clamp(22px,6.5vw,46px);font-weight:900;
+  background:linear-gradient(90deg,#ff88ff,#ffee44,#88ffff,#ff44cc,#ff88ff);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-size:250%;animation:gradMove 3.5s linear infinite;
+  line-height:1.15;position:relative;z-index:1;
+  text-shadow:none;
+}
+@keyframes gradMove{to{background-position:250%}}
+.hub-subtitle{font-size:12px;color:#cc99ff;margin-top:6px;position:relative;z-index:1;letter-spacing:.5px}
+.hub-tagline{font-size:11px;color:#ff99cc88;margin-top:4px;position:relative;z-index:1}
+
+/* キャラクターカード（大型表示） */
+.hub-chars{display:flex;justify-content:center;gap:10px;margin-top:18px;flex-wrap:wrap;position:relative;z-index:1}
+.hub-char-card{display:flex;flex-direction:column;align-items:center;gap:5px}
+.hub-char-wrap{
+  display:inline-block;background:#fff;border-radius:16px;overflow:hidden;line-height:0;
+  border:3px solid #9966ff;
+  box-shadow:0 0 0 3px #33006666;
+  animation:charB 2s ease-in-out infinite;
+  transition:transform .2s;
+}
+.hub-char-card:nth-child(2) .hub-char-wrap{animation-delay:.25s}
+.hub-char-card:nth-child(3) .hub-char-wrap{animation-delay:.5s}
+.hub-char-card:nth-child(4) .hub-char-wrap{animation-delay:.75s}
+.hub-char-wrap img{width:108px;height:130px;object-fit:cover;mix-blend-mode:multiply;display:block}
+.hub-char-name{font-size:9px;font-weight:900;text-align:center;line-height:1.3;max-width:114px;color:#ffccff}
+@keyframes charB{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
 
 .cat-tabs{display:flex;flex-wrap:wrap;gap:6px;padding:12px 16px;justify-content:center;background:#150030}
 .cat-tab{padding:6px 14px;border-radius:20px;border:2px solid #6633aa;background:#2a0055;color:#cc99ff;font-size:13px;font-weight:700;cursor:pointer;transition:.2s}
@@ -37,9 +90,12 @@ body{font-family:'Hiragino Maru Gothic ProN','BIZ UDPGothic',sans-serif;backgrou
 .game-tile:hover{transform:scale(1.05);border-color:#aa66ff;box-shadow:0 0 16px #9933ff88}
 .game-tile:active{transform:scale(.97)}
 .game-tile.hidden{display:none}
+.game-tile.hard-tile{background:linear-gradient(145deg,#3a0010,#660022);border-color:#cc2244}
+.game-tile.hard-tile:hover{border-color:#ff4466;box-shadow:0 0 16px #ff224488}
 .game-icon{font-size:30px;line-height:1;margin-bottom:5px}
 .game-name{font-size:10px;font-weight:700;color:#eeddff;line-height:1.3}
 .game-num{position:absolute;top:4px;left:6px;font-size:9px;color:#9966cc;font-weight:700}
+.game-hard-badge{position:absolute;top:4px;right:5px;background:linear-gradient(135deg,#ff2244,#880011);color:#fff;font-size:8px;font-weight:900;padding:1px 5px;border-radius:6px}
 
 /* ===== キャラクター選択モーダル ===== */
 #charSelectModal{display:none;position:fixed;inset:0;z-index:200;background:#000000cc;align-items:center;justify-content:center;padding:16px;overflow-y:auto}
@@ -210,13 +266,35 @@ body{font-family:'Hiragino Maru Gothic ProN','BIZ UDPGothic',sans-serif;backgrou
 <!-- ===== HUB ===== -->
 <div id="hub">
   <div class="hub-header">
-    <div class="hub-title">★ 名探偵プリキュア ゲームランド ★</div>
-    <div class="hub-subtitle">48このゲームであそぼう！</div>
+    <div class="hub-badge">✨ 名探偵プリキュア ✨</div>
+    <div class="hub-title">★ ゲームランド ★</div>
+    <div class="hub-subtitle" id="hubSubtitle">たくさんのゲームであそぼう！</div>
+    <div class="hub-tagline">💫 プリキュアをえらんでゲームスタート！ 💫</div>
     <div class="hub-chars">
-      <div class="hub-char-wrap"><img src="./imgs/chara01.jpg" alt="キュアアンサー" onerror="this.parentNode.style.display='none'"></div>
-      <div class="hub-char-wrap"><img src="./imgs/chara02.jpg" alt="キュアミスティック" onerror="this.parentNode.style.display='none'"></div>
-      <div class="hub-char-wrap"><img src="./imgs/chara03.jpg" alt="キュアエクレール" onerror="this.parentNode.style.display='none'"></div>
-      <div class="hub-char-wrap"><img src="./imgs/chara04.jpg" alt="キュアアルカナ・シャドウ" onerror="this.parentNode.style.display='none'"></div>
+      <div class="hub-char-card">
+        <div class="hub-char-wrap" style="border-color:#cc66ff;box-shadow:0 0 16px #cc66ff88,0 0 0 3px #33006666">
+          <img src="./imgs/chara01.jpg" alt="キュアアンサー" onerror="this.parentNode.style.display='none'">
+        </div>
+        <div class="hub-char-name" style="color:#dd99ff">キュアアンサー</div>
+      </div>
+      <div class="hub-char-card">
+        <div class="hub-char-wrap" style="border-color:#ff66bb;box-shadow:0 0 16px #ff66bb88,0 0 0 3px #33006666">
+          <img src="./imgs/chara02.jpg" alt="キュアミスティック" onerror="this.parentNode.style.display='none'">
+        </div>
+        <div class="hub-char-name" style="color:#ff99cc">キュアミスティック</div>
+      </div>
+      <div class="hub-char-card">
+        <div class="hub-char-wrap" style="border-color:#44ffcc;box-shadow:0 0 16px #44ffcc88,0 0 0 3px #33006666">
+          <img src="./imgs/chara03.jpg" alt="キュアエクレール" onerror="this.parentNode.style.display='none'">
+        </div>
+        <div class="hub-char-name" style="color:#88ffee">キュアエクレール</div>
+      </div>
+      <div class="hub-char-card">
+        <div class="hub-char-wrap" style="border-color:#aa44ff;box-shadow:0 0 16px #aa44ff88,0 0 0 3px #33006666">
+          <img src="./imgs/chara04.jpg" alt="キュアアルカナ・シャドウ" onerror="this.parentNode.style.display='none'">
+        </div>
+        <div class="hub-char-name" style="color:#cc88ff">アルカナ・シャドウ</div>
+      </div>
     </div>
   </div>
   <div class="cat-tabs" id="catTabs"></div>
@@ -396,10 +474,17 @@ var GAMES=[
   {id:50,cat:'2にんで',icon:'🂠',name:'2Pカードたいけつ',engine:'2pCard',cfg:{pairs:6}},
   {id:51,cat:'2にんで',icon:'🐹',name:'2Pもぐらたいけつ',engine:'2pWhack',cfg:{speed:1000}},
   {id:52,cat:'2にんで',icon:'❓',name:'2Pクイズたいけつ',engine:'2pQuiz',cfg:{rounds:5}},
-  {id:53,cat:'2にんで',icon:'🎈',name:'2Pふうせんたいけつ',engine:'2pBalloon',cfg:{time:30}}
+  {id:53,cat:'2にんで',icon:'🎈',name:'2Pふうせんたいけつ',engine:'2pBalloon',cfg:{time:30}},
+  /* ===== むずかしいカテゴリ ===== */
+  {id:54,cat:'むずかしい',icon:'🂠',name:'超むずカード16ペア',engine:'card',cfg:{pairs:16}},
+  {id:55,cat:'むずかしい',icon:'⚡',name:'スピードさんすう',engine:'speedmath',cfg:{time:40}},
+  {id:56,cat:'むずかしい',icon:'🎵',name:'超長リズム8ステップ',engine:'rhythm',cfg:{len:8,bpm:110}},
+  {id:57,cat:'むずかしい',icon:'💀',name:'激むずタップ',engine:'tap',cfg:{obj:'💎',bad:'💀',speed:450}},
+  {id:58,cat:'むずかしい',icon:'🔍',name:'プリキュアクイズ',engine:'prequiz',cfg:{}},
+  {id:59,cat:'むずかしい',icon:'🧩',name:'4×4スライドパズル',engine:'puzzle',cfg:{size:4}}
 ];
 
-var CATS=['すべて','さがす','タップ','カード','かず','いろ','おんがく','ふうせん','もぐら','パズル','その他','2にんで'];
+var CATS=['すべて','さがす','タップ','カード','かず','いろ','おんがく','ふうせん','もぐら','パズル','その他','2にんで','むずかしい'];
 var currentCat='すべて';
 var score=0;
 var gameTimers=[];
@@ -594,6 +679,23 @@ var BGM_TRACKS={
     },225));
   }
 };
+  // むずかしい: 緊張感のある冒険テーマ (Em minor + tension)
+  'むずかしい':function(){
+    var mel=[330,294,330,392, 440,494,440,392, 330,392,440,523, 494,440,392,330];
+    var bas=[165,147,165,196]; // E3,D3,E3,G3
+    var i=0;
+    bgmTimers.push(setInterval(function(){
+      if(!bgmOn)return;
+      var f=mel[i%16];
+      pn(f,.18,'square',.11);
+      pn(f*.749,.16,'sine',.07);
+      pn(f*1.498,.15,'triangle',.05);
+      if(i%4===0)pn(bas[Math.floor(i/4)%4],.40,'sawtooth',.10);
+      if(i%8===0)pn(82,.20,'sawtooth',.11); // deep kick
+      i++;
+    },250));
+  }
+};
 BGM_TRACKS['default']=BGM_TRACKS['その他'];
 function startBGM(cat){if(bgmOn)return;bgmOn=true;(BGM_TRACKS[cat]||BGM_TRACKS['default'])();}
 
@@ -733,15 +835,20 @@ function confirmCharAndStart(){
 // HUB
 // ============================================================
 function buildHub(){
+  document.getElementById('hubSubtitle').textContent=GAMES.length+'このゲームであそぼう！';
   var tabsEl=document.getElementById('catTabs');
   tabsEl.innerHTML=CATS.map(function(c){
-    return '<div class="cat-tab'+(c===currentCat?' active':'')+'" onclick="filterCat(\''+c+'\')">'+c+'</div>';
+    var badge=c==='むずかしい'?' 🔥':'';
+    return '<div class="cat-tab'+(c===currentCat?' active':'')+'" onclick="filterCat(\''+c+'\')" style="'+(c==='むずかしい'?'border-color:#cc2244;color:'+(currentCat===c?'#fff':'#ff6688'):'')+'">'+c+badge+'</div>';
   }).join('');
   var gridEl=document.getElementById('gamesGrid');
   gridEl.innerHTML=GAMES.map(function(g){
     var hidden=(currentCat!=='すべて'&&g.cat!==currentCat)?' hidden':'';
-    return '<div class="game-tile'+hidden+'" onclick="openCharSelect('+(g.id-1)+')">'
+    var isHard=g.cat==='むずかしい';
+    var hardBadge=isHard?'<div class="game-hard-badge">難</div>':'';
+    return '<div class="game-tile'+(isHard?' hard-tile':'')+hidden+'" onclick="openCharSelect('+(g.id-1)+')">'
       +'<div class="game-num">'+g.id+'</div>'
+      +hardBadge
       +'<div class="game-icon">'+g.icon+'</div>'
       +'<div class="game-name">'+g.name+'</div></div>';
   }).join('');
@@ -828,14 +935,22 @@ function showResult(msg){
 function launchEngine(g){
   var area=document.getElementById('gameArea');
   area.innerHTML='';
-  area.style.background=CHARS[selectedCharIdx].bgColor;
+  var ch=CHARS[selectedCharIdx];
+  // プリキュアテーマのグラデーション背景
+  area.style.background='radial-gradient(ellipse at 30% 20%,'+ch.bgColor+' 0%,#050012 70%)';
+  // キャラ名ウォーターマーク（極薄で世界観演出）
+  var wm=document.createElement('div');
+  wm.style.cssText='position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:clamp(28px,8vw,64px);font-weight:900;opacity:.04;user-select:none;pointer-events:none;z-index:0;color:#fff;text-align:center;padding:16px;line-height:1.3;word-break:break-all';
+  wm.textContent=ch.name+'  '+ch.name;
+  area.appendChild(wm);
   // ウィジェットをgameAreaの子に
   var w=document.getElementById('charWidget');
   area.appendChild(w);w.style.display='flex';
   var engines={find:engFind,tap:engTap,card:engCard,count:engCount,color:engColor,
     piano:engPiano,rhythm:engRhythm,balloon:engBalloon,whack:engWhack,
     puzzle:engPuzzle,sort:engSort,stamp:engStamp,
-    '2pTap':eng2pTap,'2pCard':eng2pCard,'2pWhack':eng2pWhack,'2pQuiz':eng2pQuiz,'2pBalloon':eng2pBalloon};
+    '2pTap':eng2pTap,'2pCard':eng2pCard,'2pWhack':eng2pWhack,'2pQuiz':eng2pQuiz,'2pBalloon':eng2pBalloon,
+    speedmath:engSpeedmath,prequiz:engPrequiz};
   if(engines[g.engine])engines[g.engine](area,g.cfg);
 }
 
@@ -1658,6 +1773,116 @@ function eng2pBalloon(area,cfg){
 }
 
 // ============================================================
+// スピードさんすう（40秒タイムアタック算数）
+// ============================================================
+function engSpeedmath(area,cfg){
+  var timeLimit=cfg.time||40;
+  var correct=0,total=0,running=true,rem=timeLimit;
+  area.style.display='flex';area.style.flexDirection='column';area.style.justifyContent='center';area.style.padding='12px';
+  function mkQ(){
+    var ops=['+','-','×'];
+    var op=ops[Math.floor(Math.random()*ops.length)];
+    var a,b,ans;
+    if(op==='+'){a=Math.floor(Math.random()*50)+1;b=Math.floor(Math.random()*50)+1;ans=a+b;}
+    else if(op==='-'){a=Math.floor(Math.random()*50)+10;b=Math.floor(Math.random()*a);ans=a-b;}
+    else{a=Math.floor(Math.random()*12)+1;b=Math.floor(Math.random()*12)+1;ans=a*b;}
+    var wrongs=[];
+    while(wrongs.length<3){var w=ans+Math.floor(Math.random()*10)-5;if(w!==ans&&w>0&&wrongs.indexOf(w)===-1)wrongs.push(w);}
+    var choices=[ans].concat(wrongs).sort(function(){return Math.random()-.5;});
+    return{q:a+' '+op+' '+b+' = ?',ans:ans,choices:choices};
+  }
+  function nextQ(){
+    area.innerHTML='';
+    if(!running){return;}
+    var q=mkQ();total++;
+    var timeBar=document.createElement('div');
+    timeBar.style.cssText='font-size:22px;font-weight:900;color:#ffff44;text-align:center;margin-bottom:8px';
+    timeBar.id='smTimer';timeBar.textContent='⏱'+rem+'びょう';
+    var scoreDiv=document.createElement('div');
+    scoreDiv.style.cssText='font-size:14px;color:#cc99ff;text-align:center;margin-bottom:10px';
+    scoreDiv.textContent='✅ '+correct+' もん せいかい！';
+    var qDiv=document.createElement('div');
+    qDiv.style.cssText='font-size:clamp(28px,8vw,52px);font-weight:900;color:#ffff88;text-align:center;background:#2a005a;padding:18px;border-radius:16px;margin-bottom:16px;border:2px solid #9933ff';
+    qDiv.textContent=q.q;
+    var btns=document.createElement('div');
+    btns.style.cssText='display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:340px;margin:0 auto;width:100%';
+    q.choices.forEach(function(c){
+      var btn=document.createElement('button');btn.className='count-btn';
+      btn.style.cssText='width:100%;height:70px;font-size:24px;';
+      btn.textContent=c;
+      btn.onclick=function(){
+        if(!running)return;
+        if(c===q.ans){sfxSuccess();addScore(15);correct++;btn.classList.add('correct');}
+        else{sfxMiss();btn.classList.add('wrong');}
+        gameTimeout(nextQ,300);
+      };
+      btns.appendChild(btn);
+    });
+    area.appendChild(timeBar);area.appendChild(scoreDiv);area.appendChild(qDiv);area.appendChild(btns);
+    reattachWidget(area);
+  }
+  nextQ();
+  gameInterval(function(){
+    rem--;
+    var t=document.getElementById('smTimer');if(t)t.textContent='⏱'+rem+'びょう';
+    if(t&&rem<=10)t.style.color='#ff4444';
+    if(rem<=0){running=false;showResult('せいかい '+correct+' もん！⚡');}
+  },1000);
+}
+
+// ============================================================
+// プリキュアクイズ（キャラクター・探偵テーマ）
+// ============================================================
+function engPrequiz(area,cfg){
+  var ch=CHARS[selectedCharIdx];
+  var QUESTIONS=[
+    {q:'キュアアンサーのカラーは？',choices:['むらさき','ピンク','みどり','あお'],ans:0},
+    {q:'キュアミスティックのせいかくは？',choices:['げんき','かしこい','ふしぎ・まほう','こわい'],ans:2},
+    {q:'キュアエクレールは どんな子？',choices:['おとなしい','ねむい','げんきいっぱい','かなしい'],ans:2},
+    {q:'アルカナ・シャドウのテーマは？',choices:['ひかりとかげ','うみとそら','はなとはな','ほしとつき'],ans:0},
+    {q:'プリキュアの必殺技の かけごえは？',choices:['プリキュア！','サンキュー！','こんにちは！','さようなら！'],ans:0},
+    {q:'たんていがつかうものは？',choices:['むちゅう','ルーペ・てがかり','けいたいゲーム','えんぴつ'],ans:1},
+    {q:'キュアアンサーが ちょうとくいな のは？',choices:['りょうり','ダンス','なぞとき・ちえ','えをかくこと'],ans:2},
+    {q:'まほうをつかうのは？',choices:['キュアミスティック','サンタさん','おかあさん','せんせい'],ans:0},
+    {q:'プリキュアがたたかう あいては？',choices:['わるいもの・てき','おかしのくに','さかな','あめ'],ans:0},
+    {q:'キュアエクレールのカラーは？',choices:['あか','みどり・ターコイズ','しろ','きいろ'],ans:1},
+    {q:'プリキュアはなんの ために たたかう？',choices:['おかねのため','みんなをまもるため','ゆうめいになるため','ゲームのため'],ans:1},
+    {q:'なまえのたんていにかかわることば は？',choices:['めいたんてい','まいたんてい','めたんてい','まめたんてい'],ans:0},
+  ].sort(function(){return Math.random()-.5;});
+  var qNum=0,totalQ=8,score2=0;
+  area.style.display='flex';area.style.flexDirection='column';area.style.justifyContent='center';area.style.padding='14px';
+  function nextQ(){
+    area.innerHTML='';reattachWidget(area);
+    if(qNum>=totalQ){showResult('クイズマスター！🔍✨');return;}
+    var q=QUESTIONS[qNum];qNum++;
+    var prog=document.createElement('div');prog.style.cssText='font-size:12px;color:#cc99ff;text-align:center;margin-bottom:6px';
+    prog.textContent=qNum+'/'+totalQ+'もん  ⭐'+score2+'てん';
+    var qDiv=document.createElement('div');
+    qDiv.style.cssText='font-size:clamp(15px,4vw,20px);font-weight:900;color:#ffff88;text-align:center;background:linear-gradient(135deg,#2a005a,#440088);padding:16px;border-radius:16px;margin-bottom:14px;border:2px solid #9933ff;line-height:1.5';
+    qDiv.textContent='🔍 '+q.q;
+    var btns=document.createElement('div');
+    btns.style.cssText='display:flex;flex-direction:column;gap:9px;max-width:380px;margin:0 auto;width:100%';
+    q.choices.forEach(function(c,i){
+      var btn=document.createElement('button');
+      btn.style.cssText='padding:12px 16px;border-radius:14px;border:3px solid #6633aa;background:linear-gradient(135deg,#2a005a,#440088);color:#fff;font-size:16px;font-weight:700;cursor:pointer;text-align:left;transition:.15s';
+      btn.textContent=['🅐 ','🅑 ','🅒 ','🅓 '][i]+c;
+      btn.onclick=function(){
+        if(i===q.ans){
+          sfxSuccess();btn.style.background='linear-gradient(135deg,#006600,#00cc44)';btn.style.borderColor='#00ff66';
+          addScore(20);score2+=20;charMsg('correct');gameTimeout(nextQ,700);
+        }else{
+          sfxMiss();btn.style.background='linear-gradient(135deg,#660000,#cc0044)';btn.style.borderColor='#ff0044';
+          charMsg('wrong');gameTimeout(function(){btn.style.background='linear-gradient(135deg,#2a005a,#440088)';btn.style.borderColor='#6633aa';},450);
+        }
+      };
+      btns.appendChild(btn);
+    });
+    area.appendChild(prog);area.appendChild(qDiv);area.appendChild(btns);reattachWidget(area);
+  }
+  nextQ();
+}
+
+// ============================================================
 // 初期化
 // ============================================================
 document.addEventListener('visibilitychange',function(){if(document.hidden){stopBGM();}});
@@ -1665,6 +1890,25 @@ window.addEventListener('resize',function(){
   var cv=document.getElementById('stampCv');
   if(cv){var p=cv.parentNode;cv.width=p.offsetWidth||300;cv.height=p.offsetHeight||200;}
 });
+
+// ============================================================
+// ハブ画面の魔法パーティクル
+// ============================================================
+var SP_EMOJIS=['✨','💫','⭐','🌟','💖','🔮','🌸','💎','🦋','🌈','💜','🔮','💐','🎀'];
+setInterval(function(){
+  if(document.getElementById('gameScreen').style.display!=='none')return;
+  var el=document.createElement('div');
+  el.className='hub-sparkle';
+  var sz=9+Math.random()*16;
+  el.style.fontSize=sz+'px';
+  el.style.left=(Math.random()*96)+'%';
+  el.style.bottom='-24px';
+  el.style.animationDuration=(4+Math.random()*5)+'s';
+  el.style.opacity=.7+Math.random()*.3;
+  el.textContent=SP_EMOJIS[Math.floor(Math.random()*SP_EMOJIS.length)];
+  document.body.appendChild(el);
+  setTimeout(function(){if(el.parentNode)el.remove();},10000);
+},600);
 </script>
 </body>
 </html>
