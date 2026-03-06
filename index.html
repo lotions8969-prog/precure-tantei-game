@@ -258,7 +258,7 @@ var CHARS=[
     bgColor:'#160030',
     desc:'クールでかしこい。\nロジカルなたんてい少女！',
     personality:'answer',
-    voice:{pitch:1.05,rate:0.87,volume:1},
+    voice:{pitch:1.15,rate:0.93,volume:1},
     msgs:{
       start:['さあ、ロジカルにいきましょう！いっしょにこたえをみつけましょう！','わたしといっしょなら、どんなナゾもとけます。はじめましょう！','このゲームのこたえは、かならずあります。よくかんがえてね！'],
       correct:['せいかい！すばらしい分析力ですね！','その通り！さすがです！','パーフェクト！ロジカルにとけましたね。','みごとです！わたしもびっくりです！'],
@@ -278,7 +278,7 @@ var CHARS=[
     bgColor:'#1a0020',
     desc:'ふしぎなまほう少女。\nきらきらひみつがいっぱい！',
     personality:'mystic',
-    voice:{pitch:1.4,rate:0.77,volume:1},
+    voice:{pitch:1.25,rate:0.82,volume:1},
     msgs:{
       start:['ふふ…まほうのじかんがはじまるわ♪ いっしょにあそびましょう！','このゲームには、ふしぎなまほうがかくれてるの。みつけてみて！','星のひかりにみちびかれて…さあ、はじめましょう♪'],
       correct:['きらきら！まほうがひかった！','すてき！あなたにはまほうのちからがあるわ♪','ふふ、さすがね！まほうをかんじましたか？','わあ！ほしがよろこんでるわ♪'],
@@ -298,7 +298,7 @@ var CHARS=[
     bgColor:'#001820',
     desc:'げんきいっぱい！\nあかるく元気なひまわり少女！',
     personality:'eclair',
-    voice:{pitch:1.65,rate:1.28,volume:1},
+    voice:{pitch:1.40,rate:1.10,volume:1},
     msgs:{
       start:['やったー！ゲームはじめるよー！いっしょにがんばろう！','わーい！このゲームだいすき！ぜったいかってみせる！','レッツゴー！もりあがっていこうよ！！'],
       correct:['やったーーー！すごい！すごすぎる！','さいこー！かっこよかった！！','やっほー！げんきよくいけたね！！','すごすごすごい！わたしおどっちゃう！！'],
@@ -318,7 +318,7 @@ var CHARS=[
     bgColor:'#100020',
     desc:'クールでミステリアス。\nひかりとかげのたんてい。',
     personality:'shadow',
-    voice:{pitch:0.72,rate:0.80,volume:1},
+    voice:{pitch:0.88,rate:0.86,volume:1},
     msgs:{
       start:['……ゲームをはじめるわ。しっかりやりなさい。','闇にひそむこたえを、みつけてみせなさい。','…わたしがいっしょだから、しんぱいしなくていいわ。'],
       correct:['……なかなかやるわね。','まあ、よかったわ。このちょうしで。','……ふん。でもよくできたわ。みとめてあげる。','…いいわ。それでいい。'],
@@ -429,49 +429,97 @@ function startBGM(){
 function stopBGM(){bgmOn=false;bgmTimers.forEach(clearInterval);bgmTimers=[];}
 
 // ============================================================
-// 音声合成
+// 音声システム
+// キャラクター固有の「音楽モチーフ」＋ 日本語TTS（利用可能な場合のみ）
+// ※実際のアニメ声優の音声は著作権のため使用不可
 // ============================================================
 var voiceMuted=false;
 var jaVoice=null;
+var ttsAvailable=false;
 
+// --- キャラクター音楽モチーフ定義 ---
+// 各キャラの個性を音で表現（Web Audio API）
+var CHAR_MOTIFS=[
+  // キュアアンサー：クール・論理的 → 澄んだ高音のアルペジオ
+  {notes:[659,784,988,1047],dur:0.10,type:'triangle',vol:0.22,gap:0.10},
+  // キュアミスティック：神秘的 → 揺らぐビブラートの和音
+  {notes:[523,659,784],dur:0.30,type:'sine',vol:0.18,gap:0.15,vibrato:true},
+  // キュアエクレール：元気 → 跳ねるような高速ファンファーレ
+  {notes:[784,988,1047,1319],dur:0.07,type:'square',vol:0.16,gap:0.06},
+  // キュアアルカナ・シャドウ：クール・謎 → 低く重なる不思議な和音
+  {notes:[196,247,294],dur:0.35,type:'sawtooth',vol:0.15,gap:0.18}
+];
+
+function playMotif(charIdx, done){
+  var m=CHAR_MOTIFS[charIdx];
+  m.notes.forEach(function(freq,i){
+    var start=i*m.gap;
+    var o=AC.createOscillator(), g=AC.createGain();
+    if(m.vibrato){
+      var lfo=AC.createOscillator(), lgain=AC.createGain();
+      lfo.frequency.value=5.5; lgain.gain.value=8;
+      lfo.connect(lgain); lgain.connect(o.frequency);
+      lfo.start(AC.currentTime+start); lfo.stop(AC.currentTime+start+m.dur+0.1);
+    }
+    o.type=m.type; o.frequency.value=freq;
+    o.connect(g); g.connect(AC.destination);
+    g.gain.setValueAtTime(0, AC.currentTime+start);
+    g.gain.linearRampToValueAtTime(m.vol, AC.currentTime+start+0.02);
+    g.gain.exponentialRampToValueAtTime(0.001, AC.currentTime+start+m.dur+0.05);
+    o.start(AC.currentTime+start);
+    o.stop(AC.currentTime+start+m.dur+0.1);
+  });
+  var totalDur=(m.notes.length-1)*m.gap+m.dur+0.15;
+  if(done) setTimeout(done, totalDur*1000);
+}
+
+// --- TTS初期化（日本語音声がある場合のみ有効） ---
 function initVoice(){
   if(!window.speechSynthesis)return;
   var voices=window.speechSynthesis.getVoices();
-  var pref=['Kyoko','O-ren','Otoya','Google 日本語','Google Japan'];
-  outer:for(var p=0;p<pref.length;p++){
+  if(!voices||voices.length===0)return;
+  // 高品質な日本語音声を優先探索
+  var pref=['Kyoko','O-ren','Otoya','Google 日本語','Google Japan','ja-JP','ja_JP'];
+  for(var p=0;p<pref.length;p++){
     for(var v=0;v<voices.length;v++){
-      if(voices[v].name.indexOf(pref[p])>=0){jaVoice=voices[v];break outer;}
+      var vn=voices[v].name||''; var vl=voices[v].lang||'';
+      if(vn.indexOf(pref[p])>=0||vl.indexOf(pref[p])>=0){
+        jaVoice=voices[v]; ttsAvailable=true; break;
+      }
     }
+    if(jaVoice)break;
   }
+  // fallback: lang が ja で始まるもの
   if(!jaVoice){
     for(var v=0;v<voices.length;v++){
-      if(voices[v].lang&&voices[v].lang.indexOf('ja')===0){jaVoice=voices[v];break;}
+      if((voices[v].lang||'').indexOf('ja')===0){jaVoice=voices[v];ttsAvailable=true;break;}
     }
   }
+  // 日本語音声が見つからない場合は TTS を無効化（英語読みを防ぐ）
+  if(!jaVoice) ttsAvailable=false;
 }
 if(window.speechSynthesis){
   window.speechSynthesis.onvoiceschanged=initVoice;
-  initVoice();
+  setTimeout(initVoice,200); // 一部ブラウザは遅延が必要
 }
 
-function speak(text){
-  if(voiceMuted||!window.speechSynthesis)return;
-  window.speechSynthesis.cancel();
-  var u=new SpeechSynthesisUtterance(text);
-  u.lang='ja-JP';
-  if(jaVoice)u.voice=jaVoice;
-  var vp=CHARS[selectedCharIdx].voice;
-  u.pitch=vp.pitch;u.rate=vp.rate;u.volume=vp.volume;
-  window.speechSynthesis.speak(u);
+function speak(text, charIdx){
+  if(voiceMuted) return;
+  var idx=(charIdx!==undefined)?charIdx:selectedCharIdx;
+  // モチーフを先に鳴らしてからTTS
+  playMotif(idx, ttsAvailable ? function(){
+    if(voiceMuted||!window.speechSynthesis)return;
+    window.speechSynthesis.cancel();
+    var u=new SpeechSynthesisUtterance(text);
+    u.lang='ja-JP';
+    if(jaVoice)u.voice=jaVoice;
+    var vp=CHARS[idx].voice;
+    u.pitch=vp.pitch; u.rate=vp.rate; u.volume=0.9;
+    window.speechSynthesis.speak(u);
+  } : null);
 }
-function speakAs(idx,text){
-  if(voiceMuted||!window.speechSynthesis)return;
-  window.speechSynthesis.cancel();
-  var u=new SpeechSynthesisUtterance(text);
-  u.lang='ja-JP';if(jaVoice)u.voice=jaVoice;
-  var vp=CHARS[idx].voice;u.pitch=vp.pitch;u.rate=vp.rate;u.volume=vp.volume;
-  window.speechSynthesis.speak(u);
-}
+function speakAs(idx,text){ speak(text,idx); }
+
 function toggleMute(){
   voiceMuted=!voiceMuted;
   if(voiceMuted&&window.speechSynthesis)window.speechSynthesis.cancel();
@@ -548,14 +596,15 @@ function selectChar(idx){
   var btn=document.getElementById('charStartBtn');
   btn.disabled=false;
   btn.style.background='linear-gradient(135deg,'+ch.color+',#7700ff)';
-  // キャラ選択時のあいさつ
+  // キャラ選択時：モチーフ → あいさつ
   var greets={
     answer:'わたしがいっしょにいきます！',
     mystic:'ふふ、いっしょにあそびましょう♪',
     eclair:'やったー！えらんでくれてありがとー！',
     shadow:'……よろしい。いっしょにいきましょう。'
   };
-  speakAs(idx,greets[ch.personality]);
+  if(AC.state==='suspended')AC.resume();
+  speak(greets[ch.personality], idx);
 }
 function openCharSelect(gameIdx){
   if(AC.state==='suspended')AC.resume();
