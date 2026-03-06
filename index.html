@@ -190,6 +190,7 @@ body{font-family:'Hiragino Maru Gothic ProN','BIZ UDPGothic',sans-serif;backgrou
     <button class="back-btn" onclick="backToHub()">&#8592;</button>
     <div class="game-title-bar" id="gameTitleBar">ゲーム</div>
     <div class="score-bar" id="scoreBar">★0</div>
+    <button id="muteBtn" onclick="toggleMute()" style="background:#44006688;border:2px solid #9933ff;color:#fff;font-size:18px;width:36px;height:36px;border-radius:50%;cursor:pointer;flex-shrink:0">🔊</button>
   </div>
   <div id="gameArea"></div>
 </div>
@@ -213,6 +214,7 @@ var CHARS=[
     bgColor:'#1a0033',
     desc:'クールでかしこい。\nロジカルなたんてい少女！',
     personality:'answer',
+    voice:{pitch:1.1,rate:0.88,volume:1},
     msgs:{
       start:['さあ、ロジカルにいきましょう！いっしょにこたえをみつけましょう！','わたしといっしょなら、どんなナゾもとけます。はじめましょう！','このゲームのこたえは、かならずあります。よくかんがえてね！'],
       correct:['せいかい！すばらしい分析力ですね！','その通り！さすがです！','パーフェクト！ロジカルにとけましたね。','みごとです！わたしもびっくりです！'],
@@ -232,6 +234,7 @@ var CHARS=[
     bgColor:'#1a0022',
     desc:'ふしぎなまほう少女。\nきらきらひみつがいっぱい！',
     personality:'mystic',
+    voice:{pitch:1.35,rate:0.78,volume:1},
     msgs:{
       start:['ふふ…まほうのじかんがはじまるわ♪ いっしょにあそびましょう！','このゲームには、ふしぎなまほうがかくれてるの。みつけてみて！','星のひかりにみちびかれて…さあ、はじめましょう♪'],
       correct:['きらきら！まほうがひかった！','すてき！あなたにはまほうのちからがあるわ♪','ふふ、さすがね！まほうをかんじましたか？','わあ！ほしがよろこんでるわ♪'],
@@ -251,6 +254,7 @@ var CHARS=[
     bgColor:'#001a22',
     desc:'げんきいっぱい！\nあかるく元気なひまわり少女！',
     personality:'eclair',
+    voice:{pitch:1.6,rate:1.25,volume:1},
     msgs:{
       start:['やったー！ゲームはじめるよー！いっしょにがんばろう！','わーい！このゲームだいすき！ぜったいかってみせる！','レッツゴー！もりあがっていこうよー！！'],
       correct:['やったーーー！！すごい！すごすぎる！','さいこー！！かっこよかった！！','やっほー！！げんきよくいけたね！！','すごすごすごい！！わたしおどっちゃう！！'],
@@ -270,6 +274,7 @@ var CHARS=[
     bgColor:'#110022',
     desc:'クールでミステリアス。\nひかりとかげのたんてい。',
     personality:'shadow',
+    voice:{pitch:0.75,rate:0.82,volume:1},
     msgs:{
       start:['……ゲームをはじめるわ。しっかりやりなさい。','闇にひそむこたえを、みつけてみせなさい。','…わたしがいっしょだから、しんぱいしなくていいわ。'],
       correct:['……なかなかやるわね。','まあ、よかったわ。このちょうしで。','……ふん。でもよくできたわ。みとめてあげる。','…いいわ。それでいい。'],
@@ -383,6 +388,57 @@ function stopBGM(){bgmOn=false;bgmTimers.forEach(clearInterval);bgmTimers=[];}
 // ============================================================
 // CHARACTER MESSAGES
 // ============================================================
+// ============================================================
+// SPEECH SYNTHESIS
+// ============================================================
+var voiceMuted=false;
+var jaVoice=null;
+
+// 日本語音声を事前に選んでおく
+function initVoice(){
+  var voices=window.speechSynthesis.getVoices();
+  // 日本語女性声を優先順で探す
+  var prefs=['Kyoko','O-ren','Otoya','Google 日本語','ja-JP'];
+  for(var p=0;p<prefs.length;p++){
+    for(var v=0;v<voices.length;v++){
+      if(voices[v].name.indexOf(prefs[p])>=0||voices[v].lang.indexOf(prefs[p])>=0){
+        jaVoice=voices[v];break;
+      }
+    }
+    if(jaVoice)break;
+  }
+  // fallbackで日本語lang
+  if(!jaVoice){
+    for(var v=0;v<voices.length;v++){
+      if(voices[v].lang.indexOf('ja')>=0){jaVoice=voices[v];break;}
+    }
+  }
+}
+if(window.speechSynthesis){
+  window.speechSynthesis.onvoiceschanged=initVoice;
+  initVoice();
+}
+
+function speak(text){
+  if(voiceMuted||!window.speechSynthesis)return;
+  window.speechSynthesis.cancel();
+  var utter=new SpeechSynthesisUtterance(text);
+  utter.lang='ja-JP';
+  if(jaVoice)utter.voice=jaVoice;
+  var vp=CHARS[selectedCharIdx].voice;
+  utter.pitch=vp.pitch;
+  utter.rate=vp.rate;
+  utter.volume=vp.volume;
+  window.speechSynthesis.speak(utter);
+}
+
+function toggleMute(){
+  voiceMuted=!voiceMuted;
+  if(voiceMuted&&window.speechSynthesis)window.speechSynthesis.cancel();
+  var btn=document.getElementById('muteBtn');
+  if(btn)btn.textContent=voiceMuted?'🔇':'🔊';
+}
+
 var bubbleTimer=null;
 function charMsg(type){
   var ch=CHARS[selectedCharIdx];
@@ -395,7 +451,8 @@ function showBubble(msg){
   if(bubbleTimer)clearTimeout(bubbleTimer);
   bubble.textContent=msg;
   bubble.classList.add('show');
-  bubbleTimer=setTimeout(function(){bubble.classList.remove('show');},3000);
+  speak(msg);
+  bubbleTimer=setTimeout(function(){bubble.classList.remove('show');},3500);
 }
 function onWidgetTap(){
   if(AC.state==='suspended')AC.resume();
@@ -436,6 +493,21 @@ function selectChar(idx){
   var ch=CHARS[idx];
   document.getElementById('charStartBtn').disabled=false;
   document.getElementById('charStartBtn').style.background='linear-gradient(135deg,'+ch.color+',#9933ff)';
+  // キャラ選択時にあいさつを声で読む
+  var greets={
+    answer:'わたしがいっしょにいきます！',
+    mystic:'ふふ、いっしょにあそびましょう♪',
+    eclair:'やったー！えらんでくれてありがとー！',
+    shadow:'……よろしい。いっしょにいきましょう。'
+  };
+  var vp=ch.voice;
+  if(window.speechSynthesis){
+    window.speechSynthesis.cancel();
+    var u=new SpeechSynthesisUtterance(greets[ch.personality]);
+    u.lang='ja-JP';if(jaVoice)u.voice=jaVoice;
+    u.pitch=vp.pitch;u.rate=vp.rate;u.volume=vp.volume;
+    window.speechSynthesis.speak(u);
+  }
 }
 function openCharSelect(gameIdx){
   if(AC.state==='suspended')AC.resume();
@@ -490,6 +562,7 @@ function actuallyStartGame(idx){
 
 function backToHub(){
   clearAllGameTimers();stopBGM();
+  if(window.speechSynthesis)window.speechSynthesis.cancel();
   document.getElementById('charWidget').style.display='none';
   document.getElementById('speechBubble').classList.remove('show');
   document.getElementById('gameScreen').style.display='none';
