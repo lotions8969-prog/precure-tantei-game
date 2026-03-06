@@ -434,193 +434,168 @@ function sfxTap(){beep(880,.05,'square',.18);}
 function sfxCard(){beep(660,.1,'sine',.28);}
 
 var bgmTimers=[];var bgmOn=false;
-
 function stopBGM(){bgmOn=false;bgmTimers.forEach(function(t){clearInterval(t);clearTimeout(t);});bgmTimers=[];}
+function pn(f,d,t,v,dt){if(!bgmOn||!f)return;beep(f,d,t||'sine',v||.09,dt||0);}
 
-function pn(freq,dur,type,vol,t){
-  // Play BGM note (only when BGM is on)
-  if(!bgmOn)return;
-  beep(freq,dur,type||'sine',vol||.09,t||0);
+// ============================================================
+// BGM: メロディ+和音+バスの3層構造で本格的なサウンド
+// 各カテゴリ専用テーマ曲
+// ============================================================
+
+// 共通ビルダー: mel=メロディ配列, bas=バス配列(4拍ごと), tempo, mDur=音符長, mType=波形
+// h2=追加ハーモニー比率(例:1.498=5度上, 1.26=長3度上), bVol=バス音量
+function mkBGM(mel,bas,tempo,mDur,mType,h2,bVol){
+  var i=0;
+  bgmTimers.push(setInterval(function(){
+    if(!bgmOn)return;
+    var f=mel[i%mel.length];
+    pn(f,mDur,mType||'triangle',.11);        // メロディ
+    pn(f*.749,mDur*.82,'sine',.055);         // 完全4度下ハーモニー
+    if(h2)pn(f*h2,mDur*.76,'sine',.046);    // 追加ハーモニー
+    if(i%4===0)pn(bas[Math.floor(i/4)%bas.length],mDur*2.4,'sine',bVol||.10); // バス
+    i++;
+  },tempo));
 }
 
-// ---- ゲームカテゴリ別BGM ----
 var BGM_TRACKS={
 
-  // さがす: ミステリアスワルツ（謎めいた三拍子）
+  // さがす: ミステリー探偵テーマ (Am: A-C-E, G: G-B-D, F: F-A-C, E: E-G#-B)
+  // 4度下+5度上の3声でコード感を演出
   'さがす':function(){
-    var mel=[220,261,247,220,196,220,261,294,261,247,220,247,261,220,196,175];
-    var bas=[110,130,123,110, 98,110,130,147,130,123,110,123,130,110, 98, 87];
-    var i=0;
-    bgmTimers.push(setInterval(function(){
-      if(!bgmOn)return;
-      pn(mel[i%mel.length],.42,'triangle',.10);
-      pn(bas[i%bas.length],.38,'sine',.07);
-      if(i%3===0)pn(mel[i%mel.length]*1.5,.22,'sine',.04);
-      i++;
-    },460));
+    var mel=[440,523,659,523, 494,587,784,587, 440,523,698,523, 415,494,659,494];
+    var bas=[220,196,174,165]; // A3,G3,F3,E3
+    mkBGM(mel,bas,460,.42,'triangle',1.498,.09);
   },
 
-  // タップ: アクションビート（高速スタッカート）
+  // タップ: アクション8ビートポップ (C-F-G-C)
+  // 高速スクエア波+4分バス+8分キック
   'タップ':function(){
-    var mel=[523,659,523,784,659,523,784,880,784,659,523,659,523,440,523,659];
-    var bas=[261,330,261,392,330,261,392,440];
-    var i=0,j=0;
+    var mel=[523,659,784,659, 523,784,880,784, 698,880,1047,880, 784,659,523,659];
+    var bas=[131,174,131,196]; // C3,F3,C3,G3
+    mkBGM(mel,bas,210,.12,'square',null,.10);
+    // 8分バスキック追加 (裏拍)
+    var kick=[131,174,131,196],k=0;
     bgmTimers.push(setInterval(function(){
       if(!bgmOn)return;
-      pn(mel[i%mel.length],.12,'square',.12);
-      i++;
-    },200));
-    bgmTimers.push(setInterval(function(){
-      if(!bgmOn)return;
-      pn(bas[j%bas.length],.18,'square',.09);
-      if(j%2===0)pn(bas[j%bas.length]/2,.14,'sawtooth',.07);
-      j++;
-    },400));
+      pn(kick[k%4]*.5,.16,'sawtooth',.09);k++;
+    },420));
   },
 
-  // カード: エレガントな小品（なめらかサイン波）
+  // カード: エレガントな小品 (C-Am-F-G: 明るく上品)
+  // サイン波+長3度ハーモニーでピアノ的な響き
   'カード':function(){
-    var mel=[523,659,784,659,784,880,784,659,523,440,523,659,523,440,392,440];
-    var has=[659,784,880,784,880,988,880,784,659,587,659,784];
-    var bas=[261,330,392,330,261,220,261,196,220,261,330,261];
-    var i=0,j=0;
-    bgmTimers.push(setInterval(function(){
-      if(!bgmOn)return;
-      pn(mel[i%mel.length],.34,'sine',.10);
-      pn(has[i%has.length],.28,'sine',.05);
-      j++;
-      pn(bas[j%bas.length],.32,'sine',.07);
-      i++;
-    },380));
+    var mel=[523,659,784,880, 784,659,523,440, 523,659,784,659, 523,440,392,440];
+    var bas=[131,220,174,196]; // C3,A3,F3,G3
+    mkBGM(mel,bas,375,.34,'sine',1.26,.09);
   },
 
-  // かず: 楽しいカウントソング（トライアングル＋ハーモニー）
+  // かず: ようちえんカウントソング (F major: 明るく弾む)
+  // トライアングル+5度上ハーモニーで無邪気な音色
   'かず':function(){
-    var mel=[261,294,330,349,392,349,330,294,261,294,330,392,440,392,330,261];
-    var bas=[131,147,165,175,196,175,165,147,131,147,165,196,220,196,165,131];
-    var i=0;
-    bgmTimers.push(setInterval(function(){
-      if(!bgmOn)return;
-      pn(mel[i%mel.length],.28,'triangle',.12);
-      pn(mel[i%mel.length]*1.5,.22,'sine',.05);  // 5度ハーモニー
-      pn(bas[i%bas.length],.28,'triangle',.07);
-      i++;
-    },350));
+    var mel=[349,392,440,523, 440,523,698,523, 440,392,349,294, 349,440,523,440];
+    var bas=[174,131,196,174]; // F3,C3,G3,F3
+    mkBGM(mel,bas,350,.30,'triangle',1.498,.09);
   },
 
-  // いろ: キラキラシロフォン（高音＋アルペジオ）
+  // いろ: キラキラシロフォン (Cペンタトニック: G-A-C-D-E)
+  // 高音サイン+オクターブ下+4度下の3層で煌めく音
   'いろ':function(){
-    var mel=[784,1047,880,1047,784,659,784,880,1047,880,784,1047,784,659,523,659];
-    var mid=[523, 659,587, 659,523,440,523,587, 659,587,523, 659,523,440,392,440];
+    var mel=[784,1047,880,784, 659,784,1047,880, 523,784,1047,784, 659,880,1047,659];
+    var bas=[392,261,392,330]; // G4,C4,G4,E4
     var i=0;
     bgmTimers.push(setInterval(function(){
       if(!bgmOn)return;
-      pn(mel[i%mel.length],.13,'sine',.10);
-      pn(mid[i%mid.length],.18,'sine',.06);
+      var f=mel[i%16];
+      pn(f,.13,'sine',.11);
+      pn(f*.5,.18,'sine',.07);    // オクターブ下
+      pn(f*.749,.13,'sine',.05);  // 4度下
+      if(i%4===0)pn(bas[Math.floor(i/4)%4],.55,'sine',.09);
       i++;
     },240));
   },
 
-  // おんがく: ファンファーレ（和音つきメロディ）
+  // おんがく: 勝利のファンファーレ (C major: 根音+長3度+完全5度の三和音)
+  // スクエア波で華やかなファンファーレ感
   'おんがく':function(){
-    var mel=[523,659,784,880,784,659,784,880,988,880,784,659,523,659,784,523];
+    var mel=[523,659,784,880, 1047,880,784,659, 523,659,784,880, 784,659,523,392];
+    var bas=[131,174,196,131]; // C3,F3,G3,C3
     var i=0;
     bgmTimers.push(setInterval(function(){
       if(!bgmOn)return;
-      var f=mel[i%mel.length];
-      pn(f,.20,'square',.10);
-      pn(f*5/4,.18,'sine',.06);   // 長三度
-      pn(f*3/2,.18,'sine',.05);   // 完全五度
+      var f=mel[i%16];
+      pn(f,.22,'square',.10);
+      pn(f*.749,.20,'sine',.07);   // 4度下
+      pn(f*1.26,.19,'sine',.06);   // 長3度上
+      pn(f*1.498,.18,'sine',.05);  // 完全5度上 → 三和音完成
+      if(i%4===0)pn(bas[Math.floor(i/4)%4],.45,'sawtooth',.10);
       i++;
     },310));
-    // バスリズム
-    var bm=[261,330,261,196,261,330,392,261];var j=0;
-    bgmTimers.push(setInterval(function(){
-      if(!bgmOn)return;
-      pn(bm[j%bm.length],.28,'sawtooth',.08);
-      j++;
-    },620));
   },
 
-  // ふうせん: ふわふわワルツ（ゆったり三拍子）
+  // ふうせん: ふわふわワルツ (C major 3/4拍子)
+  // サイン波+4度ハーモニー+バス打鍵で本物のワルツ感
   'ふうせん':function(){
-    var mel=[523,659,784,659,784,880,784,659,523,440,523,659,784,659,523,392];
-    var bas=[261,261,392,261,392,440,392,330,261,220,261,330];
-    var i=0,j=0;
+    var mel=[523,659,784, 880,784,659, 523,440,392, 440,523,659]; // 12音(4小節×3拍)
+    var bas=[131,174,131,196]; // C3,F3,C3,G3
+    var i=0;
     bgmTimers.push(setInterval(function(){
       if(!bgmOn)return;
-      pn(mel[i%mel.length],.40,'sine',.09);
-      if(i%3===0){pn(bas[j%bas.length],.36,'sine',.07);j++;}
+      var f=mel[i%12];
+      pn(f,.44,'sine',.10);
+      pn(f*.749,.38,'sine',.055);
+      if(i%3===0)pn(bas[Math.floor(i/3)%4],.88,'sine',.10); // 1拍目にバス
       i++;
-    },430));
+    },435));
   },
 
-  // もぐら: ドタバタアクション（短音連打）
+  // もぐら: ドタバタアクション (Dm: D-F-A, C, F, G)
+  // スクエア+ノコギリ波ベースでドタバタ感
   'もぐら':function(){
-    var mel=[523,523,659,523,523,440,440,523,659,659,784,659,523,523,440,523];
-    var bas=[261,196,261,220,261,196,220,261];
-    var i=0,j=0;
+    var mel=[294,330,349,440, 440,392,349,330, 294,349,440,392, 349,294,261,294];
+    var bas=[147,131,165,174]; // D3,C3,E3,F3
+    mkBGM(mel,bas,185,.10,'square',null,.10);
+    var bd=[147,131,165,174],k=0;
     bgmTimers.push(setInterval(function(){
       if(!bgmOn)return;
-      pn(mel[i%mel.length],.10,'square',.13);
-      i++;
-    },185));
-    bgmTimers.push(setInterval(function(){
-      if(!bgmOn)return;
-      pn(bas[j%bas.length],.15,'sawtooth',.10);
-      j++;
+      pn(bd[k%4]*.5,.20,'sawtooth',.11);k++;
     },370));
   },
 
-  // パズル: やさしいアルペジオ（じっくり考える音楽）
+  // パズル: やさしいアルペジオ (C-Am-F-G 4小節を上昇・下降)
+  // ゆっくりサイン波+低音アクセントで考える雰囲気
   'パズル':function(){
-    var arp=[261,330,392,523,659,523,392,330,
-             294,370,440,587,740,587,440,370,
-             261,330,392,494,659,494,392,330];
-    var i=0;
-    bgmTimers.push(setInterval(function(){
-      if(!bgmOn)return;
-      var f=arp[i%arp.length];
-      pn(f,.50,'sine',.09);
-      if(i%8===0)pn(f*0.5,.48,'sine',.05);   // 低音アクセント
-      i++;
-    },540));
+    var mel=[261,330,392,523, 659,523,392,330, 294,349,440,587, 523,440,349,261];
+    var bas=[131,220,174,196]; // C3,A3,F3,G3
+    mkBGM(mel,bas,530,.52,'sine',null,.09);
   },
 
-  // その他: かわいいポップ（汎用かわいいメロディ）
+  // その他: キュートポップ (G major: G-Em-C-D)
+  // サイン+長3度ハーモニーで明るくかわいい
   'その他':function(){
-    var mel=[523,659,784,659,784,880,784,659,523,659,784,659,523,440,523,659];
-    var bas=[261,330,392,330,392,440,392,330,261,330,392,330,261,220,261,330];
-    var i=0;
-    bgmTimers.push(setInterval(function(){
-      if(!bgmOn)return;
-      pn(mel[i%mel.length],.22,'sine',.10);
-      pn(bas[i%bas.length],.22,'triangle',.07);
-      i++;
-    },300));
+    var mel=[392,494,587,784, 659,784,880,784, 659,587,494,392, 587,784,880,784];
+    var bas=[196,165,261,294]; // G3,E3,C4,D4
+    mkBGM(mel,bas,295,.26,'sine',1.26,.09);
   },
 
-  // 2にんで: バトルテーマ（エネルギッシュな対決曲）
+  // 2にんで: バトルテーマ (C major: 疾走感あるロック調)
+  // スクエア波+重いキック+2拍バスで対決感
   '2にんで':function(){
-    var mel=[659,784,880,784,659,784,880,988,880,784,659,784,659,523,659,784];
-    var bas=[330,392,440,392,330,392,440,494,440,392,330,392,330,261,330,392];
+    var mel=[523,659,784,880, 784,659,523,659, 784,880,1047,880, 784,659,523,784];
+    var bas=[131,174,196,131]; // C3,F3,G3,C3
     var i=0;
     bgmTimers.push(setInterval(function(){
       if(!bgmOn)return;
-      pn(mel[i%mel.length],.14,'square',.12);
-      pn(bas[i%bas.length],.16,'square',.09);
-      if(i%4===0)pn(bas[i%bas.length]/2,.18,'sawtooth',.07); // キック
+      var f=mel[i%16];
+      pn(f,.14,'square',.12);
+      pn(f*.749,.13,'square',.08);
+      if(i%2===0)pn(bas[Math.floor(i/2)%4],.22,'sawtooth',.11); // 2拍ごとバス
+      if(i%8===0)pn(65,.18,'sawtooth',.13); // C2キック
       i++;
-    },220));
+    },225));
   }
 };
 BGM_TRACKS['default']=BGM_TRACKS['その他'];
-
-function startBGM(cat){
-  if(bgmOn)return;bgmOn=true;
-  var fn=BGM_TRACKS[cat]||BGM_TRACKS['default'];
-  fn();
-}
+function startBGM(cat){if(bgmOn)return;bgmOn=true;(BGM_TRACKS[cat]||BGM_TRACKS['default'])();}
 
 // ============================================================
 // キャラクターメッセージ / ウィジェット
@@ -922,6 +897,7 @@ function engTap(area,cfg){
     var t=speed*(0.65+Math.random()*.7);
     gameTimeout(function(){
       if(el.parentNode&&isGood&&!el.dataset.used){
+        if(!running){if(el.parentNode)el.remove();return;}
         misses++;missBar.textContent='❌ミス：'+misses+'/'+maxMiss;
         if(misses>=maxMiss){running=false;showResult('よくがんばった！');return;}
       }
@@ -1086,7 +1062,7 @@ function engColor(area,cfg){
           if(btn.dataset.picked)return;btn.dataset.picked='1';picked.push(btn);btn.style.outline='3px solid #fff';
           if(picked.length===2){
             if(picked[0].dataset.f===picked[1].dataset.f){sfxSuccess();picked.forEach(function(b){b.classList.add('correct');});addScore(15);charMsg('correct');gameTimeout(nextQ,700);}
-            else{sfxMiss();charMsg('wrong');picked.forEach(function(b){b.classList.add('wrong');delete b.dataset.picked;b.style.outline='';});picked=[];}
+            else{sfxMiss();charMsg('wrong');var wb=picked.slice();picked.forEach(function(b){b.classList.add('wrong');delete b.dataset.picked;b.style.outline='';});picked=[];gameTimeout(function(){wb.forEach(function(b){b.classList.remove('wrong');});},420);}
           }
         };
         cc3.appendChild(btn);
@@ -1095,8 +1071,9 @@ function engColor(area,cfg){
     }else{
       var pool=FRUITS.slice(0,6).sort(function(){return Math.random()-.5;}).slice(0,4);
       var ti3=Math.floor(Math.random()*4);
-      var ref=pool[ti3===0?1:0];
-      var items2=pool.map(function(f,i){return i===ti3?pool[(ti3+2)%4]:ref;});
+      var odd=pool[ti3];
+      var ref=pool.filter(function(f){return f!==odd;})[0];
+      var items2=pool.map(function(f,i){return i===ti3?odd:ref;});
       wrap.innerHTML=qLabel+'<div class="color-question">ちがうのはどれ？</div>';
       var cc4=document.createElement('div');cc4.className='count-choices';
       items2.forEach(function(f,k){
@@ -1251,6 +1228,7 @@ function engWhack(area,cfg){
       };
       gameTimeout(function(){
         if(hRef.classList.contains('active')){hRef.classList.remove('active');hRef.textContent='';
+          if(!running)return;
           misses++;info.textContent='❌'+misses+'/'+maxMiss;
           if(misses>=maxMiss){running=false;showResult('よくがんばった！💪');}}
       },speed);
