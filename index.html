@@ -434,14 +434,193 @@ function sfxTap(){beep(880,.05,'square',.18);}
 function sfxCard(){beep(660,.1,'sine',.28);}
 
 var bgmTimers=[];var bgmOn=false;
-function startBGM(){
-  if(bgmOn)return;bgmOn=true;
-  var scale=[261,294,330,349,392,440,494,523];
-  var mel=[4,4,5,4,3,2,1,1,4,4,5,4,6,5,4,4,3,3,2,6,5,4,3,2];
-  var step=0;
-  bgmTimers.push(setInterval(function(){if(!bgmOn)return;beep(scale[mel[step%mel.length]],.22,'sine',.09);step++;},360));
+
+function stopBGM(){bgmOn=false;bgmTimers.forEach(function(t){clearInterval(t);clearTimeout(t);});bgmTimers=[];}
+
+function pn(freq,dur,type,vol,t){
+  // Play BGM note (only when BGM is on)
+  if(!bgmOn)return;
+  beep(freq,dur,type||'sine',vol||.09,t||0);
 }
-function stopBGM(){bgmOn=false;bgmTimers.forEach(clearInterval);bgmTimers=[];}
+
+// ---- ゲームカテゴリ別BGM ----
+var BGM_TRACKS={
+
+  // さがす: ミステリアスワルツ（謎めいた三拍子）
+  'さがす':function(){
+    var mel=[220,261,247,220,196,220,261,294,261,247,220,247,261,220,196,175];
+    var bas=[110,130,123,110, 98,110,130,147,130,123,110,123,130,110, 98, 87];
+    var i=0;
+    bgmTimers.push(setInterval(function(){
+      if(!bgmOn)return;
+      pn(mel[i%mel.length],.42,'triangle',.10);
+      pn(bas[i%bas.length],.38,'sine',.07);
+      if(i%3===0)pn(mel[i%mel.length]*1.5,.22,'sine',.04);
+      i++;
+    },460));
+  },
+
+  // タップ: アクションビート（高速スタッカート）
+  'タップ':function(){
+    var mel=[523,659,523,784,659,523,784,880,784,659,523,659,523,440,523,659];
+    var bas=[261,330,261,392,330,261,392,440];
+    var i=0,j=0;
+    bgmTimers.push(setInterval(function(){
+      if(!bgmOn)return;
+      pn(mel[i%mel.length],.12,'square',.12);
+      i++;
+    },200));
+    bgmTimers.push(setInterval(function(){
+      if(!bgmOn)return;
+      pn(bas[j%bas.length],.18,'square',.09);
+      if(j%2===0)pn(bas[j%bas.length]/2,.14,'sawtooth',.07);
+      j++;
+    },400));
+  },
+
+  // カード: エレガントな小品（なめらかサイン波）
+  'カード':function(){
+    var mel=[523,659,784,659,784,880,784,659,523,440,523,659,523,440,392,440];
+    var has=[659,784,880,784,880,988,880,784,659,587,659,784];
+    var bas=[261,330,392,330,261,220,261,196,220,261,330,261];
+    var i=0,j=0;
+    bgmTimers.push(setInterval(function(){
+      if(!bgmOn)return;
+      pn(mel[i%mel.length],.34,'sine',.10);
+      pn(has[i%has.length],.28,'sine',.05);
+      j++;
+      pn(bas[j%bas.length],.32,'sine',.07);
+      i++;
+    },380));
+  },
+
+  // かず: 楽しいカウントソング（トライアングル＋ハーモニー）
+  'かず':function(){
+    var mel=[261,294,330,349,392,349,330,294,261,294,330,392,440,392,330,261];
+    var bas=[131,147,165,175,196,175,165,147,131,147,165,196,220,196,165,131];
+    var i=0;
+    bgmTimers.push(setInterval(function(){
+      if(!bgmOn)return;
+      pn(mel[i%mel.length],.28,'triangle',.12);
+      pn(mel[i%mel.length]*1.5,.22,'sine',.05);  // 5度ハーモニー
+      pn(bas[i%bas.length],.28,'triangle',.07);
+      i++;
+    },350));
+  },
+
+  // いろ: キラキラシロフォン（高音＋アルペジオ）
+  'いろ':function(){
+    var mel=[784,1047,880,1047,784,659,784,880,1047,880,784,1047,784,659,523,659];
+    var mid=[523, 659,587, 659,523,440,523,587, 659,587,523, 659,523,440,392,440];
+    var i=0;
+    bgmTimers.push(setInterval(function(){
+      if(!bgmOn)return;
+      pn(mel[i%mel.length],.13,'sine',.10);
+      pn(mid[i%mid.length],.18,'sine',.06);
+      i++;
+    },240));
+  },
+
+  // おんがく: ファンファーレ（和音つきメロディ）
+  'おんがく':function(){
+    var mel=[523,659,784,880,784,659,784,880,988,880,784,659,523,659,784,523];
+    var i=0;
+    bgmTimers.push(setInterval(function(){
+      if(!bgmOn)return;
+      var f=mel[i%mel.length];
+      pn(f,.20,'square',.10);
+      pn(f*5/4,.18,'sine',.06);   // 長三度
+      pn(f*3/2,.18,'sine',.05);   // 完全五度
+      i++;
+    },310));
+    // バスリズム
+    var bm=[261,330,261,196,261,330,392,261];var j=0;
+    bgmTimers.push(setInterval(function(){
+      if(!bgmOn)return;
+      pn(bm[j%bm.length],.28,'sawtooth',.08);
+      j++;
+    },620));
+  },
+
+  // ふうせん: ふわふわワルツ（ゆったり三拍子）
+  'ふうせん':function(){
+    var mel=[523,659,784,659,784,880,784,659,523,440,523,659,784,659,523,392];
+    var bas=[261,261,392,261,392,440,392,330,261,220,261,330];
+    var i=0,j=0;
+    bgmTimers.push(setInterval(function(){
+      if(!bgmOn)return;
+      pn(mel[i%mel.length],.40,'sine',.09);
+      if(i%3===0){pn(bas[j%bas.length],.36,'sine',.07);j++;}
+      i++;
+    },430));
+  },
+
+  // もぐら: ドタバタアクション（短音連打）
+  'もぐら':function(){
+    var mel=[523,523,659,523,523,440,440,523,659,659,784,659,523,523,440,523];
+    var bas=[261,196,261,220,261,196,220,261];
+    var i=0,j=0;
+    bgmTimers.push(setInterval(function(){
+      if(!bgmOn)return;
+      pn(mel[i%mel.length],.10,'square',.13);
+      i++;
+    },185));
+    bgmTimers.push(setInterval(function(){
+      if(!bgmOn)return;
+      pn(bas[j%bas.length],.15,'sawtooth',.10);
+      j++;
+    },370));
+  },
+
+  // パズル: やさしいアルペジオ（じっくり考える音楽）
+  'パズル':function(){
+    var arp=[261,330,392,523,659,523,392,330,
+             294,370,440,587,740,587,440,370,
+             261,330,392,494,659,494,392,330];
+    var i=0;
+    bgmTimers.push(setInterval(function(){
+      if(!bgmOn)return;
+      var f=arp[i%arp.length];
+      pn(f,.50,'sine',.09);
+      if(i%8===0)pn(f*0.5,.48,'sine',.05);   // 低音アクセント
+      i++;
+    },540));
+  },
+
+  // その他: かわいいポップ（汎用かわいいメロディ）
+  'その他':function(){
+    var mel=[523,659,784,659,784,880,784,659,523,659,784,659,523,440,523,659];
+    var bas=[261,330,392,330,392,440,392,330,261,330,392,330,261,220,261,330];
+    var i=0;
+    bgmTimers.push(setInterval(function(){
+      if(!bgmOn)return;
+      pn(mel[i%mel.length],.22,'sine',.10);
+      pn(bas[i%bas.length],.22,'triangle',.07);
+      i++;
+    },300));
+  },
+
+  // 2にんで: バトルテーマ（エネルギッシュな対決曲）
+  '2にんで':function(){
+    var mel=[659,784,880,784,659,784,880,988,880,784,659,784,659,523,659,784];
+    var bas=[330,392,440,392,330,392,440,494,440,392,330,392,330,261,330,392];
+    var i=0;
+    bgmTimers.push(setInterval(function(){
+      if(!bgmOn)return;
+      pn(mel[i%mel.length],.14,'square',.12);
+      pn(bas[i%bas.length],.16,'square',.09);
+      if(i%4===0)pn(bas[i%bas.length]/2,.18,'sawtooth',.07); // キック
+      i++;
+    },220));
+  }
+};
+BGM_TRACKS['default']=BGM_TRACKS['その他'];
+
+function startBGM(cat){
+  if(bgmOn)return;bgmOn=true;
+  var fn=BGM_TRACKS[cat]||BGM_TRACKS['default'];
+  fn();
+}
 
 // ============================================================
 // キャラクターメッセージ / ウィジェット
@@ -606,7 +785,7 @@ function actuallyStartGame(idx){
   document.getElementById('gameTitleBar').textContent=currentGame.name;
   document.getElementById('scoreBar').textContent=is2P?'🟥0 🟦0':'★0';
   if(!is2P){setupWidget();}
-  startBGM();
+  startBGM(currentGame.cat);
   launchEngine(currentGame);
   if(!is2P){
     gameTimeout(function(){charMsg('start');},700);
