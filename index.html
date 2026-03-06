@@ -72,8 +72,6 @@ body{font-family:'Hiragino Maru Gothic ProN','BIZ UDPGothic',sans-serif;backgrou
 .back-btn:hover{background:#ff44aa}
 .game-title-bar{font-size:15px;font-weight:900;flex:1;text-align:center;background:linear-gradient(90deg,#ff88ff,#88ffff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .score-bar{font-size:14px;font-weight:700;color:#ffff88;flex-shrink:0;white-space:nowrap}
-.mute-btn{background:#44006688;border:2px solid #9933ff;color:#fff;font-size:16px;width:34px;height:34px;border-radius:50%;cursor:pointer;flex-shrink:0;transition:.15s}
-.mute-btn:hover{background:#6600aa88}
 #gameArea{flex:1;position:relative;overflow:hidden}
 
 /* ===== キャラウィジェット ===== */
@@ -189,6 +187,22 @@ body{font-family:'Hiragino Maru Gothic ProN','BIZ UDPGothic',sans-serif;backgrou
 @keyframes floatScore{from{transform:translateY(0);opacity:1}to{transform:translateY(-55px);opacity:0}}
 .pulsBtn{animation:pulsBtn 1.2s ease-in-out infinite}
 @keyframes pulsBtn{0%,100%{transform:scale(1)}50%{transform:scale(1.07)}}
+
+/* ===== 2Pゲーム共通 ===== */
+.p2-split{display:flex;width:100%;height:100%;position:absolute;top:0;left:0}
+.p2-side{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.p2-side.p1-zone{border-right:3px solid #ff66cc;background:#1a0028}
+.p2-side.p2-zone{border-left:3px solid #4488ff;background:#001828}
+.p2-label{position:absolute;top:8px;left:50%;transform:translateX(-50%);font-size:13px;font-weight:900;padding:3px 14px;border-radius:12px;z-index:5;white-space:nowrap}
+.p2-score-big{font-size:28px;font-weight:900;color:#ffff88;text-align:center;margin-top:8px}
+.p2-tap-obj{position:absolute;font-size:clamp(36px,10vw,56px);cursor:pointer;user-select:none}
+.p2-tap-obj:active{transform:scale(.8)}
+.p2-result{position:absolute;inset:0;background:#000000cc;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;z-index:50;padding:20px;overflow-y:auto}
+.p2-result-title{font-size:clamp(22px,6vw,40px);font-weight:900;text-align:center;line-height:1.3}
+.p2-result-row{display:flex;gap:16px;align-items:flex-end;justify-content:center;flex-wrap:wrap}
+.p2-result-player{text-align:center}
+.p2-result-img-wrap{display:inline-block;background:#fff;border-radius:12px;overflow:hidden;line-height:0;margin-bottom:6px}
+.p2-result-img-wrap img{width:80px;height:96px;object-fit:cover;mix-blend-mode:multiply;display:block}
 </style>
 </head>
 <body>
@@ -212,9 +226,10 @@ body{font-family:'Hiragino Maru Gothic ProN','BIZ UDPGothic',sans-serif;backgrou
 <!-- ===== キャラクター選択モーダル ===== -->
 <div id="charSelectModal">
   <div class="char-select-box">
-    <div class="char-select-title">✨ なかまをえらんでね ✨</div>
-    <div class="char-select-sub">いっしょにあそぶプリキュアをえらんでね！</div>
+    <div class="char-select-title" id="modalTitle">✨ なかまをえらんでね ✨</div>
+    <div class="char-select-sub" id="modalSub">いっしょにあそぶプリキュアをえらんでね！</div>
     <div class="char-select-game" id="modalGameName"></div>
+    <div id="modal2pInfo" style="display:none;font-size:13px;color:#ffccff;text-align:center;margin-bottom:8px;font-weight:700"></div>
     <div class="char-cards" id="charCards"></div>
     <button class="char-select-start" id="charStartBtn" disabled onclick="confirmCharAndStart()">このこといっしょにあそぶ！</button>
     <button class="char-select-cancel" onclick="closeCharSelect()">もどる &#8592;</button>
@@ -227,7 +242,6 @@ body{font-family:'Hiragino Maru Gothic ProN','BIZ UDPGothic',sans-serif;backgrou
     <button class="back-btn" onclick="backToHub()">&#8592;</button>
     <div class="game-title-bar" id="gameTitleBar">ゲーム</div>
     <div class="score-bar" id="scoreBar">★0</div>
-    <button class="mute-btn" id="muteBtn" onclick="toggleMute()" title="おとのオン/オフ">🔊</button>
   </div>
   <div id="gameArea" style="flex:1;position:relative;overflow:hidden"></div>
 </div>
@@ -246,8 +260,6 @@ body{font-family:'Hiragino Maru Gothic ProN','BIZ UDPGothic',sans-serif;backgrou
 <script>
 // ============================================================
 // キャラクターデータ
-// ※実際のアニメ声優の音声は著作権上使用できないため、
-//   Web Speech API で各キャラの個性を最大限に表現しています。
 // ============================================================
 var CHARS=[
   {
@@ -258,7 +270,6 @@ var CHARS=[
     bgColor:'#160030',
     desc:'クールでかしこい。\nロジカルなたんてい少女！',
     personality:'answer',
-    voice:{pitch:1.15,rate:0.93,volume:1},
     msgs:{
       start:['さあ、ロジカルにいきましょう！いっしょにこたえをみつけましょう！','わたしといっしょなら、どんなナゾもとけます。はじめましょう！','このゲームのこたえは、かならずあります。よくかんがえてね！'],
       correct:['せいかい！すばらしい分析力ですね！','その通り！さすがです！','パーフェクト！ロジカルにとけましたね。','みごとです！わたしもびっくりです！'],
@@ -278,7 +289,6 @@ var CHARS=[
     bgColor:'#1a0020',
     desc:'ふしぎなまほう少女。\nきらきらひみつがいっぱい！',
     personality:'mystic',
-    voice:{pitch:1.25,rate:0.82,volume:1},
     msgs:{
       start:['ふふ…まほうのじかんがはじまるわ♪ いっしょにあそびましょう！','このゲームには、ふしぎなまほうがかくれてるの。みつけてみて！','星のひかりにみちびかれて…さあ、はじめましょう♪'],
       correct:['きらきら！まほうがひかった！','すてき！あなたにはまほうのちからがあるわ♪','ふふ、さすがね！まほうをかんじましたか？','わあ！ほしがよろこんでるわ♪'],
@@ -298,7 +308,6 @@ var CHARS=[
     bgColor:'#001820',
     desc:'げんきいっぱい！\nあかるく元気なひまわり少女！',
     personality:'eclair',
-    voice:{pitch:1.40,rate:1.10,volume:1},
     msgs:{
       start:['やったー！ゲームはじめるよー！いっしょにがんばろう！','わーい！このゲームだいすき！ぜったいかってみせる！','レッツゴー！もりあがっていこうよ！！'],
       correct:['やったーーー！すごい！すごすぎる！','さいこー！かっこよかった！！','やっほー！げんきよくいけたね！！','すごすごすごい！わたしおどっちゃう！！'],
@@ -318,7 +327,6 @@ var CHARS=[
     bgColor:'#100020',
     desc:'クールでミステリアス。\nひかりとかげのたんてい。',
     personality:'shadow',
-    voice:{pitch:0.88,rate:0.86,volume:1},
     msgs:{
       start:['……ゲームをはじめるわ。しっかりやりなさい。','闇にひそむこたえを、みつけてみせなさい。','…わたしがいっしょだから、しんぱいしなくていいわ。'],
       correct:['……なかなかやるわね。','まあ、よかったわ。このちょうしで。','……ふん。でもよくできたわ。みとめてあげる。','…いいわ。それでいい。'],
@@ -383,16 +391,23 @@ var GAMES=[
   {id:45,cat:'その他',icon:'🖌️',name:'プリキュアスタンプ',engine:'stamp',cfg:{paint:false}},
   {id:46,cat:'その他',icon:'🎨',name:'いろをぬろう',engine:'stamp',cfg:{paint:true}},
   {id:47,cat:'その他',icon:'🔎',name:'プリキュアをさがせ！',engine:'find',cfg:{bg:'🌟',item:'💖',count:10}},
-  {id:48,cat:'その他',icon:'🏆',name:'チャンピオンタップ',engine:'tap',cfg:{obj:'🏆',bad:'😈',speed:600}}
+  {id:48,cat:'その他',icon:'🏆',name:'チャンピオンタップ',engine:'tap',cfg:{obj:'🏆',bad:'😈',speed:600}},
+  {id:49,cat:'2にんで',icon:'👥',name:'2Pタップたいけつ',engine:'2pTap',cfg:{time:30}},
+  {id:50,cat:'2にんで',icon:'🂠',name:'2Pカードたいけつ',engine:'2pCard',cfg:{pairs:6}},
+  {id:51,cat:'2にんで',icon:'🐹',name:'2Pもぐらたいけつ',engine:'2pWhack',cfg:{speed:1000}},
+  {id:52,cat:'2にんで',icon:'❓',name:'2Pクイズたいけつ',engine:'2pQuiz',cfg:{rounds:5}},
+  {id:53,cat:'2にんで',icon:'🎈',name:'2Pふうせんたいけつ',engine:'2pBalloon',cfg:{time:30}}
 ];
 
-var CATS=['すべて','さがす','タップ','カード','かず','いろ','おんがく','ふうせん','もぐら','パズル','その他'];
+var CATS=['すべて','さがす','タップ','カード','かず','いろ','おんがく','ふうせん','もぐら','パズル','その他','2にんで'];
 var currentCat='すべて';
 var score=0;
 var gameTimers=[];
 var currentGame=null;
 var selectedCharIdx=0;
+var selectedChar2Idx=1;
 var pendingGameIdx=null;
+var is2P=false;
 
 function gameTimeout(fn,ms){var t=setTimeout(fn,ms);gameTimers.push(t);return t;}
 function gameInterval(fn,ms){var t=setInterval(fn,ms);gameTimers.push(t);return t;}
@@ -429,104 +444,6 @@ function startBGM(){
 function stopBGM(){bgmOn=false;bgmTimers.forEach(clearInterval);bgmTimers=[];}
 
 // ============================================================
-// 音声システム
-// キャラクター固有の「音楽モチーフ」＋ 日本語TTS（利用可能な場合のみ）
-// ※実際のアニメ声優の音声は著作権のため使用不可
-// ============================================================
-var voiceMuted=false;
-var jaVoice=null;
-var ttsAvailable=false;
-
-// --- キャラクター音楽モチーフ定義 ---
-// 各キャラの個性を音で表現（Web Audio API）
-var CHAR_MOTIFS=[
-  // キュアアンサー：クール・論理的 → 澄んだ高音のアルペジオ
-  {notes:[659,784,988,1047],dur:0.10,type:'triangle',vol:0.22,gap:0.10},
-  // キュアミスティック：神秘的 → 揺らぐビブラートの和音
-  {notes:[523,659,784],dur:0.30,type:'sine',vol:0.18,gap:0.15,vibrato:true},
-  // キュアエクレール：元気 → 跳ねるような高速ファンファーレ
-  {notes:[784,988,1047,1319],dur:0.07,type:'square',vol:0.16,gap:0.06},
-  // キュアアルカナ・シャドウ：クール・謎 → 低く重なる不思議な和音
-  {notes:[196,247,294],dur:0.35,type:'sawtooth',vol:0.15,gap:0.18}
-];
-
-function playMotif(charIdx, done){
-  var m=CHAR_MOTIFS[charIdx];
-  m.notes.forEach(function(freq,i){
-    var start=i*m.gap;
-    var o=AC.createOscillator(), g=AC.createGain();
-    if(m.vibrato){
-      var lfo=AC.createOscillator(), lgain=AC.createGain();
-      lfo.frequency.value=5.5; lgain.gain.value=8;
-      lfo.connect(lgain); lgain.connect(o.frequency);
-      lfo.start(AC.currentTime+start); lfo.stop(AC.currentTime+start+m.dur+0.1);
-    }
-    o.type=m.type; o.frequency.value=freq;
-    o.connect(g); g.connect(AC.destination);
-    g.gain.setValueAtTime(0, AC.currentTime+start);
-    g.gain.linearRampToValueAtTime(m.vol, AC.currentTime+start+0.02);
-    g.gain.exponentialRampToValueAtTime(0.001, AC.currentTime+start+m.dur+0.05);
-    o.start(AC.currentTime+start);
-    o.stop(AC.currentTime+start+m.dur+0.1);
-  });
-  var totalDur=(m.notes.length-1)*m.gap+m.dur+0.15;
-  if(done) setTimeout(done, totalDur*1000);
-}
-
-// --- TTS初期化（日本語音声がある場合のみ有効） ---
-function initVoice(){
-  if(!window.speechSynthesis)return;
-  var voices=window.speechSynthesis.getVoices();
-  if(!voices||voices.length===0)return;
-  // 高品質な日本語音声を優先探索
-  var pref=['Kyoko','O-ren','Otoya','Google 日本語','Google Japan','ja-JP','ja_JP'];
-  for(var p=0;p<pref.length;p++){
-    for(var v=0;v<voices.length;v++){
-      var vn=voices[v].name||''; var vl=voices[v].lang||'';
-      if(vn.indexOf(pref[p])>=0||vl.indexOf(pref[p])>=0){
-        jaVoice=voices[v]; ttsAvailable=true; break;
-      }
-    }
-    if(jaVoice)break;
-  }
-  // fallback: lang が ja で始まるもの
-  if(!jaVoice){
-    for(var v=0;v<voices.length;v++){
-      if((voices[v].lang||'').indexOf('ja')===0){jaVoice=voices[v];ttsAvailable=true;break;}
-    }
-  }
-  // 日本語音声が見つからない場合は TTS を無効化（英語読みを防ぐ）
-  if(!jaVoice) ttsAvailable=false;
-}
-if(window.speechSynthesis){
-  window.speechSynthesis.onvoiceschanged=initVoice;
-  setTimeout(initVoice,200); // 一部ブラウザは遅延が必要
-}
-
-function speak(text, charIdx){
-  if(voiceMuted) return;
-  var idx=(charIdx!==undefined)?charIdx:selectedCharIdx;
-  // モチーフを先に鳴らしてからTTS
-  playMotif(idx, ttsAvailable ? function(){
-    if(voiceMuted||!window.speechSynthesis)return;
-    window.speechSynthesis.cancel();
-    var u=new SpeechSynthesisUtterance(text);
-    u.lang='ja-JP';
-    if(jaVoice)u.voice=jaVoice;
-    var vp=CHARS[idx].voice;
-    u.pitch=vp.pitch; u.rate=vp.rate; u.volume=0.9;
-    window.speechSynthesis.speak(u);
-  } : null);
-}
-function speakAs(idx,text){ speak(text,idx); }
-
-function toggleMute(){
-  voiceMuted=!voiceMuted;
-  if(voiceMuted&&window.speechSynthesis)window.speechSynthesis.cancel();
-  document.getElementById('muteBtn').textContent=voiceMuted?'🔇':'🔊';
-}
-
-// ============================================================
 // キャラクターメッセージ / ウィジェット
 // ============================================================
 var bubbleTimer=null;
@@ -544,7 +461,6 @@ function showBubble(msg){
   tag.textContent=CHARS[selectedCharIdx].name;
   tag.style.color=CHARS[selectedCharIdx].color;
   bubble.classList.add('show');
-  speak(msg);
   bubbleTimer=setTimeout(function(){bubble.classList.remove('show');},3800);
 }
 function onWidgetTap(){
@@ -570,19 +486,49 @@ function setupWidget(){
 function buildCharCards(){
   var html='';
   CHARS.forEach(function(ch,i){
-    var isActive=(i===selectedCharIdx);
+    var badge='';
+    if(is2P){
+      if(i===selectedCharIdx) badge='<div class="selected-badge" style="background:#ff66cc">1P</div>';
+      else if(i===selectedChar2Idx) badge='<div class="selected-badge" style="background:#4488ff">2P</div>';
+    } else {
+      if(i===selectedCharIdx) badge='<div class="selected-badge">✓ えらんだ！</div>';
+    }
+    var isActive=(i===selectedCharIdx)||(is2P&&i===selectedChar2Idx);
+    var borderColor=!isActive?'transparent':i===selectedCharIdx?ch.color:'#4488ff';
+    var shadow=!isActive?'none':i===selectedCharIdx?'0 0 20px '+ch.color:'0 0 20px #4488ff';
     html+='<div class="char-card'+(isActive?' active-char':'')+'" id="charCard'+i+'"'
-      +' style="border-color:'+(isActive?ch.color:'transparent')+';box-shadow:'+(isActive?'0 0 20px '+ch.color:'none')+'"'
+      +' style="border-color:'+borderColor+';box-shadow:'+shadow+'"'
       +' onclick="selectChar('+i+')">';
-    html+='<div class="selected-badge">✓ えらんだ！</div>';
+    html+=badge;
     html+='<div class="char-card-img-wrap"><img src="'+ch.img+'" alt="'+ch.name+'" onerror="this.parentNode.style.display=\'none\'"></div>';
     html+='<div class="char-card-name" style="color:'+ch.color+'">'+ch.name+'</div>';
     html+='<div class="char-card-desc">'+ch.desc.replace(/\n/g,'<br>')+'</div>';
     html+='</div>';
   });
   document.getElementById('charCards').innerHTML=html;
+  if(is2P){
+    var info=document.getElementById('modal2pInfo');
+    info.style.display='block';
+    info.innerHTML='🟥<b style="color:#ff88cc">1P</b>と🟦<b style="color:#88aaff">2P</b>のキャラをえらんでね！<br>（タップするたびに1P→2Pじゅんにえらびます）';
+  }
 }
+var p2SelectMode=1; // 1=1P selecting, 2=2P selecting
 function selectChar(idx){
+  if(is2P){
+    if(p2SelectMode===1){
+      selectedCharIdx=idx;
+      p2SelectMode=2;
+    } else {
+      if(idx===selectedCharIdx){p2SelectMode=1;return;}
+      selectedChar2Idx=idx;
+      p2SelectMode=1;
+    }
+    buildCharCards();
+    var btn=document.getElementById('charStartBtn');
+    btn.disabled=false;
+    btn.style.background='linear-gradient(135deg,#ff66cc,#4488ff)';
+    return;
+  }
   selectedCharIdx=idx;
   CHARS.forEach(function(ch,i){
     var card=document.getElementById('charCard'+i);
@@ -596,26 +542,33 @@ function selectChar(idx){
   var btn=document.getElementById('charStartBtn');
   btn.disabled=false;
   btn.style.background='linear-gradient(135deg,'+ch.color+',#7700ff)';
-  // キャラ選択時：モチーフ → あいさつ
-  var greets={
-    answer:'わたしがいっしょにいきます！',
-    mystic:'ふふ、いっしょにあそびましょう♪',
-    eclair:'やったー！えらんでくれてありがとー！',
-    shadow:'……よろしい。いっしょにいきましょう。'
-  };
   if(AC.state==='suspended')AC.resume();
-  speak(greets[ch.personality], idx);
 }
 function openCharSelect(gameIdx){
   if(AC.state==='suspended')AC.resume();
   pendingGameIdx=gameIdx;
+  is2P=GAMES[gameIdx].engine.indexOf('2p')===0;
+  p2SelectMode=1;
   document.getElementById('modalGameName').textContent=GAMES[gameIdx].icon+' '+GAMES[gameIdx].name;
+  if(is2P){
+    document.getElementById('modalTitle').textContent='👥 2にんでえらんでね！';
+    document.getElementById('modalSub').textContent='1Pと2Pのプリキュアをえらんでね！';
+    document.getElementById('charStartBtn').textContent='2にんであそぶ！';
+    if(selectedChar2Idx===selectedCharIdx)selectedChar2Idx=(selectedCharIdx+1)%CHARS.length;
+  } else {
+    document.getElementById('modalTitle').textContent='✨ なかまをえらんでね ✨';
+    document.getElementById('modalSub').textContent='いっしょにあそぶプリキュアをえらんでね！';
+    document.getElementById('charStartBtn').textContent='このこといっしょにあそぶ！';
+    document.getElementById('modal2pInfo').style.display='none';
+  }
   buildCharCards();
+  var btn=document.getElementById('charStartBtn');
+  btn.disabled=false;
+  btn.style.background=is2P?'linear-gradient(135deg,#ff66cc,#4488ff)':'linear-gradient(135deg,'+CHARS[selectedCharIdx].color+',#7700ff)';
   document.getElementById('charSelectModal').classList.add('show');
 }
 function closeCharSelect(){
   document.getElementById('charSelectModal').classList.remove('show');
-  if(window.speechSynthesis)window.speechSynthesis.cancel();
 }
 function confirmCharAndStart(){
   closeCharSelect();
@@ -647,21 +600,23 @@ buildHub();
 // ============================================================
 function actuallyStartGame(idx){
   currentGame=GAMES[idx];score=0;
+  is2P=currentGame.engine.indexOf('2p')===0;
   document.getElementById('hub').style.display='none';
   document.getElementById('gameScreen').style.display='flex';
   document.getElementById('gameTitleBar').textContent=currentGame.name;
-  document.getElementById('scoreBar').textContent='★0';
-  setupWidget();
+  document.getElementById('scoreBar').textContent=is2P?'🟥0 🟦0':'★0';
+  if(!is2P){setupWidget();}
   startBGM();
   launchEngine(currentGame);
-  gameTimeout(function(){charMsg('start');},700);
-  gameInterval(function(){
-    if(!document.getElementById('speechBubble').classList.contains('show'))charMsg('cheer');
-  },22000);
+  if(!is2P){
+    gameTimeout(function(){charMsg('start');},700);
+    gameInterval(function(){
+      if(!document.getElementById('speechBubble').classList.contains('show'))charMsg('cheer');
+    },22000);
+  }
 }
 function backToHub(){
   clearAllGameTimers();stopBGM();
-  if(window.speechSynthesis)window.speechSynthesis.cancel();
   if(bubbleTimer)clearTimeout(bubbleTimer);
   var w=document.getElementById('charWidget');
   w.style.display='none';
@@ -684,7 +639,6 @@ function floatScoreEl(x,y,n){
 }
 function showResult(msg){
   clearAllGameTimers();stopBGM();sfxComplete();
-  if(window.speechSynthesis)window.speechSynthesis.cancel();
   var ch=CHARS[selectedCharIdx];
   var area=document.getElementById('gameArea');
   // confetti
@@ -712,8 +666,6 @@ function showResult(msg){
   area.appendChild(ov);
   // ウィジェット非表示
   var w=document.getElementById('charWidget');if(w)w.style.display='none';
-  // クリアメッセージを読み上げ
-  gameTimeout(function(){speak(clearMsg);},600);
 }
 
 // ============================================================
@@ -728,7 +680,8 @@ function launchEngine(g){
   area.appendChild(w);w.style.display='flex';
   var engines={find:engFind,tap:engTap,card:engCard,count:engCount,color:engColor,
     piano:engPiano,rhythm:engRhythm,balloon:engBalloon,whack:engWhack,
-    puzzle:engPuzzle,sort:engSort,stamp:engStamp};
+    puzzle:engPuzzle,sort:engSort,stamp:engStamp,
+    '2pTap':eng2pTap,'2pCard':eng2pCard,'2pWhack':eng2pWhack,'2pQuiz':eng2pQuiz,'2pBalloon':eng2pBalloon};
   if(engines[g.engine])engines[g.engine](area,g.cfg);
 }
 
@@ -1266,9 +1219,291 @@ function engStamp(area,cfg){
 }
 
 // ============================================================
+// 2Pリザルト表示
+// ============================================================
+function show2PResult(s1,s2){
+  clearAllGameTimers();stopBGM();sfxComplete();
+  var ch1=CHARS[selectedCharIdx],ch2=CHARS[selectedChar2Idx];
+  var area=document.getElementById('gameArea');
+  // confetti
+  for(var i=0;i<40;i++){
+    var c=document.createElement('div');c.className='confetti';
+    c.style.left=Math.random()*100+'%';c.style.top='-10px';
+    c.style.background=['#ff66cc','#ffff44','#66ffcc','#ff9900','#44aaff'][i%5];
+    c.style.animationDuration=(1.4+Math.random()*2)+'s';
+    c.style.animationDelay=(Math.random()*.7)+'s';
+    area.appendChild(c);
+  }
+  var winner,winMsg,color;
+  if(s1>s2){winner='🟥 1P '+ch1.name+'のかち！';color=ch1.color;}
+  else if(s2>s1){winner='🟦 2P '+ch2.name+'のかち！';color=ch2.color;}
+  else{winner='🤝 ひきわけ！';color='#ffff88';}
+  var ov=document.createElement('div');ov.className='p2-result';
+  ov.innerHTML='<div class="p2-result-title" style="color:'+color+'">'+winner+'</div>'
+    +'<div class="p2-result-row">'
+    +'<div class="p2-result-player">'
+    +'<div class="p2-result-img-wrap" style="border:3px solid #ff66cc;filter:'+ch1.glow+'"><img src="'+ch1.img+'" onerror="this.parentNode.style.display=\'none\'"></div>'
+    +'<div style="color:#ff88cc;font-weight:900">🟥 1P</div>'
+    +'<div style="font-size:22px;font-weight:900;color:#ffff44">★'+s1+'</div>'
+    +'</div>'
+    +'<div style="font-size:26px;font-weight:900;color:#fff;align-self:center">VS</div>'
+    +'<div class="p2-result-player">'
+    +'<div class="p2-result-img-wrap" style="border:3px solid #4488ff;filter:'+ch2.glow+'"><img src="'+ch2.img+'" onerror="this.parentNode.style.display=\'none\'"></div>'
+    +'<div style="color:#88aaff;font-weight:900">🟦 2P</div>'
+    +'<div style="font-size:22px;font-weight:900;color:#ffff44">★'+s2+'</div>'
+    +'</div>'
+    +'</div>'
+    +'<div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center">'
+    +'<button class="result-btn" onclick="backToHub()">もどる</button>'
+    +'<button class="result-btn retry pulsBtn" onclick="actuallyStartGame('+(currentGame.id-1)+')">もういちど！</button>'
+    +'</div>';
+  area.appendChild(ov);
+}
+
+// ============================================================
+// 2Pタップ対決
+// ============================================================
+function eng2pTap(area,cfg){
+  var time=cfg.time||30;
+  var s1=0,s2=0,running=true;
+  area.innerHTML='';
+  var split=document.createElement('div');split.className='p2-split';
+  var z1=document.createElement('div');z1.className='p2-side p1-zone';
+  var z2=document.createElement('div');z2.className='p2-side p2-zone';
+  var ch1=CHARS[selectedCharIdx],ch2=CHARS[selectedChar2Idx];
+  var lbl1=document.createElement('div');lbl1.className='p2-label';lbl1.style.background='#ff44aa';lbl1.textContent='🟥 1P '+ch1.name;z1.appendChild(lbl1);
+  var lbl2=document.createElement('div');lbl2.className='p2-label';lbl2.style.background='#2266cc';lbl2.textContent='🟦 2P '+ch2.name;z2.appendChild(lbl2);
+  var sc1=document.createElement('div');sc1.className='p2-score-big';sc1.textContent='0';sc1.style.position='absolute';sc1.style.bottom='60px';z1.appendChild(sc1);
+  var sc2=document.createElement('div');sc2.className='p2-score-big';sc2.textContent='0';sc2.style.position='absolute';sc2.style.bottom='60px';z2.appendChild(sc2);
+  var timeEl=document.createElement('div');timeEl.style.cssText='position:absolute;top:8px;left:50%;transform:translateX(-50%);font-size:18px;font-weight:900;color:#ffff88;z-index:10;white-space:nowrap';
+  timeEl.textContent='⏱'+time;area.appendChild(timeEl);
+  var imgW1=document.createElement('div');imgW1.style.cssText='background:#fff;border-radius:10px;overflow:hidden;line-height:0;position:absolute;bottom:8px;left:50%;transform:translateX(-50%)';
+  imgW1.innerHTML='<img src="'+ch1.img+'" style="width:50px;height:60px;object-fit:cover;mix-blend-mode:multiply;display:block">';
+  z1.appendChild(imgW1);
+  var imgW2=document.createElement('div');imgW2.style.cssText='background:#fff;border-radius:10px;overflow:hidden;line-height:0;position:absolute;bottom:8px;left:50%;transform:translateX(-50%)';
+  imgW2.innerHTML='<img src="'+ch2.img+'" style="width:50px;height:60px;object-fit:cover;mix-blend-mode:multiply;display:block">';
+  z2.appendChild(imgW2);
+  split.appendChild(z1);split.appendChild(z2);area.appendChild(split);
+  function rnd(a,b){return a+Math.floor(Math.random()*(b-a));}
+  function spawnIn(zone,player){
+    if(!running)return;
+    var el=document.createElement('div');el.className='p2-tap-obj';
+    el.textContent=['💖','⭐','🌸','🍭','💎'][Math.floor(Math.random()*5)];
+    el.style.left=rnd(5,65)+'%';el.style.top=rnd(20,65)+'%';
+    zone.appendChild(el);
+    el.addEventListener('pointerdown',function(e){
+      if(!running||el.dataset.used)return;el.dataset.used='1';
+      sfxTap();
+      if(player===1){s1++;sc1.textContent=s1;}else{s2++;sc2.textContent=s2;}
+      document.getElementById('scoreBar').textContent='🟥'+s1+' 🟦'+s2;
+      el.style.animation='scPop .3s ease forwards';
+      gameTimeout(function(){if(el.parentNode)el.remove();spawnIn(zone,player);},320);
+    });
+    gameTimeout(function(){if(el.parentNode&&!el.dataset.used){el.remove();spawnIn(zone,player);}},1200);
+  }
+  for(var i=0;i<3;i++){spawnIn(z1,1);spawnIn(z2,2);}
+  var rem=time;
+  gameInterval(function(){
+    rem--;timeEl.textContent='⏱'+rem;
+    if(rem<=0){running=false;show2PResult(s1,s2);}
+  },1000);
+}
+
+// ============================================================
+// 2Pカード対決（ターン制）
+// ============================================================
+function eng2pCard(area,cfg){
+  var pairs=cfg.pairs||6;
+  var EMOJIS=['🌸','🌟','💖','🦋','🍭','🎵','🌈','💎','🏆','🦄'];
+  var deck=EMOJIS.slice(0,pairs).concat(EMOJIS.slice(0,pairs)).sort(function(){return Math.random()-.5;});
+  var s1=0,s2=0,flipped=[],matched=0,locked=false;
+  var currentPlayer=1;
+  area.style.display='flex';area.style.flexDirection='column';area.style.justifyContent='center';area.style.padding='10px';
+  var info=document.createElement('div');info.style.cssText='font-size:16px;font-weight:900;text-align:center;color:#ffff88;margin-bottom:8px';
+  var ch1=CHARS[selectedCharIdx],ch2=CHARS[selectedChar2Idx];
+  function updateInfo(){
+    document.getElementById('scoreBar').textContent='🟥'+s1+' 🟦'+s2;
+    info.textContent=(currentPlayer===1?'🟥 1P '+ch1.name:'🟦 2P '+ch2.name)+'のばん！';
+    info.style.color=currentPlayer===1?'#ff88cc':'#88aaff';
+  }
+  updateInfo();
+  area.appendChild(info);
+  var grid=document.createElement('div');grid.className='card-grid';
+  deck.forEach(function(em){
+    var card=document.createElement('div');card.className='card';card.dataset.em=em;
+    card.innerHTML='<div class="card-back">✨</div><div class="card-front">'+em+'</div>';
+    card.onclick=function(){
+      if(locked||card.classList.contains('flipped')||card.classList.contains('matched'))return;
+      sfxCard();card.classList.add('flipped');flipped.push(card);
+      if(flipped.length===2){
+        locked=true;
+        if(flipped[0].dataset.em===flipped[1].dataset.em){
+          sfxSuccess();flipped.forEach(function(c){c.classList.add('matched');});
+          if(currentPlayer===1)s1+=20;else s2+=20;
+          matched++;flipped=[];locked=false;updateInfo();
+          if(matched===pairs)gameTimeout(function(){show2PResult(s1,s2);},400);
+        }else{
+          var f=flipped.slice();
+          gameTimeout(function(){
+            f.forEach(function(c){c.classList.remove('flipped');});
+            flipped=[];locked=false;
+            currentPlayer=currentPlayer===1?2:1;updateInfo();
+          },950);
+        }
+      }
+    };
+    grid.appendChild(card);
+  });
+  area.appendChild(grid);
+}
+
+// ============================================================
+// 2Pもぐらたたき対決
+// ============================================================
+function eng2pWhack(area,cfg){
+  var speed=cfg.speed||1000;
+  var s1=0,s2=0,running=true,rem=30;
+  var ch1=CHARS[selectedCharIdx],ch2=CHARS[selectedChar2Idx];
+  area.innerHTML='';
+  var MOLES=['🐹','🐰','🐭','⭐'];
+  var split=document.createElement('div');split.className='p2-split';
+  var z1=document.createElement('div');z1.className='p2-side p1-zone';
+  var z2=document.createElement('div');z2.className='p2-side p2-zone';
+  var lbl1=document.createElement('div');lbl1.className='p2-label';lbl1.style.background='#ff44aa';lbl1.textContent='🟥 1P';z1.appendChild(lbl1);
+  var lbl2=document.createElement('div');lbl2.className='p2-label';lbl2.style.background='#2266cc';lbl2.textContent='🟦 2P';z2.appendChild(lbl2);
+  var sc1=document.createElement('div');sc1.style.cssText='position:absolute;bottom:70px;font-size:26px;font-weight:900;color:#ffff44';sc1.textContent='★0';z1.appendChild(sc1);
+  var sc2=document.createElement('div');sc2.style.cssText='position:absolute;bottom:70px;font-size:26px;font-weight:900;color:#ffff44';sc2.textContent='★0';z2.appendChild(sc2);
+  var timeEl=document.createElement('div');timeEl.style.cssText='position:absolute;top:8px;left:50%;transform:translateX(-50%);font-size:18px;font-weight:900;color:#ffff88;z-index:10';
+  timeEl.textContent='⏱30';area.appendChild(timeEl);
+  function makeGrid(zone,player){
+    var g=document.createElement('div');g.style.cssText='display:grid;grid-template-columns:repeat(2,1fr);gap:8px;padding:50px 8px 8px';
+    var holes=[];
+    for(var i=0;i<4;i++){var h=document.createElement('div');h.className='hole';h.style.cssText='width:clamp(50px,14vw,70px);height:clamp(50px,14vw,70px)';holes.push(h);g.appendChild(h);}
+    zone.appendChild(g);
+    function showMole(){
+      if(!running)return;
+      var avail=holes.filter(function(h){return !h.classList.contains('active');});
+      if(avail.length){
+        var h=avail[Math.floor(Math.random()*avail.length)];
+        h.classList.add('active');h.textContent=MOLES[Math.floor(Math.random()*MOLES.length)];
+        h.onclick=function(){
+          if(!h.classList.contains('active'))return;
+          sfxTap();h.classList.remove('active');h.textContent='';
+          if(player===1){s1+=10;sc1.textContent='★'+s1;}else{s2+=10;sc2.textContent='★'+s2;}
+          document.getElementById('scoreBar').textContent='🟥'+s1+' 🟦'+s2;
+        };
+        gameTimeout(function(){if(h.classList.contains('active')){h.classList.remove('active');h.textContent='';}},speed);
+      }
+      gameTimeout(showMole,250+Math.random()*300);
+    }
+    showMole();
+  }
+  makeGrid(z1,1);makeGrid(z2,2);
+  split.appendChild(z1);split.appendChild(z2);area.appendChild(split);
+  gameInterval(function(){rem--;timeEl.textContent='⏱'+rem;if(rem<=0){running=false;show2PResult(s1,s2);}},1000);
+}
+
+// ============================================================
+// 2Pクイズ対決
+// ============================================================
+function eng2pQuiz(area,cfg){
+  var rounds=cfg.rounds||5;
+  var s1=0,s2=0,round=0;
+  var ch1=CHARS[selectedCharIdx],ch2=CHARS[selectedChar2Idx];
+  var QUESTIONS=[
+    {q:'🍎+🍎はいくつ？',a:'4',choices:['2','4','6','3'],correct:1},
+    {q:'🌸🌸🌸はいくつ？',a:'3',choices:['2','4','3','5'],correct:2},
+    {q:'⭐⭐⭐⭐⭐はいくつ？',a:'5',choices:['3','4','5','6'],correct:2},
+    {q:'🍭🍭+🍭はいくつ？',a:'3',choices:['4','2','3','5'],correct:2},
+    {q:'💖💖💖💖はいくつ？',a:'4',choices:['3','5','4','2'],correct:2},
+    {q:'🦋+🦋+🦋はいくつ？',a:'3',choices:['3','2','4','1'],correct:0},
+    {q:'🌟🌟🌟🌟🌟🌟はいくつ？',a:'6',choices:['4','5','6','7'],correct:2},
+    {q:'🎵🎵+🎵🎵はいくつ？',a:'4',choices:['3','4','5','2'],correct:1},
+  ].sort(function(){return Math.random()-.5;});
+  area.style.display='flex';area.style.flexDirection='column';area.style.justifyContent='center';area.style.padding='12px';
+  function nextQ(){
+    area.innerHTML='';
+    if(round>=rounds){show2PResult(s1,s2);return;}
+    round++;
+    var q=QUESTIONS[round%QUESTIONS.length];
+    var roundInfo=document.createElement('div');roundInfo.style.cssText='font-size:13px;color:#cc99ff;text-align:center;margin-bottom:4px';roundInfo.textContent=round+'/'+rounds+'もん';
+    var qDiv=document.createElement('div');qDiv.style.cssText='font-size:22px;font-weight:900;color:#ffff88;text-align:center;margin-bottom:14px;background:#2a005a;padding:10px;border-radius:12px';qDiv.textContent=q.q;
+    var scoreDiv=document.createElement('div');scoreDiv.style.cssText='font-size:14px;color:#fff;text-align:center;margin-bottom:10px';
+    scoreDiv.innerHTML='🟥 <b style="color:#ff88cc">1P: '+s1+'</b>　🟦 <b style="color:#88aaff">2P: '+s2+'</b>';
+    var btnRow=document.createElement('div');btnRow.style.cssText='display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:400px;margin:0 auto;width:100%';
+    var p1Col=document.createElement('div');p1Col.style.cssText='display:flex;flex-direction:column;gap:8px;align-items:center';
+    var p2Col=document.createElement('div');p2Col.style.cssText='display:flex;flex-direction:column;gap:8px;align-items:center';
+    var p1lbl=document.createElement('div');p1lbl.style.cssText='font-size:12px;font-weight:900;color:#ff88cc;margin-bottom:2px';p1lbl.textContent='🟥 1P '+ch1.name;
+    var p2lbl=document.createElement('div');p2lbl.style.cssText='font-size:12px;font-weight:900;color:#88aaff;margin-bottom:2px';p2lbl.textContent='🟦 2P '+ch2.name;
+    p1Col.appendChild(p1lbl);p2Col.appendChild(p2lbl);
+    var answered=false;
+    q.choices.forEach(function(c,i){
+      var b1=document.createElement('button');b1.className='count-btn';b1.style.cssText='width:100%;background:linear-gradient(135deg,#6600aa,#440066);border-color:#ff66cc';b1.textContent=c;
+      var b2=document.createElement('button');b2.className='count-btn';b2.style.cssText='width:100%;background:linear-gradient(135deg,#003366,#002244);border-color:#4488ff';b2.textContent=c;
+      b1.onclick=function(){
+        if(answered)return;answered=true;
+        if(i===q.correct){sfxSuccess();b1.classList.add('correct');s1+=20;}else{sfxMiss();b1.classList.add('wrong');}
+        document.getElementById('scoreBar').textContent='🟥'+s1+' 🟦'+s2;
+        gameTimeout(nextQ,800);
+      };
+      b2.onclick=function(){
+        if(answered)return;answered=true;
+        if(i===q.correct){sfxSuccess();b2.classList.add('correct');s2+=20;}else{sfxMiss();b2.classList.add('wrong');}
+        document.getElementById('scoreBar').textContent='🟥'+s1+' 🟦'+s2;
+        gameTimeout(nextQ,800);
+      };
+      p1Col.appendChild(b1);p2Col.appendChild(b2);
+    });
+    btnRow.appendChild(p1Col);btnRow.appendChild(p2Col);
+    area.appendChild(roundInfo);area.appendChild(qDiv);area.appendChild(scoreDiv);area.appendChild(btnRow);
+  }
+  nextQ();
+}
+
+// ============================================================
+// 2Pふうせん対決
+// ============================================================
+function eng2pBalloon(area,cfg){
+  var time=cfg.time||30;
+  var s1=0,s2=0,running=true,rem=time;
+  var ch1=CHARS[selectedCharIdx],ch2=CHARS[selectedChar2Idx];
+  area.innerHTML='';
+  var split=document.createElement('div');split.className='p2-split';
+  var z1=document.createElement('div');z1.className='p2-side p1-zone';
+  var z2=document.createElement('div');z2.className='p2-side p2-zone';
+  var lbl1=document.createElement('div');lbl1.className='p2-label';lbl1.style.background='#ff44aa';lbl1.textContent='🟥 1P';z1.appendChild(lbl1);
+  var lbl2=document.createElement('div');lbl2.className='p2-label';lbl2.style.background='#2266cc';lbl2.textContent='🟦 2P';z2.appendChild(lbl2);
+  var sc1=document.createElement('div');sc1.style.cssText='position:absolute;bottom:8px;font-size:26px;font-weight:900;color:#ffff44';sc1.textContent='💥0';z1.appendChild(sc1);
+  var sc2=document.createElement('div');sc2.style.cssText='position:absolute;bottom:8px;font-size:26px;font-weight:900;color:#ffff44';sc2.textContent='💥0';z2.appendChild(sc2);
+  var timeEl=document.createElement('div');timeEl.style.cssText='position:absolute;top:8px;left:50%;transform:translateX(-50%);font-size:18px;font-weight:900;color:#ffff88;z-index:10';
+  timeEl.textContent='⏱'+rem;area.appendChild(timeEl);
+  split.appendChild(z1);split.appendChild(z2);area.appendChild(split);
+  function spawnBalloon(zone,player,emoji){
+    if(!running)return;
+    var el=document.createElement('div');el.className='balloon';el.textContent=emoji;
+    el.style.left=(5+Math.random()*80)+'%';el.style.bottom='-70px';
+    var dur=(4+Math.random()*2.5)+'s';el.style.animationDuration=dur;el.style.animationFillMode='forwards';
+    zone.appendChild(el);
+    el.onclick=function(){
+      if(!running)return;sfxTap();
+      if(player===1){s1++;sc1.textContent='💥'+s1;}else{s2++;sc2.textContent='💥'+s2;}
+      document.getElementById('scoreBar').textContent='🟥'+s1+' 🟦'+s2;
+      el.style.animation='scPop .3s ease forwards';
+      gameTimeout(function(){if(el.parentNode)el.remove();},360);
+    };
+    gameTimeout(function(){if(el.parentNode)el.remove();},(parseFloat(dur)+.5)*1000);
+  }
+  var P1_BALLOONS=['🎈','💖','🌸','🌺'];
+  var P2_BALLOONS=['🎀','💎','⭐','🌊'];
+  gameInterval(function(){spawnBalloon(z1,1,P1_BALLOONS[Math.floor(Math.random()*P1_BALLOONS.length)]);},700);
+  gameInterval(function(){spawnBalloon(z2,2,P2_BALLOONS[Math.floor(Math.random()*P2_BALLOONS.length)]);},700);
+  gameInterval(function(){rem--;timeEl.textContent='⏱'+rem;if(rem<=0){running=false;show2PResult(s1,s2);}},1000);
+}
+
+// ============================================================
 // 初期化
 // ============================================================
-document.addEventListener('visibilitychange',function(){if(document.hidden){stopBGM();if(window.speechSynthesis)window.speechSynthesis.cancel();}});
+document.addEventListener('visibilitychange',function(){if(document.hidden){stopBGM();}});
 window.addEventListener('resize',function(){
   var cv=document.getElementById('stampCv');
   if(cv){var p=cv.parentNode;cv.width=p.offsetWidth||300;cv.height=p.offsetHeight||200;}
