@@ -9,26 +9,42 @@
     body{width:100vw;height:100vh;overflow:hidden;cursor:none;touch-action:none;
       font-family:'Hiragino Maru Gothic Pro','M PLUS Rounded 1c','Comic Sans MS',sans-serif;background:#1a1a2e}
     #cursor{position:fixed;width:44px;height:44px;pointer-events:none;z-index:9999;font-size:32px;transform:translate(-30%,-30%)}
+
+    /* ===== TITLE ===== */
     #title-screen{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
       overflow:hidden;background:linear-gradient(160deg,#cc44ff 0%,#ff44aa 40%,#ffaa00 100%)}
     .t-stars{position:absolute;inset:0;pointer-events:none}
     .t-star{position:absolute;opacity:0;animation:twinkle var(--d) var(--dl) ease-in-out infinite}
     @keyframes twinkle{0%,100%{opacity:0;transform:scale(.3)}50%{opacity:1;transform:scale(1.4)}}
-    .logo-wrap{text-align:center;z-index:10;animation:floatY 3s ease-in-out infinite;margin-bottom:6px}
+    .logo-wrap{text-align:center;z-index:10;animation:floatY 3s ease-in-out infinite;margin-bottom:8px}
     @keyframes floatY{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
     .logo-sub{font-size:clamp(13px,3vw,20px);color:#ffe135;font-weight:900;text-shadow:1px 1px 0 #996600;letter-spacing:2px}
     .logo-main{font-size:clamp(26px,6vw,50px);color:white;font-weight:900;text-shadow:3px 3px 0 #990066,6px 6px 0 rgba(0,0,0,.2);letter-spacing:3px}
     .logo-game{font-size:clamp(11px,2.5vw,17px);color:white;margin-top:5px;text-shadow:1px 1px 0 rgba(0,0,0,.4)}
-    .chars-row{display:flex;gap:clamp(4px,1.5vw,14px);margin:10px 0;z-index:10;align-items:flex-end}
-    .char-t{animation:charB 2s ease-in-out infinite}
-    .char-t:nth-child(2){animation-delay:.3s}.char-t:nth-child(3){animation-delay:.6s}.char-t:nth-child(4){animation-delay:.9s}
-    @keyframes charB{0%,100%{transform:translateY(0) rotate(0deg)}30%{transform:translateY(-9px) rotate(-3deg)}70%{transform:translateY(-5px) rotate(3deg)}}
-    .btn-start{padding:15px 44px;font-size:clamp(17px,4vw,25px);font-weight:900;
+
+    /* Character images */
+    .char-img{
+      mix-blend-mode:multiply;
+      object-fit:contain;
+      filter:drop-shadow(0 6px 18px rgba(0,0,0,.45));
+      display:block;
+    }
+    .char-bounce{animation:charB 2s ease-in-out infinite;display:inline-block}
+    .char-bounce:nth-child(2){animation-delay:.3s}
+    .char-bounce:nth-child(3){animation-delay:.6s}
+    .char-bounce:nth-child(4){animation-delay:.9s}
+    @keyframes charB{0%,100%{transform:translateY(0)}30%{transform:translateY(-10px)}70%{transform:translateY(-6px)}}
+
+    .chars-row{display:flex;gap:clamp(2px,1vw,10px);margin:10px 0;z-index:10;align-items:flex-end}
+
+    .btn-start{padding:16px 48px;font-size:clamp(18px,4vw,26px);font-weight:900;
       background:linear-gradient(135deg,#ffe135,#ff8c00);border:none;border-radius:60px;
       color:white;text-shadow:1px 1px 0 rgba(0,0,0,.3);cursor:pointer;z-index:10;
       box-shadow:0 6px 24px rgba(0,0,0,.3),0 0 40px rgba(255,220,0,.4);
       animation:pulsBtn 1.6s ease-in-out infinite;font-family:inherit}
     @keyframes pulsBtn{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+
+    /* ===== GAME ===== */
     #game-screen{position:absolute;inset:0;display:none}
     #stage-bg{position:absolute;inset:0}
     .bg-town{background:linear-gradient(180deg,#87CEEB 0%,#87CEEB 55%,#6abf5e 55%,#5aaf4e 65%,#228B22 65%,#1a6b1a 100%)}
@@ -36,6 +52,8 @@
     .bg-library{background:linear-gradient(180deg,#f5deb3 0%,#daa520 25%,#c8941a 50%,#8b6010 70%,#4a3005 100%)}
     .bg-castle{background:radial-gradient(ellipse at 50% 0%,#4a1888 0%,#1a0a3e 60%,#0d0522 100%)}
     #decorations{position:absolute;inset:0;pointer-events:none}
+
+    /* HUD */
     #hud{position:absolute;top:0;left:0;right:0;z-index:100;padding:8px 16px;
       display:flex;justify-content:space-between;align-items:center;
       background:rgba(255,255,255,.18);backdrop-filter:blur(8px)}
@@ -43,15 +61,26 @@
     #counter-row{display:flex;gap:5px}
     .ci{font-size:clamp(18px,4vw,26px);opacity:.25;transition:opacity .3s,transform .4s cubic-bezier(.175,.885,.32,1.275)}
     .ci.got{opacity:1;transform:scale(1.35)}
+
+    /* Guide */
     #guide{position:absolute;bottom:10px;left:12px;z-index:100;display:flex;align-items:flex-end;gap:8px}
-    #bubble{background:white;border-radius:18px;padding:8px 13px;max-width:170px;
+    #bubble{background:white;border-radius:18px;padding:8px 13px;max-width:180px;
       font-size:clamp(11px,2.2vw,14px);color:#333;box-shadow:0 3px 12px rgba(0,0,0,.2);
-      position:relative;margin-bottom:14px;line-height:1.5}
+      position:relative;margin-bottom:16px;line-height:1.5}
     #bubble::after{content:'';position:absolute;bottom:-9px;left:16px;border:9px solid transparent;border-top-color:white;border-bottom:0}
+
+    /* Guide character glow per stage */
+    .guide-glow-0{filter:drop-shadow(0 0 12px #cc66ff)}
+    .guide-glow-1{filter:drop-shadow(0 0 12px #ff66bb)}
+    .guide-glow-2{filter:drop-shadow(0 0 12px #44ffcc)}
+    .guide-glow-3{filter:drop-shadow(0 0 12px #aa44ff)}
+
     #hint-btn{position:absolute;bottom:14px;right:14px;z-index:100;padding:10px 18px;
       font-size:clamp(13px,2.5vw,16px);font-weight:bold;
       background:linear-gradient(135deg,#ff6eb4,#c44dff);border:none;border-radius:40px;
       color:white;cursor:pointer;font-family:inherit;box-shadow:0 4px 14px rgba(0,0,0,.25)}
+
+    /* Items */
     .item{position:absolute;font-size:clamp(30px,5vw,42px);cursor:pointer;user-select:none;z-index:50;
       padding:10px;touch-action:none;filter:drop-shadow(1px 1px 3px rgba(0,0,0,.25));transition:filter .3s,opacity .3s,transform .2s}
     .item.hidden{opacity:.22;filter:blur(.4px) drop-shadow(0 0 2px rgba(0,0,0,.15))}
@@ -59,6 +88,8 @@
     .item:hover{transform:scale(1.15);filter:drop-shadow(0 0 10px gold) brightness(1.3)}
     .item.found{animation:itemPop .5s ease-out forwards;pointer-events:none}
     @keyframes itemPop{0%{transform:scale(1);opacity:1}50%{transform:scale(2.2);opacity:1;filter:brightness(2.5) drop-shadow(0 0 20px gold)}100%{transform:scale(0);opacity:0}}
+
+    /* Stage clear */
     #stage-clear{position:absolute;inset:0;display:none;align-items:center;justify-content:center;
       flex-direction:column;z-index:300;background:rgba(255,255,255,.08);backdrop-filter:blur(6px)}
     .sc-box{text-align:center;animation:scPop .5s cubic-bezier(.175,.885,.32,1.275);
@@ -70,11 +101,14 @@
     .btn-next{padding:13px 38px;font-size:clamp(16px,3.2vw,22px);font-weight:900;
       background:linear-gradient(135deg,#ff6eb4,#c44dff);border:none;border-radius:50px;
       color:white;cursor:pointer;font-family:inherit;box-shadow:0 6px 20px rgba(0,0,0,.3);animation:pulsBtn 1.6s ease-in-out infinite}
+
     #toast{position:fixed;top:60px;right:-300px;z-index:1000;
       background:linear-gradient(135deg,#ffe135,#ff8c00);border-radius:16px;
       padding:9px 18px;color:white;font-weight:bold;font-size:15px;
       box-shadow:0 4px 20px rgba(0,0,0,.3);transition:right .45s cubic-bezier(.175,.885,.32,1.275)}
     #toast.show{right:16px}
+
+    /* ===== VICTORY ===== */
     #victory-screen{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;
       justify-content:center;overflow:hidden;background:linear-gradient(160deg,#cc44ff,#ff44aa,#ffaa00)}
     #confetti-wrap{position:absolute;inset:0;pointer-events:none}
@@ -83,17 +117,20 @@
     .v-box{text-align:center;z-index:10}
     .v-title{font-size:clamp(28px,7vw,50px);font-weight:900;color:#ffe135;text-shadow:3px 3px 0 #cc8800,6px 6px 0 rgba(0,0,0,.3);animation:scPop .8s cubic-bezier(.175,.885,.32,1.275);margin-bottom:8px}
     .v-msg{font-size:clamp(13px,3vw,18px);color:white;margin-bottom:16px;text-shadow:1px 1px 0 rgba(0,0,0,.4);line-height:1.7}
-    .v-chars{display:flex;justify-content:center;gap:clamp(4px,1.5vw,12px);margin-bottom:18px;align-items:flex-end}
+    .v-chars{display:flex;justify-content:center;gap:clamp(2px,1vw,8px);margin-bottom:18px;align-items:flex-end}
     .v-char{animation:charB 1.2s ease-in-out infinite}
     .v-char:nth-child(2){animation-delay:.3s}.v-char:nth-child(3){animation-delay:.6s}.v-char:nth-child(4){animation-delay:.9s}
     .btn-replay{padding:13px 38px;font-size:clamp(16px,3.2vw,22px);font-weight:900;
       background:linear-gradient(135deg,#ffe135,#ff8c00);border:none;border-radius:50px;
       color:white;cursor:pointer;font-family:inherit;box-shadow:0 6px 20px rgba(0,0,0,.3);animation:pulsBtn 1.6s ease-in-out infinite}
+
     @keyframes floatSpk{0%,100%{transform:translateY(0) scale(1);opacity:.7}50%{transform:translateY(-14px) scale(1.3);opacity:1}}
   </style>
 </head>
 <body>
 <div id="cursor">🔍</div>
+
+<!-- TITLE -->
 <div id="title-screen">
   <div class="t-stars" id="t-stars"></div>
   <div class="logo-wrap">
@@ -104,6 +141,8 @@
   <div class="chars-row" id="title-chars"></div>
   <button class="btn-start" onclick="startGame()">🔍 ゲームをはじめる！</button>
 </div>
+
+<!-- GAME -->
 <div id="game-screen">
   <div id="stage-bg"></div>
   <div id="decorations"></div>
@@ -114,7 +153,7 @@
   </div>
   <div id="guide">
     <div id="bubble">てがかりをさがしてね！</div>
-    <div id="guide-svg-wrap"></div>
+    <div id="guide-img-wrap"></div>
   </div>
   <button id="hint-btn" onclick="showHint()">💡 ヒント！</button>
   <div id="stage-clear">
@@ -126,6 +165,8 @@
     </div>
   </div>
 </div>
+
+<!-- VICTORY -->
 <div id="victory-screen">
   <div id="confetti-wrap"></div>
   <div class="v-box">
@@ -135,443 +176,47 @@
     <button class="btn-replay" onclick="replayGame()">🔍 もういちど！</button>
   </div>
 </div>
+
 <div id="toast"><span id="toast-txt">✨ みつけた！</span></div>
 
 <script>
 // ============================================================
-// ANIME-STYLE CHARACTER SVGs
+// OFFICIAL CHARACTER IMAGES
 // ============================================================
+const CHAR_IMGS = ['./imgs/chara01.jpg','./imgs/chara02.jpg','./imgs/chara03.jpg','./imgs/chara04.jpg'];
+const CHAR_NAMES = ['キュアアンサー','キュアミスティック','キュアエクレール','キュアアルカナ・シャドウ'];
+const CHAR_GLOWS = ['drop-shadow(0 0 14px #cc66ff)','drop-shadow(0 0 14px #ff66bb)','drop-shadow(0 0 14px #44ffcc)','drop-shadow(0 0 14px #aa44ff)'];
+const CHAR_COLORS = ['#cc44ff','#ff44bb','#22ddaa','#aa22ff'];
 
-// Shared anime eye renderer
-// cx/cy = eye center, iris color, dark color, id prefix
-function animeEye(cx, cy, irisColor, darkColor, flipShine) {
-  const sx = flipShine ? cx + 2.5 : cx - 2.5; // shine x offset
-  return `
-    <ellipse cx="${cx}" cy="${cy}" rx="10.5" ry="9" fill="white"/>
-    <ellipse cx="${cx}" cy="${cy+1}" rx="7.5" ry="7.5" fill="${irisColor}"/>
-    <ellipse cx="${cx}" cy="${cy+2.5}" rx="5.5" ry="5" fill="${darkColor}" opacity=".55"/>
-    <ellipse cx="${cx}" cy="${cy+1}" rx="3.5" ry="4.5" fill="${darkColor}"/>
-    <ellipse cx="${sx}" cy="${cy-3}" rx="3.8" ry="2.8" fill="white" opacity=".95" transform="rotate(-20,${sx},${cy-3})"/>
-    <circle cx="${cx+3.5}" cy="${cy+4}" r="2" fill="white" opacity=".75"/>
-    <circle cx="${cx-3}" cy="${cy+4.5}" r="1.2" fill="white" opacity=".5"/>
-    <path d="${flipShine ? `M${cx-10} ${cy-4} Q${cx} ${cy-9} ${cx+10} ${cy-4}` : `M${cx-10} ${cy-4} Q${cx} ${cy-9} ${cx+10} ${cy-4}`}" stroke="#1a0030" stroke-width="2.8" fill="none" stroke-linecap="round"/>
-    <line x1="${cx-9}" y1="${cy-5}" x2="${cx-11.5}" y2="${cy-8.5}" stroke="#1a0030" stroke-width="1.8"/>
-    <line x1="${cx-5.5}" y1="${cy-7}" x2="${cx-6}" y2="${cy-10.5}" stroke="#1a0030" stroke-width="1.8"/>
-    <line x1="${cx}" y1="${cy-8}" x2="${cx}" y2="${cy-11.5}" stroke="#1a0030" stroke-width="1.8"/>
-    <line x1="${cx+5.5}" y1="${cy-7}" x2="${cx+6}" y2="${cy-10.5}" stroke="#1a0030" stroke-width="1.8"/>
-    <line x1="${cx+9}" y1="${cy-5}" x2="${cx+11.5}" y2="${cy-8.5}" stroke="#1a0030" stroke-width="1.8"/>
-    <line x1="${cx-9.5}" y1="${cy+6}" x2="${cx-11}" y2="${cy+8}" stroke="#1a0030" stroke-width="1"/>
-    <line x1="${cx-5}" y1="${cy+8.5}" x2="${cx-5.5}" y2="${cy+11}" stroke="#1a0030" stroke-width="1"/>
-    <line x1="${cx}" y1="${cy+9}" x2="${cx}" y2="${cy+11.5}" stroke="#1a0030" stroke-width="1"/>
-    <line x1="${cx+5}" y1="${cy+8.5}" x2="${cx+5.5}" y2="${cy+11}" stroke="#1a0030" stroke-width="1"/>
-    <line x1="${cx+9.5}" y1="${cy+6}" x2="${cx+11}" y2="${cy+8}" stroke="#1a0030" stroke-width="1"/>
-  `;
+function charHTML(idx, w, h, extraStyle='') {
+  return `<img class="char-img" src="${CHAR_IMGS[idx]}" width="${w}" height="${h}"
+    alt="${CHAR_NAMES[idx]}"
+    style="filter:${CHAR_GLOWS[idx]};${extraStyle}"
+    onerror="this.style.display='none'">`;
 }
 
-// ── キュアアンサー ── purple twin buns, teal eyes, purple outfit + yellow bow
-function svgAnswer(w, h) {
-  return `<svg width="${w}" height="${h}" viewBox="0 0 100 158" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <radialGradient id="aHair" cx="40%" cy="35%"><stop offset="0%" stop-color="#9955ff"/><stop offset="100%" stop-color="#4400bb"/></radialGradient>
-    <radialGradient id="aBun" cx="35%" cy="30%"><stop offset="0%" stop-color="#bb77ff"/><stop offset="60%" stop-color="#7722ee"/><stop offset="100%" stop-color="#4400bb"/></radialGradient>
-    <linearGradient id="aBody" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#aa66ff"/><stop offset="100%" stop-color="#7733cc"/></linearGradient>
-    <linearGradient id="aCape" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#8844ee" stop-opacity=".85"/><stop offset="100%" stop-color="#5511aa" stop-opacity=".7"/></linearGradient>
-  </defs>
-
-  <!-- ── LEGS / SHOES ── -->
-  <ellipse cx="40" cy="149" rx="10" ry="10" fill="#e8c8e8"/>
-  <ellipse cx="60" cy="149" rx="10" ry="10" fill="#e8c8e8"/>
-  <ellipse cx="40" cy="153" rx="10.5" ry="7" fill="#ccaaee"/>
-  <ellipse cx="60" cy="153" rx="10.5" ry="7" fill="#ccaaee"/>
-  <ellipse cx="39" cy="156" rx="11" ry="5" fill="#6622cc"/>
-  <ellipse cx="61" cy="156" rx="11" ry="5" fill="#6622cc"/>
-
-  <!-- ── BODY ── -->
-  <path d="M26 94 Q28 145 50 147 Q72 145 74 94" fill="url(#aBody)"/>
-  <!-- Skirt flare -->
-  <path d="M22 116 Q50 130 78 116 L80 144 Q50 152 20 144 Z" fill="#8833dd" opacity=".6"/>
-  <!-- Cape -->
-  <path d="M20 90 Q50 82 80 90 L82 124 Q50 132 18 124 Z" fill="url(#aCape)"/>
-  <path d="M20 90 Q50 82 80 90" stroke="#cc88ff" stroke-width="1.5" fill="none"/>
-
-  <!-- ── ARMS ── -->
-  <path d="M26 95 Q15 100 11 114 Q9 124 16 128 Q21 130 25 122 Q27 114 32 102 Z" fill="#fce8d0"/>
-  <path d="M74 95 Q85 100 89 114 Q91 124 84 128 Q79 130 75 122 Q73 114 68 102 Z" fill="#fce8d0"/>
-  <!-- Gloves (light purple at wrists) -->
-  <ellipse cx="13" cy="127" rx="7" ry="4" fill="#ddaaff" opacity=".8"/>
-  <ellipse cx="87" cy="127" rx="7" ry="4" fill="#ddaaff" opacity=".8"/>
-
-  <!-- Yellow bow on chest -->
-  <path d="M50 97 Q44 91 38 93 Q40 99 50 97 Z" fill="#ffe135"/>
-  <path d="M50 97 Q56 91 62 93 Q60 99 50 97 Z" fill="#ffe135"/>
-  <path d="M44 91 Q40 86 43 83 Q47 81 50 88 Z" fill="#ffcc00"/>
-  <path d="M56 91 Q60 86 57 83 Q53 81 50 88 Z" fill="#ffcc00"/>
-  <circle cx="50" cy="96" r="4" fill="#ff9900"/>
-  <circle cx="50" cy="96" r="2" fill="#ffdd00"/>
-
-  <!-- Magnifying glass -->
-  <circle cx="89" cy="119" r="9" stroke="#ffe135" stroke-width="2.5" fill="rgba(200,255,240,.35)" stroke-dasharray="0"/>
-  <line x1="95" y1="125" x2="100" y2="133" stroke="#ffe135" stroke-width="3.5" stroke-linecap="round"/>
-
-  <!-- ── NECK ── -->
-  <rect x="44" y="86" width="12" height="10" rx="4" fill="#fce8d0"/>
-
-  <!-- ── HEAD BASE ── -->
-  <ellipse cx="50" cy="58" rx="34" ry="36" fill="#fce8d0"/>
-
-  <!-- ── HAIR BACK ── -->
-  <ellipse cx="50" cy="41" rx="36" ry="22" fill="url(#aHair)"/>
-  <path d="M16 54 Q10 72 13 94 Q16 104 24 100 Q21 88 19 72 Q20 62 26 54 Z" fill="#4400bb"/>
-  <path d="M84 54 Q90 72 87 94 Q84 104 76 100 Q79 88 81 72 Q80 62 74 54 Z" fill="#4400bb"/>
-
-  <!-- ── TWIN BUNS ── -->
-  <circle cx="22" cy="36" r="16" fill="url(#aBun)"/>
-  <circle cx="78" cy="36" r="16" fill="url(#aBun)"/>
-  <!-- Pink gradient tips -->
-  <circle cx="15" cy="26" r="9" fill="#ff88cc" opacity=".45"/>
-  <circle cx="71" cy="26" r="9" fill="#ff88cc" opacity=".45"/>
-  <!-- Heart shape on bun tips -->
-  <path d="M13 25 Q15 21 17 25 Q15 28 13 25 Z" fill="#ff44aa" opacity=".6"/>
-  <path d="M69 25 Q71 21 73 25 Q71 28 69 25 Z" fill="#ff44aa" opacity=".6"/>
-  <!-- Bun highlight -->
-  <ellipse cx="18" cy="29" rx="6" ry="4" fill="#ddaaff" opacity=".55" transform="rotate(-25,18,29)"/>
-  <ellipse cx="74" cy="29" rx="6" ry="4" fill="#ddaaff" opacity=".55" transform="rotate(-25,74,29)"/>
-  <!-- Ribbon tie at bun base -->
-  <path d="M22 50 Q18 47 16 49 Q18 52 22 50 Z" fill="#ff1188"/>
-  <path d="M22 50 Q26 47 28 49 Q26 52 22 50 Z" fill="#ff1188"/>
-  <circle cx="22" cy="50" r="2.5" fill="#ff44aa"/>
-  <path d="M78 50 Q74 47 72 49 Q74 52 78 50 Z" fill="#ff1188"/>
-  <path d="M78 50 Q82 47 84 49 Q82 52 78 50 Z" fill="#ff1188"/>
-  <circle cx="78" cy="50" r="2.5" fill="#ff44aa"/>
-
-  <!-- ── BANGS ── -->
-  <path d="M18 46 Q20 30 30 28 Q36 20 42 30 Q46 20 52 28 Q58 20 64 30 Q70 26 78 32 Q82 38 80 46
-           Q76 40 70 40 Q66 30 60 36 Q56 24 50 32 Q44 24 40 34 Q34 28 28 36 Q22 38 20 46 Z"
-        fill="#5511cc"/>
-  <!-- Bang highlights -->
-  <path d="M30 36 Q34 27 40 32" stroke="#9966ff" stroke-width="2.5" fill="none" stroke-linecap="round" opacity=".7"/>
-  <path d="M56 28 Q60 22 65 28" stroke="#9966ff" stroke-width="2" fill="none" stroke-linecap="round" opacity=".5"/>
-
-  <!-- ── AHOGE ── -->
-  <path d="M50 24 Q55 12 49 5" stroke="#6622cc" stroke-width="3.5" fill="none" stroke-linecap="round"/>
-  <circle cx="49" cy="5" r="3.5" fill="#9944ff"/>
-
-  <!-- ── DETECTIVE HAT BRIM ── -->
-  <rect x="25" y="44" width="50" height="6" rx="3.5" fill="#2200aa" opacity=".75"/>
-
-  <!-- ── FACE ── -->
-  <!-- Nose -->
-  <path d="M48 70 Q50 72 52 70" stroke="#e8aaaa" stroke-width="1.5" fill="none" stroke-linecap="round" opacity=".8"/>
-  <!-- RIGHT EYE -->
-  ${animeEye(36, 61, '#00ccbb', '#004433', false)}
-  <!-- LEFT EYE -->
-  ${animeEye(64, 61, '#00ccbb', '#004433', true)}
-  <!-- Smile -->
-  <path d="M42 77 Q50 86 58 77" stroke="#cc4488" stroke-width="2.8" fill="none" stroke-linecap="round"/>
-  <!-- Blush -->
-  <ellipse cx="26" cy="71" rx="9" ry="4.5" fill="#ff99bb" opacity=".38"/>
-  <ellipse cx="74" cy="71" rx="9" ry="4.5" fill="#ff99bb" opacity=".38"/>
-
-  <!-- Label -->
-  <text x="50" y="156" font-size="7.5" fill="#cc88ff" text-anchor="middle" font-weight="bold">キュアアンサー</text>
-</svg>`;
+function buildTitleChars() {
+  const wrap = document.getElementById('title-chars');
+  const size = Math.min(Math.floor(window.innerWidth / 4.8), 120);
+  CHAR_IMGS.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'char-bounce';
+    d.innerHTML = charHTML(i, size, Math.floor(size * 1.35));
+    wrap.appendChild(d);
+  });
 }
 
-// ── キュアミスティック ── pink braids, purple eyes, pink outfit
-function svgMystic(w, h) {
-  return `<svg width="${w}" height="${h}" viewBox="0 0 100 158" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <radialGradient id="mHair" cx="40%" cy="30%"><stop offset="0%" stop-color="#ff88cc"/><stop offset="100%" stop-color="#dd1188"/></radialGradient>
-    <linearGradient id="mBody" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ff99dd"/><stop offset="100%" stop-color="#ee55bb"/></linearGradient>
-  </defs>
-
-  <!-- LEGS / SHOES -->
-  <ellipse cx="40" cy="149" rx="10" ry="10" fill="#f8d8f0"/>
-  <ellipse cx="60" cy="149" rx="10" ry="10" fill="#f8d8f0"/>
-  <ellipse cx="40" cy="153" rx="10.5" ry="7" fill="#eebbff"/>
-  <ellipse cx="60" cy="153" rx="10.5" ry="7" fill="#eebbff"/>
-  <ellipse cx="39" cy="156" rx="11" ry="5" fill="#ee55bb"/>
-  <ellipse cx="61" cy="156" rx="11" ry="5" fill="#ee55bb"/>
-
-  <!-- BODY -->
-  <path d="M26 94 Q28 145 50 147 Q72 145 74 94" fill="url(#mBody)"/>
-  <path d="M22 116 Q50 130 78 116 L80 144 Q50 152 20 144 Z" fill="#dd44aa" opacity=".55"/>
-  <!-- Cape -->
-  <path d="M20 90 Q50 82 80 90 L82 124 Q50 132 18 124 Z" fill="#cc3399" opacity=".75"/>
-  <path d="M20 90 Q50 82 80 90" stroke="#ffaadd" stroke-width="1.5" fill="none"/>
-
-  <!-- ARMS -->
-  <path d="M26 95 Q15 100 11 114 Q9 124 16 128 Q21 130 25 122 Q27 114 32 102 Z" fill="#fce8d0"/>
-  <path d="M74 95 Q85 100 89 114 Q91 124 84 128 Q79 130 75 122 Q73 114 68 102 Z" fill="#fce8d0"/>
-  <!-- Light purple fingerless gloves -->
-  <ellipse cx="13" cy="124" rx="7" ry="5" fill="#ddaaff" opacity=".75"/>
-  <ellipse cx="87" cy="124" rx="7" ry="5" fill="#ddaaff" opacity=".75"/>
-
-  <!-- Notebook (right hand) -->
-  <rect x="78" y="108" width="16" height="21" rx="2.5" fill="white" stroke="#dd44aa" stroke-width="1.5"/>
-  <rect x="78" y="108" width="4" height="21" rx="2" fill="#ffbbdd"/>
-  <line x1="83" y1="114" x2="92" y2="114" stroke="#dd44aa" stroke-width="1"/>
-  <line x1="83" y1="119" x2="92" y2="119" stroke="#dd44aa" stroke-width="1"/>
-  <line x1="83" y1="124" x2="92" y2="124" stroke="#dd44aa" stroke-width="1"/>
-
-  <!-- Pink heart decoration on chest -->
-  <path d="M46 95 Q50 90 54 95 Q50 100 46 95 Z" fill="#ff44aa"/>
-  <path d="M46 95 Q43 90 44 87 Q47 85 50 91 Z" fill="#ff1188"/>
-  <path d="M54 95 Q57 90 56 87 Q53 85 50 91 Z" fill="#ff1188"/>
-  <circle cx="50" cy="95" r="3" fill="#ff77bb"/>
-
-  <!-- NECK -->
-  <rect x="44" y="86" width="12" height="10" rx="4" fill="#fce8d0"/>
-
-  <!-- HEAD BASE -->
-  <ellipse cx="50" cy="58" rx="34" ry="36" fill="#fce8d0"/>
-
-  <!-- HAIR BACK -->
-  <ellipse cx="50" cy="41" rx="36" ry="22" fill="#dd1188"/>
-  <path d="M16 54 Q10 72 13 94 Q16 104 24 100 Q21 88 19 72 Q20 62 26 54 Z" fill="#bb0066"/>
-  <path d="M84 54 Q90 72 87 94 Q84 104 76 100 Q79 88 81 72 Q80 62 74 54 Z" fill="#bb0066"/>
-
-  <!-- BRAIDED PIGTAILS (三つ編み) -->
-  <!-- Left braid body -->
-  <path d="M20 52 Q14 66 16 82 Q13 96 15 112 Q12 124 16 134" stroke="#dd1188" stroke-width="11" fill="none" stroke-linecap="round"/>
-  <!-- Braid weave pattern left -->
-  <path d="M20 52 Q24 60 20 68 Q24 76 20 84 Q24 92 20 100 Q24 108 20 116 Q24 124 20 132" stroke="#ff66aa" stroke-width="4" fill="none" stroke-linecap="round" opacity=".7"/>
-  <!-- Right braid -->
-  <path d="M80 52 Q86 66 84 82 Q87 96 85 112 Q88 124 84 134" stroke="#dd1188" stroke-width="11" fill="none" stroke-linecap="round"/>
-  <path d="M80 52 Q76 60 80 68 Q76 76 80 84 Q76 92 80 100 Q76 108 80 116 Q76 124 80 132" stroke="#ff66aa" stroke-width="4" fill="none" stroke-linecap="round" opacity=".7"/>
-  <!-- Braid ends: light purple gradient -->
-  <ellipse cx="16" cy="136" rx="7" ry="9" fill="#cc88ff"/>
-  <ellipse cx="84" cy="136" rx="7" ry="9" fill="#cc88ff"/>
-  <!-- Light purple tip -->
-  <ellipse cx="16" cy="141" rx="5" ry="5" fill="#ddbbff"/>
-  <ellipse cx="84" cy="141" rx="5" ry="5" fill="#ddbbff"/>
-  <!-- Ribbon ties at top of braids -->
-  <path d="M20 52 Q16 48 14 51 Q16 54 20 52 Z" fill="#ff1188"/>
-  <path d="M20 52 Q24 48 26 51 Q24 54 20 52 Z" fill="#ff1188"/>
-  <circle cx="20" cy="52" r="2.8" fill="#ff66aa"/>
-  <path d="M80 52 Q76 48 74 51 Q76 54 80 52 Z" fill="#ff1188"/>
-  <path d="M80 52 Q84 48 86 51 Q84 54 80 52 Z" fill="#ff1188"/>
-  <circle cx="80" cy="52" r="2.8" fill="#ff66aa"/>
-
-  <!-- BANGS -->
-  <path d="M18 46 Q22 30 32 28 Q38 20 44 30 Q48 20 54 28 Q60 20 68 28 Q76 30 80 44
-           Q74 36 68 38 Q64 26 58 34 Q54 22 50 32 Q46 22 42 32 Q36 26 30 36 Q24 36 20 44 Z"
-        fill="#ee2299"/>
-  <path d="M32 36 Q36 26 42 32" stroke="#ff99cc" stroke-width="2.5" fill="none" stroke-linecap="round" opacity=".7"/>
-  <path d="M56 26 Q62 20 67 28" stroke="#ff99cc" stroke-width="2" fill="none" stroke-linecap="round" opacity=".6"/>
-
-  <!-- HAT -->
-  <rect x="25" y="44" width="50" height="6" rx="3.5" fill="#990055" opacity=".75"/>
-  <rect x="30" y="30" width="40" height="16" rx="5" fill="#cc1177" opacity=".85"/>
-  <rect x="25" y="44" width="50" height="6" rx="3.5" fill="#880044"/>
-  <circle cx="50" cy="38" r="4" fill="#ffe135"/>
-  <circle cx="50" cy="38" r="2" fill="white"/>
-
-  <!-- FACE -->
-  <path d="M48 70 Q50 72 52 70" stroke="#e8aaaa" stroke-width="1.5" fill="none" stroke-linecap="round" opacity=".8"/>
-  ${animeEye(36, 61, '#aa44dd', '#440066', false)}
-  ${animeEye(64, 61, '#aa44dd', '#440066', true)}
-  <path d="M42 78 Q50 87 58 78" stroke="#ee1188" stroke-width="2.8" fill="none" stroke-linecap="round"/>
-  <ellipse cx="26" cy="71" rx="9" ry="4.5" fill="#ff88bb" opacity=".42"/>
-  <ellipse cx="74" cy="71" rx="9" ry="4.5" fill="#ff88bb" opacity=".42"/>
-
-  <text x="50" y="156" font-size="7" fill="#ff66bb" text-anchor="middle" font-weight="bold">キュアミスティック</text>
-</svg>`;
+function buildVictoryChars() {
+  const wrap = document.getElementById('v-chars');
+  wrap.innerHTML = '';
+  const size = Math.min(Math.floor(window.innerWidth / 5.2), 100);
+  CHAR_IMGS.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'v-char';
+    d.innerHTML = charHTML(i, size, Math.floor(size * 1.35));
+    wrap.appendChild(d);
+  });
 }
-
-// ── キュアエクレール ── teal, ponytail+drills, mini hat, teal eyes
-function svgEclair(w, h) {
-  return `<svg width="${w}" height="${h}" viewBox="0 0 100 158" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <radialGradient id="eHair" cx="40%" cy="30%"><stop offset="0%" stop-color="#55ddc0"/><stop offset="100%" stop-color="#10a080"/></radialGradient>
-    <linearGradient id="eBody" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#44ccb0"/><stop offset="100%" stop-color="#10a888"/></linearGradient>
-  </defs>
-
-  <!-- LEGS / SHOES -->
-  <ellipse cx="40" cy="149" rx="10" ry="10" fill="#d8f5ee"/>
-  <ellipse cx="60" cy="149" rx="10" ry="10" fill="#d8f5ee"/>
-  <ellipse cx="40" cy="153" rx="10.5" ry="7" fill="#aaeedd"/>
-  <ellipse cx="60" cy="153" rx="10.5" ry="7" fill="#aaeedd"/>
-  <ellipse cx="39" cy="156" rx="11" ry="5" fill="#10a888"/>
-  <ellipse cx="61" cy="156" rx="11" ry="5" fill="#10a888"/>
-
-  <!-- BODY (asymmetric crop top + skirt) -->
-  <path d="M26 94 Q28 145 50 147 Q72 145 74 94" fill="url(#eBody)"/>
-  <!-- Asymmetric skirt -->
-  <path d="M22 110 Q38 122 50 114 L50 146 Q36 150 22 140 Z" fill="#0d9978" opacity=".7"/>
-  <path d="M78 110 Q62 122 50 114 L50 146 Q64 150 78 140 Z" fill="#18b898" opacity=".5"/>
-  <path d="M20 90 Q50 82 80 90 L82 118 Q50 126 18 118 Z" fill="#0e9080" opacity=".65"/>
-  <path d="M20 90 Q50 82 80 90" stroke="#88ffdd" stroke-width="1.5" fill="none"/>
-
-  <!-- ARMS (wide sleeves) -->
-  <path d="M26 95 Q15 100 11 114 Q9 124 16 128 Q21 130 25 122 Q27 114 32 102 Z" fill="#fce8d0"/>
-  <ellipse cx="12" cy="127" rx="9" ry="5" fill="#88eecc" opacity=".8"/>
-  <path d="M74 95 Q85 100 89 114 Q91 124 84 128 Q79 130 75 122 Q73 114 68 102 Z" fill="#fce8d0"/>
-  <ellipse cx="88" cy="127" rx="9" ry="5" fill="#88eecc" opacity=".8"/>
-
-  <!-- Teal gem/brooch -->
-  <path d="M47 94 L50 89 L53 94 L50 99 Z" fill="#88ffdd"/>
-  <path d="M47 94 L50 89 L53 94 L50 99 Z" fill="none" stroke="#10a888" stroke-width="1"/>
-
-  <!-- NECK -->
-  <rect x="44" y="86" width="12" height="10" rx="4" fill="#fce8d0"/>
-
-  <!-- HEAD BASE -->
-  <ellipse cx="50" cy="58" rx="34" ry="36" fill="#fce8d0"/>
-
-  <!-- HAIR BACK -->
-  <ellipse cx="50" cy="41" rx="36" ry="22" fill="#10a080"/>
-  <path d="M16 54 Q10 72 13 90 Q16 100 24 96 Q21 84 19 70 Q20 60 26 54 Z" fill="#0d8870"/>
-  <path d="M84 54 Q90 72 87 90 Q84 100 76 96 Q79 84 81 70 Q80 60 74 54 Z" fill="#0d8870"/>
-
-  <!-- PONYTAIL going right/back -->
-  <path d="M76 46 Q90 42 93 56 Q97 72 90 88" stroke="#10a080" stroke-width="13" fill="none" stroke-linecap="round"/>
-  <path d="M76 46 Q88 44 91 56 Q94 68 88 80" stroke="#44ccb0" stroke-width="5" fill="none" stroke-linecap="round" opacity=".6"/>
-  <!-- Drill curl left -->
-  <path d="M90 88 Q98 96 92 106 Q86 116 92 124 Q98 132 90 140" stroke="#10a080" stroke-width="10" fill="none" stroke-linecap="round"/>
-  <path d="M90 88 Q94 96 90 106 Q86 116 90 124 Q94 132 90 140" stroke="#44ccb0" stroke-width="4" fill="none" stroke-linecap="round" opacity=".7"/>
-  <!-- Yellow-green tip -->
-  <circle cx="90" cy="141" r="7" fill="#88ee60"/>
-  <circle cx="88" cy="138" r="4" fill="#bbff88" opacity=".8"/>
-  <!-- Ponytail tie -->
-  <ellipse cx="78" cy="47" rx="7" ry="4.5" fill="#ffe135" opacity=".9"/>
-  <ellipse cx="78" cy="47" rx="4" ry="2.5" fill="white" opacity=".6"/>
-
-  <!-- BANGS -->
-  <path d="M18 46 Q22 30 32 28 Q38 20 44 30 Q48 20 54 28 Q60 20 68 28 Q76 30 80 46
-           Q74 38 68 38 Q64 28 58 34 Q54 22 50 32 Q46 22 42 32 Q36 26 30 36 Q24 36 20 44 Z"
-        fill="#14b090"/>
-  <path d="M32 36 Q36 26 42 32" stroke="#66ffdd" stroke-width="2.5" fill="none" stroke-linecap="round" opacity=".7"/>
-
-  <!-- MINI DETECTIVE HAT (tilted) -->
-  <g transform="rotate(-18, 38, 36)">
-    <rect x="18" y="38" width="40" height="7" rx="4" fill="#0a7060"/>
-    <rect x="22" y="24" width="32" height="16" rx="5" fill="#0e9878"/>
-    <rect x="18" y="37" width="40" height="7" rx="4" fill="#0a6050"/>
-    <!-- Hat star badge -->
-    <circle cx="38" cy="32" r="4.5" fill="#ffe135"/>
-    <text x="38" y="35" font-size="7" fill="white" text-anchor="middle" font-weight="bold">★</text>
-  </g>
-
-  <!-- FACE -->
-  <path d="M48 70 Q50 72 52 70" stroke="#aae8d8" stroke-width="1.5" fill="none" stroke-linecap="round" opacity=".9"/>
-  ${animeEye(36, 61, '#18ccaa', '#004433', false)}
-  ${animeEye(64, 61, '#18ccaa', '#004433', true)}
-  <!-- Confident smile (slightly asymmetric) -->
-  <path d="M43 77 Q50 85 57 78" stroke="#0daa88" stroke-width="2.8" fill="none" stroke-linecap="round"/>
-  <ellipse cx="26" cy="71" rx="9" ry="4.5" fill="#88ffdd" opacity=".35"/>
-  <ellipse cx="74" cy="71" rx="9" ry="4.5" fill="#88ffdd" opacity=".35"/>
-
-  <text x="50" y="156" font-size="7" fill="#44ddbb" text-anchor="middle" font-weight="bold">キュアエクレール</text>
-</svg>`;
-}
-
-// ── キュアアルカナ・シャドウ ── dark black-purple, phantom thief, purple glowing eyes
-function svgArcana(w, h) {
-  return `<svg width="${w}" height="${h}" viewBox="0 0 100 158" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <radialGradient id="arHair" cx="40%" cy="30%"><stop offset="0%" stop-color="#330066"/><stop offset="100%" stop-color="#0a0018"/></radialGradient>
-    <linearGradient id="arBody" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#2a0055"/><stop offset="100%" stop-color="#0d0022"/></linearGradient>
-    <radialGradient id="arEye" cx="40%" cy="35%"><stop offset="0%" stop-color="#ee88ff"/><stop offset="60%" stop-color="#aa22ee"/><stop offset="100%" stop-color="#660099"/></radialGradient>
-  </defs>
-
-  <!-- LEGS / SHOES -->
-  <ellipse cx="40" cy="149" rx="10" ry="10" fill="#e0c8ee"/>
-  <ellipse cx="60" cy="149" rx="10" ry="10" fill="#e0c8ee"/>
-  <ellipse cx="40" cy="153" rx="10.5" ry="7" fill="#8833bb" opacity=".8"/>
-  <ellipse cx="60" cy="153" rx="10.5" ry="7" fill="#8833bb" opacity=".8"/>
-  <ellipse cx="39" cy="156" rx="11" ry="5" fill="#110022"/>
-  <ellipse cx="61" cy="156" rx="11" ry="5" fill="#110022"/>
-
-  <!-- DRAMATIC PHANTOM THIEF CAPE -->
-  <path d="M14 84 Q50 70 86 84 L96 148 Q50 160 4 148 Z" fill="#0d0022" opacity=".92"/>
-  <path d="M14 84 Q50 70 86 84" stroke="#8844ff" stroke-width="2" fill="none"/>
-  <!-- Inner cape lining (purple) -->
-  <path d="M20 90 Q50 78 80 90 L86 140 Q50 150 14 140 Z" fill="#440088" opacity=".5"/>
-  <path d="M24 96 Q50 86 76 96 L80 132 Q50 140 20 132 Z" fill="#660099" opacity=".3"/>
-
-  <!-- BODY -->
-  <path d="M28 94 Q30 142 50 144 Q70 142 72 94" fill="url(#arBody)"/>
-
-  <!-- ARMS -->
-  <path d="M26 95 Q15 100 11 114 Q9 124 16 128 Q21 130 25 122 Q27 114 32 102 Z" fill="#e8d0f0"/>
-  <path d="M74 95 Q85 100 89 114 Q91 124 84 128 Q79 130 75 122 Q73 114 68 102 Z" fill="#e8d0f0"/>
-  <!-- Dark gloves -->
-  <ellipse cx="13" cy="127" rx="7" ry="4.5" fill="#220044" opacity=".9"/>
-  <ellipse cx="87" cy="127" rx="7" ry="4.5" fill="#220044" opacity=".9"/>
-  <!-- Purple trim on gloves -->
-  <path d="M7 125 Q13 122 19 125" stroke="#9944ff" stroke-width="1.5" fill="none"/>
-  <path d="M81 125 Q87 122 93 125" stroke="#9944ff" stroke-width="1.5" fill="none"/>
-
-  <!-- Playing card (phantom thief signature) -->
-  <rect x="79" y="104" width="15" height="21" rx="2" fill="white" stroke="#220044" stroke-width="1.5"/>
-  <text x="86.5" y="118" font-size="13" fill="#cc0033" text-anchor="middle">♦</text>
-  <circle cx="82" cy="107" r="1.5" fill="#cc0033"/>
-  <circle cx="91" cy="122" r="1.5" fill="#cc0033"/>
-
-  <!-- Purple jewel on chest -->
-  <path d="M47 95 L50 89 L53 95 L50 101 Z" fill="#cc44ff"/>
-  <path d="M47 95 L50 89 L53 95 L50 101 Z" fill="none" stroke="#9900cc" stroke-width="1"/>
-  <circle cx="50" cy="95" r="2" fill="white" opacity=".6"/>
-
-  <!-- NECK -->
-  <rect x="44" y="86" width="12" height="10" rx="4" fill="#f0d8ee"/>
-
-  <!-- HEAD BASE -->
-  <ellipse cx="50" cy="58" rx="34" ry="36" fill="#f0d8ee"/>
-
-  <!-- HAIR BACK (very dark) -->
-  <ellipse cx="50" cy="41" rx="36" ry="22" fill="#0a0018"/>
-  <!-- Long flowing side hair -->
-  <path d="M16 52 Q8 72 10 96 Q12 116 18 130 Q14 142 16 150" stroke="#150030" stroke-width="15" fill="none" stroke-linecap="round"/>
-  <path d="M84 52 Q92 72 90 96 Q88 116 82 130 Q86 142 84 150" stroke="#150030" stroke-width="15" fill="none" stroke-linecap="round"/>
-  <!-- Purple sheen on hair -->
-  <path d="M18 54 Q12 74 14 96" stroke="#440088" stroke-width="4" fill="none" opacity=".6" stroke-linecap="round"/>
-  <path d="M82 54 Q88 74 86 96" stroke="#440088" stroke-width="4" fill="none" opacity=".6" stroke-linecap="round"/>
-
-  <!-- BANGS (dark, dramatic) -->
-  <path d="M18 46 Q22 28 34 26 Q40 18 46 30 Q50 18 54 28 Q60 18 66 28 Q76 30 82 44
-           Q76 36 68 38 Q64 26 58 34 Q54 20 50 30 Q46 20 42 32 Q36 26 28 36 Q22 38 20 46 Z"
-        fill="#160028"/>
-  <!-- Purple hair highlight streak -->
-  <path d="M32 36 Q36 26 42 32" stroke="#8833ff" stroke-width="2" fill="none" stroke-linecap="round" opacity=".65"/>
-  <path d="M54 24 Q60 18 65 26" stroke="#6622cc" stroke-width="1.5" fill="none" stroke-linecap="round" opacity=".5"/>
-
-  <!-- DETECTIVE HAT (dark, with purple band) -->
-  <rect x="23" y="43" width="54" height="7" rx="4" fill="#0a0018"/>
-  <rect x="28" y="27" width="44" height="18" rx="5" fill="#110025"/>
-  <rect x="25" y="43" width="50" height="7" rx="4" fill="#0a0018"/>
-  <!-- Purple band on hat -->
-  <rect x="28" y="40" width="44" height="5" rx="0" fill="#6600cc" opacity=".7"/>
-  <!-- Silver badge -->
-  <circle cx="50" cy="36" r="5" fill="#330066"/>
-  <path d="M47 36 L50 31 L53 36 L50 41 Z" fill="#cc88ff" opacity=".8"/>
-
-  <!-- FACE (slightly paler) -->
-  <path d="M48 70 Q50 72 52 70" stroke="#ccaacc" stroke-width="1.5" fill="none" stroke-linecap="round" opacity=".7"/>
-
-  <!-- GLOWING PURPLE EYES -->
-  <!-- Eye glow effect -->
-  <ellipse cx="36" cy="61" rx="13" ry="11" fill="#aa22ff" opacity=".12"/>
-  <ellipse cx="64" cy="61" rx="13" ry="11" fill="#aa22ff" opacity=".12"/>
-  <!-- Eyes using custom purple iris -->
-  ${animeEye(36, 61, '#cc44ff', '#440066', false)}
-  ${animeEye(64, 61, '#cc44ff', '#440066', true)}
-  <!-- Extra purple glow in pupils -->
-  <circle cx="36" cy="63" r="2" fill="#ff88ff" opacity=".5"/>
-  <circle cx="64" cy="63" r="2" fill="#ff88ff" opacity=".5"/>
-
-  <!-- Mysterious slight smirk -->
-  <path d="M44 77 Q50 83 56 79" stroke="#9922cc" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-  <!-- Very subtle blush -->
-  <ellipse cx="26" cy="70" rx="8" ry="3.5" fill="#ddaaee" opacity=".25"/>
-  <ellipse cx="74" cy="70" rx="8" ry="3.5" fill="#ddaaee" opacity=".25"/>
-
-  <text x="50" y="156" font-size="6.2" fill="#aa66ff" text-anchor="middle" font-weight="bold">キュアアルカナ・シャドウ</text>
-</svg>`;
-}
-
-const CHAR_FUNCS = [svgAnswer, svgMystic, svgEclair, svgArcana];
 
 // ============================================================
 // AUDIO
@@ -585,7 +230,7 @@ const BPM=148,BEAT=60/BPM;
 function playTone(f,t,dur,type='triangle',vol=.15){if(!AC||!f)return;const o=AC.createOscillator(),g=AC.createGain();o.connect(g);g.connect(AC.destination);o.type=type;o.frequency.value=f;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol,t+.015);g.gain.exponentialRampToValueAtTime(.001,t+dur-.01);o.start(t);o.stop(t+dur);}
 function playNoise(t,dur,vol=.15,hp=false){if(!AC)return;const buf=AC.createBuffer(1,AC.sampleRate*dur,AC.sampleRate),d=buf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*(1-i/d.length);const src=AC.createBufferSource();src.buffer=buf;const g=AC.createGain();if(hp){const f=AC.createBiquadFilter();f.type='highpass';f.frequency.value=6000;src.connect(f);f.connect(g);}else src.connect(g);g.connect(AC.destination);g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.001,t+dur*.8);src.start(t);src.stop(t+dur);}
 function playKick(t){if(!AC)return;const o=AC.createOscillator(),g=AC.createGain();o.connect(g);g.connect(AC.destination);o.frequency.setValueAtTime(150,t);o.frequency.exponentialRampToValueAtTime(40,t+.12);g.gain.setValueAtTime(.5,t);g.gain.exponentialRampToValueAtTime(.001,t+.22);o.start(t);o.stop(t+.22);}
-function scheduleBGM(){if(!AC||!bgmOn)return;const s=AC.currentTime+.05,bd=BEAT*2;let mt=s;MELODY.forEach(n=>{const d=n.d*bd*2;playTone(Hz[n.n],mt,d*.88,'triangle',.14);mt+=d;});const total=mt-s;let bt=s;BASS.forEach(n=>{const d=n.d*bd*2;playTone(Hz[n.n],bt,d*.85,'sine',.11);bt+=d;});const chords=[[Hz.C4,Hz.E4,Hz.G4],[Hz.F4,Hz.A4,Hz.C5],[Hz.G4,Hz.B4,Hz.D5],[Hz.A4,Hz.C5,Hz.E5],[Hz.F4,Hz.A4,Hz.C5],[Hz.G4,Hz.B4,Hz.D5],[Hz.E4,Hz.G4,Hz.B4],[Hz.C4,Hz.E4,Hz.G4]];chords.forEach((c,i)=>c.forEach(f=>playTone(f,s+i*bd*4,bd*3.8,'sine',.05)));for(let b=0;b<16;b++){const bs=s+b*bd*4;playKick(bs);playKick(bs+bd*2);playNoise(bs+bd,.1,.18);playNoise(bs+bd*3,.1,.18);for(let h=0;h<8;h++)playNoise(bs+h*bd*.5,.05,.06,true);}bgmTimer=setTimeout(scheduleBGM,(total-.15)*1000);}
+function scheduleBGM(){if(!AC||!bgmOn)return;const s=AC.currentTime+.05,bd=BEAT*2;let mt=s;MELODY.forEach(n=>{const d=n.d*bd*2;playTone(Hz[n.n],mt,d*.88,'triangle',.14);mt+=d;});const total=mt-s;let bt=s;BASS.forEach(n=>{const d=n.d*bd*2;playTone(Hz[n.n],bt,d*.85,'sine',.11);bt+=d;});[[Hz.C4,Hz.E4,Hz.G4],[Hz.F4,Hz.A4,Hz.C5],[Hz.G4,Hz.B4,Hz.D5],[Hz.A4,Hz.C5,Hz.E5],[Hz.F4,Hz.A4,Hz.C5],[Hz.G4,Hz.B4,Hz.D5],[Hz.E4,Hz.G4,Hz.B4],[Hz.C4,Hz.E4,Hz.G4]].forEach((c,i)=>c.forEach(f=>playTone(f,s+i*bd*4,bd*3.8,'sine',.05)));for(let b=0;b<16;b++){const bs=s+b*bd*4;playKick(bs);playKick(bs+bd*2);playNoise(bs+bd,.1,.18);playNoise(bs+bd*3,.1,.18);for(let h=0;h<8;h++)playNoise(bs+h*bd*.5,.05,.06,true);}bgmTimer=setTimeout(scheduleBGM,(total-.15)*1000);}
 function startBGM(){if(bgmOn)return;bgmOn=true;scheduleBGM();}
 function stopBGM(){bgmOn=false;if(bgmTimer){clearTimeout(bgmTimer);bgmTimer=null;}}
 function sfxFound(){if(!AC)return;const t=AC.currentTime;[Hz.C5,Hz.E5,Hz.G5,Hz.C6].forEach((f,i)=>playTone(f,t+i*.07,.22,'triangle',.3));for(let i=0;i<6;i++)playTone(600+Math.random()*1000,t+i*.03,.08,'sine',.08);}
@@ -604,33 +249,169 @@ const STAGES=[
 const PRAISE=['やったね！','すごい！','さすが！','めいたんてい！','かしこい！','ナイス！'];
 let stage=0,found=0,total=0,hintActive=false;
 
-function buildTitleChars(){const wrap=document.getElementById('title-chars');CHAR_FUNCS.forEach(fn=>{const d=document.createElement('div');d.className='char-t';d.innerHTML=fn(70,94);wrap.appendChild(d);});}
-function buildVictoryChars(){const wrap=document.getElementById('v-chars');wrap.innerHTML='';CHAR_FUNCS.forEach(fn=>{const d=document.createElement('div');d.className='v-char';d.innerHTML=fn(64,86);wrap.appendChild(d);});}
+// ============================================================
+// GAME FUNCTIONS
+// ============================================================
+function startGame(){
+  initAudio();stage=0;
+  document.getElementById('title-screen').style.display='none';
+  document.getElementById('game-screen').style.display='block';
+  startBGM();loadStage();
+}
 
-function startGame(){initAudio();stage=0;document.getElementById('title-screen').style.display='none';document.getElementById('game-screen').style.display='block';startBGM();loadStage();}
-function loadStage(){const s=STAGES[stage];found=0;total=s.count;hintActive=false;document.getElementById('stage-label').textContent=s.name;document.getElementById('stage-bg').className='stage-bg '+s.bg;document.getElementById('stage-clear').style.display='none';document.getElementById('bubble').textContent=s.msg;document.getElementById('guide-svg-wrap').innerHTML=CHAR_FUNCS[s.charIdx](54,72);buildDecor(s.decor);buildItems(s);buildCounter(s);}
-function buildCounter(s){const row=document.getElementById('counter-row');row.innerHTML='';for(let i=0;i<s.count;i++){const sp=document.createElement('span');sp.className='ci';sp.textContent=s.item;sp.id='ci-'+i;row.appendChild(sp);}}
+function loadStage(){
+  const s=STAGES[stage];found=0;total=s.count;hintActive=false;
+  document.getElementById('stage-label').textContent=s.name;
+  document.getElementById('stage-bg').className='stage-bg '+s.bg;
+  document.getElementById('stage-clear').style.display='none';
+  document.getElementById('bubble').textContent=s.msg;
+  // Guide character image (small)
+  document.getElementById('guide-img-wrap').innerHTML =
+    charHTML(s.charIdx, 64, 86, 'animation:charB 2s ease-in-out infinite;');
+  buildDecor(s.decor);buildItems(s);buildCounter(s);
+}
+
+function buildCounter(s){
+  const row=document.getElementById('counter-row');row.innerHTML='';
+  for(let i=0;i<s.count;i++){const sp=document.createElement('span');sp.className='ci';sp.textContent=s.item;sp.id='ci-'+i;row.appendChild(sp);}
+}
+
 function buildDecor(theme){
   const c=document.getElementById('decorations');c.innerHTML='';
   const add=(emoji,style)=>{const d=document.createElement('div');d.style.cssText='position:absolute;pointer-events:none;'+style;d.textContent=emoji;c.appendChild(d);};
-  if(theme==='town'){['☁️','☁️','☁️','🌤️'].forEach((e,i)=>add(e,`top:${8+i*6}%;left:${8+i*23}%;font-size:${30+i*8}px;opacity:.85;`));add('☀️','top:5%;right:8%;font-size:55px;');['🏠','🏪','🏦','🏬','🏫','🏠'].forEach((e,i)=>add(e,`bottom:16%;left:${4+i*16}%;font-size:${42+((i%3)-1)*8}px;`));['🌳','🚗','🌳','🌸','🌲','🚲'].forEach((e,i)=>add(e,`bottom:6%;left:${3+i*17}%;font-size:28px;`));add('🐦','top:18%;left:40%;font-size:20px;');add('🐦','top:22%;left:55%;font-size:16px;');}
-  else if(theme==='forest'){for(let i=0;i<12;i++)add('✦',`top:${3+Math.random()*30}%;left:${Math.random()*90}%;font-size:${8+Math.random()*14}px;color:rgba(255,255,200,.6);animation:floatSpk ${2+Math.random()*2}s ${Math.random()}s ease-in-out infinite;`);for(let i=0;i<10;i++)add(['🌲','🌳'][i%2],`bottom:${Math.random()*20}%;left:${i*10+Math.random()*6}%;font-size:${44+Math.random()*36}px;opacity:${.5+Math.random()*.5};`);['🦋','🐰','🦊','🌸','🍄','🦔'].forEach((e,i)=>add(e,`bottom:${16+i*5}%;left:${10+i*16}%;font-size:26px;animation:floatSpk ${2.5+i*.4}s ${i*.3}s ease-in-out infinite;`));for(let i=0;i<14;i++)add(['🌸','🌼','🌺','🌷'][i%4],`bottom:${2+Math.random()*12}%;left:${Math.random()*90}%;font-size:${14+Math.random()*16}px;`);}
-  else if(theme==='library'){add('🕰️','top:8%;left:5%;font-size:50px;animation:floatSpk 3s ease-in-out infinite;');add('🕯️','top:8%;right:8%;font-size:45px;animation:floatSpk 2.5s .5s ease-in-out infinite;');['📚','📖','📕','📗','📘','📙'].forEach((e,i)=>add(e,`bottom:22%;left:${6+i*16}%;font-size:${36+i%2*8}px;`));['🗝️','🔭','📜','🏺','🧩','🎩'].forEach((e,i)=>add(e,`bottom:${35+i*4}%;left:${8+i*18}%;font-size:26px;animation:floatSpk ${2+i*.4}s ${i*.2}s ease-in-out infinite;`));['📚','📚','📚'].forEach((e,i)=>add(e,`bottom:12%;left:${5+i*42}%;font-size:55px;opacity:.5;`));add('🔎','top:15%;left:45%;font-size:40px;opacity:.3;animation:floatSpk 4s ease-in-out infinite;');}
-  else if(theme==='castle'){for(let i=0;i<25;i++)add(['✦','✧','⭐'][i%3],`top:${Math.random()*55}%;left:${Math.random()*90}%;font-size:${7+Math.random()*16}px;color:${['white','#ffe135','#cc88ff'][i%3]};opacity:${.3+Math.random()*.7};animation:floatSpk ${1.5+Math.random()*2}s ${Math.random()*2}s ease-in-out infinite;`);add('🌙','top:6%;right:10%;font-size:65px;');add('🏰','bottom:14%;left:50%;transform:translateX(-50%);font-size:110px;opacity:.55;');['🔮','✨','🪄','🌟','🔱','💀'].forEach((e,i)=>add(e,`bottom:${8+i*6}%;left:${5+i*18}%;font-size:30px;animation:floatSpk ${2+i*.5}s ${i*.2}s ease-in-out infinite;`));}
+  if(theme==='town'){
+    ['☁️','☁️','☁️','🌤️'].forEach((e,i)=>add(e,`top:${8+i*6}%;left:${8+i*23}%;font-size:${30+i*8}px;opacity:.85;`));
+    add('☀️','top:5%;right:8%;font-size:55px;');
+    ['🏠','🏪','🏦','🏬','🏫','🏠'].forEach((e,i)=>add(e,`bottom:16%;left:${4+i*16}%;font-size:${42+((i%3)-1)*8}px;`));
+    ['🌳','🚗','🌳','🌸','🌲','🚲'].forEach((e,i)=>add(e,`bottom:6%;left:${3+i*17}%;font-size:28px;`));
+    add('🐦','top:18%;left:40%;font-size:20px;');add('🐦','top:22%;left:55%;font-size:16px;');
+  } else if(theme==='forest'){
+    for(let i=0;i<12;i++)add('✦',`top:${3+Math.random()*30}%;left:${Math.random()*90}%;font-size:${8+Math.random()*14}px;color:rgba(255,255,200,.6);animation:floatSpk ${2+Math.random()*2}s ${Math.random()}s ease-in-out infinite;`);
+    for(let i=0;i<10;i++)add(['🌲','🌳'][i%2],`bottom:${Math.random()*20}%;left:${i*10+Math.random()*6}%;font-size:${44+Math.random()*36}px;opacity:${.5+Math.random()*.5};`);
+    ['🦋','🐰','🦊','🌸','🍄','🦔'].forEach((e,i)=>add(e,`bottom:${16+i*5}%;left:${10+i*16}%;font-size:26px;animation:floatSpk ${2.5+i*.4}s ${i*.3}s ease-in-out infinite;`));
+    for(let i=0;i<14;i++)add(['🌸','🌼','🌺','🌷'][i%4],`bottom:${2+Math.random()*12}%;left:${Math.random()*90}%;font-size:${14+Math.random()*16}px;`);
+  } else if(theme==='library'){
+    add('🕰️','top:8%;left:5%;font-size:50px;animation:floatSpk 3s ease-in-out infinite;');
+    add('🕯️','top:8%;right:8%;font-size:45px;animation:floatSpk 2.5s .5s ease-in-out infinite;');
+    ['📚','📖','📕','📗','📘','📙'].forEach((e,i)=>add(e,`bottom:22%;left:${6+i*16}%;font-size:${36+i%2*8}px;`));
+    ['🗝️','🔭','📜','🏺','🧩','🎩'].forEach((e,i)=>add(e,`bottom:${35+i*4}%;left:${8+i*18}%;font-size:26px;animation:floatSpk ${2+i*.4}s ${i*.2}s ease-in-out infinite;`));
+    ['📚','📚','📚'].forEach((e,i)=>add(e,`bottom:12%;left:${5+i*42}%;font-size:55px;opacity:.5;`));
+    add('🔎','top:15%;left:45%;font-size:40px;opacity:.3;animation:floatSpk 4s ease-in-out infinite;');
+  } else if(theme==='castle'){
+    for(let i=0;i<25;i++)add(['✦','✧','⭐'][i%3],`top:${Math.random()*55}%;left:${Math.random()*90}%;font-size:${7+Math.random()*16}px;color:${['white','#ffe135','#cc88ff'][i%3]};opacity:${.3+Math.random()*.7};animation:floatSpk ${1.5+Math.random()*2}s ${Math.random()*2}s ease-in-out infinite;`);
+    add('🌙','top:6%;right:10%;font-size:65px;');
+    add('🏰','bottom:14%;left:50%;transform:translateX(-50%);font-size:110px;opacity:.55;');
+    ['🔮','✨','🪄','🌟','🔱','💀'].forEach((e,i)=>add(e,`bottom:${8+i*6}%;left:${5+i*18}%;font-size:30px;animation:floatSpk ${2+i*.5}s ${i*.2}s ease-in-out infinite;`));
+  }
 }
-function buildItems(s){const wrap=document.getElementById('items-wrap');wrap.innerHTML='';const positions=[];let tries=0;while(positions.length<s.count&&tries<600){tries++;const x=12+Math.random()*72,y=14+Math.random()*62;if(positions.every(p=>{const dx=x-p.x,dy=y-p.y;return Math.sqrt(dx*dx+dy*dy)>14;}))positions.push({x,y});}positions.forEach((pos,i)=>{const el=document.createElement('div');el.className='item hidden';el.style.left=pos.x+'%';el.style.top=pos.y+'%';el.textContent=s.item;el.dataset.idx=i;el.style.transform=`rotate(${(Math.random()-.5)*25}deg)`;el.addEventListener('click',e=>{if(!el.classList.contains('found'))foundItem(el,i);});el.addEventListener('touchstart',e=>{e.preventDefault();if(!el.classList.contains('found'))foundItem(el,i);},{passive:false});wrap.appendChild(el);});}
-function foundItem(el,idx){initAudio();el.classList.remove('hidden','hint-show');el.classList.add('found');found++;sfxFound();spawnSparkles(el);const ci=document.getElementById('ci-'+(found-1));if(ci)ci.classList.add('got');document.getElementById('bubble').textContent=PRAISE[Math.floor(Math.random()*PRAISE.length)]+' '+found+'/'+total+' みつけた！';showToast('✨ みつけた！ '+found+'/'+total);if(found>=total)setTimeout(stageClear,700);}
-function showHint(){hintActive=true;document.querySelectorAll('.item.hidden').forEach(el=>el.classList.add('hint-show'));document.getElementById('bubble').textContent='ここにかくれているよ！ みつけてね！';setTimeout(()=>{hintActive=false;document.querySelectorAll('.item.hint-show').forEach(el=>el.classList.remove('hint-show'));},2500);}
-function spawnSparkles(el){const rect=el.getBoundingClientRect(),cx=rect.left+rect.width/2,cy=rect.top+rect.height/2;const emojis=['✨','⭐','💫','🌟','💖','✦'];for(let i=0;i<10;i++){const sp=document.createElement('div');const angle=(i/10)*Math.PI*2,dist=35+Math.random()*40,tx=Math.cos(angle)*dist,ty=Math.sin(angle)*dist;sp.style.cssText=`position:fixed;left:${cx}px;top:${cy}px;font-size:${12+Math.random()*18}px;pointer-events:none;z-index:500;`;sp.textContent=emojis[Math.floor(Math.random()*emojis.length)];const anim=sp.animate([{transform:'translate(0,0) scale(0) rotate(0deg)',opacity:1},{transform:`translate(${tx}px,${ty}px) scale(1.6) rotate(${Math.random()*360}deg)`,opacity:0}],{duration:(0.6+Math.random()*.3)*1000,easing:'ease-out'});document.body.appendChild(sp);anim.onfinish=()=>sp.remove();}}
-function showToast(txt){const t=document.getElementById('toast');document.getElementById('toast-txt').textContent=txt;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1800);}
-function stageClear(){sfxClear();const s=STAGES[stage];document.getElementById('sc-msg').textContent=s.clearMsg;document.getElementById('sc-char').innerHTML=CHAR_FUNCS[s.charIdx](72,96);const last=stage>=STAGES.length-1;document.getElementById('btn-next').textContent=last?'🎉 ゲームクリア！':'つぎへ ➡️';document.getElementById('stage-clear').style.display='flex';}
-function nextStage(){stage++;if(stage>=STAGES.length){showVictory();return;}loadStage();}
-function showVictory(){stopBGM();document.getElementById('game-screen').style.display='none';document.getElementById('victory-screen').style.display='flex';sfxVictory();buildVictoryChars();spawnConfetti();}
-function spawnConfetti(){const wrap=document.getElementById('confetti-wrap');wrap.innerHTML='';const emojis=['🌟','⭐','💖','🎉','✨','💫','🌸','🏅','💎','🔮'],colors=['#cc44ff','#ff44aa','#ffaa00','#ffe135','#4CAF50','#4488ff'];for(let i=0;i<70;i++){const el=document.createElement('div');el.className='cf';if(Math.random()>.5){el.textContent=emojis[Math.floor(Math.random()*emojis.length)];el.style.fontSize=(12+Math.random()*20)+'px';}else{el.style.background=colors[Math.floor(Math.random()*colors.length)];el.style.width=(8+Math.random()*12)+'px';el.style.height=(8+Math.random()*12)+'px';el.style.borderRadius=Math.random()>.5?'50%':'3px';}el.style.left=Math.random()*100+'%';el.style.setProperty('--d',(2+Math.random()*3)+'s');el.style.setProperty('--dl',(Math.random()*2)+'s');wrap.appendChild(el);}}
-function replayGame(){document.getElementById('victory-screen').style.display='none';document.getElementById('title-screen').style.display='flex';stopBGM();}
 
+function buildItems(s){
+  const wrap=document.getElementById('items-wrap');wrap.innerHTML='';
+  const positions=[];let tries=0;
+  while(positions.length<s.count&&tries<600){
+    tries++;const x=12+Math.random()*72,y=14+Math.random()*62;
+    if(positions.every(p=>{const dx=x-p.x,dy=y-p.y;return Math.sqrt(dx*dx+dy*dy)>14;}))positions.push({x,y});
+  }
+  positions.forEach((pos,i)=>{
+    const el=document.createElement('div');el.className='item hidden';
+    el.style.left=pos.x+'%';el.style.top=pos.y+'%';el.textContent=STAGES[stage].item;
+    el.style.transform=`rotate(${(Math.random()-.5)*25}deg)`;
+    el.addEventListener('click',()=>{if(!el.classList.contains('found'))foundItem(el,i);});
+    el.addEventListener('touchstart',e=>{e.preventDefault();if(!el.classList.contains('found'))foundItem(el,i);},{passive:false});
+    wrap.appendChild(el);
+  });
+}
+
+function foundItem(el,idx){
+  initAudio();el.classList.remove('hidden','hint-show');el.classList.add('found');found++;
+  sfxFound();spawnSparkles(el);
+  const ci=document.getElementById('ci-'+(found-1));if(ci)ci.classList.add('got');
+  document.getElementById('bubble').textContent=PRAISE[Math.floor(Math.random()*PRAISE.length)]+' '+found+'/'+total+' みつけた！';
+  showToast('✨ みつけた！ '+found+'/'+total);
+  if(found>=total)setTimeout(stageClear,700);
+}
+
+function showHint(){
+  hintActive=true;
+  document.querySelectorAll('.item.hidden').forEach(el=>el.classList.add('hint-show'));
+  document.getElementById('bubble').textContent='ここにかくれているよ！ みつけてね！';
+  setTimeout(()=>{hintActive=false;document.querySelectorAll('.item.hint-show').forEach(el=>el.classList.remove('hint-show'));},2500);
+}
+
+function spawnSparkles(el){
+  const rect=el.getBoundingClientRect(),cx=rect.left+rect.width/2,cy=rect.top+rect.height/2;
+  const emojis=['✨','⭐','💫','🌟','💖','✦'];
+  for(let i=0;i<10;i++){
+    const sp=document.createElement('div');
+    const angle=(i/10)*Math.PI*2,dist=35+Math.random()*40;
+    const tx=Math.cos(angle)*dist,ty=Math.sin(angle)*dist;
+    sp.style.cssText=`position:fixed;left:${cx}px;top:${cy}px;font-size:${12+Math.random()*18}px;pointer-events:none;z-index:500;`;
+    sp.textContent=emojis[Math.floor(Math.random()*emojis.length)];
+    const anim=sp.animate([{transform:'translate(0,0) scale(0) rotate(0deg)',opacity:1},{transform:`translate(${tx}px,${ty}px) scale(1.6) rotate(${Math.random()*360}deg)`,opacity:0}],{duration:(0.6+Math.random()*.3)*1000,easing:'ease-out'});
+    document.body.appendChild(sp);anim.onfinish=()=>sp.remove();
+  }
+}
+
+function showToast(txt){
+  const t=document.getElementById('toast');document.getElementById('toast-txt').textContent=txt;
+  t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1800);
+}
+
+function stageClear(){
+  sfxClear();const s=STAGES[stage];
+  document.getElementById('sc-msg').textContent=s.clearMsg;
+  document.getElementById('sc-char').innerHTML=charHTML(s.charIdx, 110, 148);
+  const last=stage>=STAGES.length-1;
+  document.getElementById('btn-next').textContent=last?'🎉 ゲームクリア！':'つぎへ ➡️';
+  document.getElementById('stage-clear').style.display='flex';
+}
+
+function nextStage(){
+  stage++;if(stage>=STAGES.length){showVictory();return;}loadStage();
+}
+
+function showVictory(){
+  stopBGM();
+  document.getElementById('game-screen').style.display='none';
+  document.getElementById('victory-screen').style.display='flex';
+  sfxVictory();buildVictoryChars();spawnConfetti();
+}
+
+function spawnConfetti(){
+  const wrap=document.getElementById('confetti-wrap');wrap.innerHTML='';
+  const emojis=['🌟','⭐','💖','🎉','✨','💫','🌸','🏅','💎','🔮'],colors=['#cc44ff','#ff44aa','#ffaa00','#ffe135','#4CAF50','#4488ff'];
+  for(let i=0;i<70;i++){
+    const el=document.createElement('div');el.className='cf';
+    if(Math.random()>.5){el.textContent=emojis[Math.floor(Math.random()*emojis.length)];el.style.fontSize=(12+Math.random()*20)+'px';}
+    else{el.style.background=colors[Math.floor(Math.random()*colors.length)];el.style.width=(8+Math.random()*12)+'px';el.style.height=(8+Math.random()*12)+'px';el.style.borderRadius=Math.random()>.5?'50%':'3px';}
+    el.style.left=Math.random()*100+'%';
+    el.style.setProperty('--d',(2+Math.random()*3)+'s');el.style.setProperty('--dl',(Math.random()*2)+'s');
+    wrap.appendChild(el);
+  }
+}
+
+function replayGame(){
+  document.getElementById('victory-screen').style.display='none';
+  document.getElementById('title-screen').style.display='flex';
+  stopBGM();
+}
+
+// ============================================================
+// CURSOR & INIT
+// ============================================================
 document.addEventListener('mousemove',e=>{const c=document.getElementById('cursor');c.style.left=e.clientX+'px';c.style.top=e.clientY+'px';});
-(function(){buildTitleChars();const wrap=document.getElementById('t-stars'),arr=['⭐','✨','💫','🌟','✦','💖','🔮'];for(let i=0;i<35;i++){const s=document.createElement('div');s.className='t-star';s.style.left=Math.random()*95+'%';s.style.top=Math.random()*95+'%';s.style.fontSize=(10+Math.random()*18)+'px';s.style.setProperty('--d',(1.5+Math.random()*2.5)+'s');s.style.setProperty('--dl',(Math.random()*3)+'s');s.textContent=arr[Math.floor(Math.random()*arr.length)];wrap.appendChild(s);}})();
+
+(function init(){
+  buildTitleChars();
+  const wrap=document.getElementById('t-stars'),arr=['⭐','✨','💫','🌟','✦','💖','🔮'];
+  for(let i=0;i<35;i++){
+    const s=document.createElement('div');s.className='t-star';
+    s.style.left=Math.random()*95+'%';s.style.top=Math.random()*95+'%';
+    s.style.fontSize=(10+Math.random()*18)+'px';
+    s.style.setProperty('--d',(1.5+Math.random()*2.5)+'s');s.style.setProperty('--dl',(Math.random()*3)+'s');
+    s.textContent=arr[Math.floor(Math.random()*arr.length)];wrap.appendChild(s);
+  }
+})();
 </script>
 </body>
 </html>
