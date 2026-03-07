@@ -476,7 +476,7 @@ var GAMES=[
   {id:27,cat:'いろ',icon:'👯',name:'おなじをみつけよう',engine:'color',cfg:{mode:'same'}},
   {id:28,cat:'いろ',icon:'❓',name:'ちがうのはどれ？',engine:'color',cfg:{mode:'odd'}},
   {id:29,cat:'おんがく',icon:'🎹',name:'プリキュアピアノ',engine:'piano',cfg:{keys:5,drum:false}},
-  {id:30,cat:'おんがく',icon:'🥁',name:'プリキュアドラム',engine:'piano',cfg:{keys:4,drum:true}},
+  {id:30,cat:'おんがく',icon:'🥁',name:'プリキュアドラム',engine:'drum',cfg:{}},
   {id:31,cat:'おんがく',icon:'🎵',name:'リズムにのろう！かんたん',engine:'rhythm',cfg:{len:4,bpm:70}},
   {id:32,cat:'おんがく',icon:'🎶',name:'リズムにのろう！むずかしい',engine:'rhythm',cfg:{len:6,bpm:90}},
   {id:33,cat:'ふうせん',icon:'🎈',name:'ふうせんをわれ！',engine:'balloon',cfg:{speed:4}},
@@ -1232,7 +1232,7 @@ function launchEngine(g){
     piano:engPiano,rhythm:engRhythm,balloon:engBalloon,whack:engWhack,
     puzzle:engPuzzle,sort:engSort,stamp:engStamp,
     '2pTap':eng2pTap,'2pCard':eng2pCard,'2pWhack':eng2pWhack,'2pQuiz':eng2pQuiz,'2pBalloon':eng2pBalloon,
-    speedmath:engSpeedmath,prequiz:engPrequiz,
+    drum:engDrum,speedmath:engSpeedmath,prequiz:engPrequiz,
     blackjack:engBlackjack,pageone:engPageone,sevenbridge:engSevenbridge,cardspeed:engCardspeed,solitaire:engSolitaire,
     lightsout:engLightsout,g2048:engG2048,minesweeper:engMinesweeper,sudoku:engSudoku,sokoban:engSokoban,
     snake:engSnake,pong:engPong,breakout:engBreakout,fruitmerge:engFruitmerge,crossy:engCrossy,
@@ -1523,51 +1523,318 @@ function engPiano(area,cfg){
   reattachWidget(area);
 }
 
+
+// ============================================================
+// ドラム音ゲー（落下ノーツ式）
+// ============================================================
+function engDrum(area,cfg){
+  area.style.cssText='position:relative;background:#08001a;overflow:hidden;display:flex;flex-direction:column;';
+  var PADS=[
+    {label:'ドン',color:'#ff3355',wave:'sawtooth'},
+    {label:'タン',color:'#ff9933',wave:'triangle'},
+    {label:'チッ',color:'#33ccff',wave:'square'},
+    {label:'シャン',color:'#cc44ff',wave:'sine'}
+  ];
+  var BPM=128,beat=60000/BPM,fallMs=1800;
+  var HITS=[];
+  for(var b=0;b<32;b++){
+    if(b%4===0||b%4===2)HITS.push({lane:0,t:b*beat});
+    if(b%4===1||b%4===3)HITS.push({lane:1,t:b*beat});
+    HITS.push({lane:2,t:b*beat});
+    HITS.push({lane:2,t:b*beat+beat/2});
+    if(b%8===0)HITS.push({lane:3,t:b*beat});
+    if(b%4===2)HITS.push({lane:3,t:b*beat+beat*0.75});
+  }
+  HITS.sort(function(a,b){return a.t-b.t;});
+  var notes=HITS.map(function(h){return {lane:h.lane,t:h.t,el:null,hit:false,missed:false,spawnT:0};});
+  var totalNotes=notes.length;
+
+  // ── Top bar ──
+  var topBar=document.createElement('div');
+  topBar.style.cssText='display:flex;justify-content:space-between;align-items:center;padding:4px 10px;background:#08001a;border-bottom:1px solid #330055;flex-shrink:0;';
+  topBar.innerHTML='<div style="color:#ffcc00;font-weight:900;font-size:12px">COMBO<br><span id="dr_cv" style="font-size:22px;color:#ffee44">0</span></div>'
+    +'<div id="dr_judge" style="font-size:15px;font-weight:900;color:#fff;min-width:88px;text-align:center;transition:transform .1s"> </div>'
+    +'<div style="color:#aa88ff;font-size:12px;text-align:right">SCORE<br><span id="dr_sv" style="font-size:18px;color:#fff">0</span></div>';
+  area.appendChild(topBar);
+
+  // ── Lane area ──
+  var laneWrap=document.createElement('div');
+  laneWrap.style.cssText='flex:1;display:flex;position:relative;overflow:hidden;min-height:0;';
+  var lanes=[];
+  PADS.forEach(function(p,i){
+    var l=document.createElement('div');
+    l.style.cssText='flex:1;position:relative;overflow:hidden;background:linear-gradient(180deg,#08001a 0%,#110025 60%,#1a0035 100%);'+(i<3?'border-right:1px solid #220044;':'');
+    // Lane label
+    l.innerHTML='<div style="position:absolute;top:5px;left:0;right:0;text-align:center;font-size:10px;font-weight:700;color:'+p.color+';opacity:.45;pointer-events:none">'+p.label+'</div>'
+      // Hit zone at 78%
+      +'<div id="hz'+i+'" style="position:absolute;top:78%;left:0;right:0;height:3px;background:'+p.color+';box-shadow:0 0 10px '+p.color+',0 0 22px '+p.color+'44;transition:height .07s;pointer-events:none;"></div>'
+      // Below hit zone dark overlay
+      +'<div style="position:absolute;top:calc(78% + 3px);left:0;right:0;bottom:0;background:'+p.color+'08;pointer-events:none;"></div>';
+    laneWrap.appendChild(l);
+    lanes.push(l);
+  });
+  area.appendChild(laneWrap);
+
+  // ── Pad buttons ──
+  var padRow=document.createElement('div');
+  padRow.style.cssText='display:flex;height:66px;flex-shrink:0;';
+  PADS.forEach(function(p,i){
+    var btn=document.createElement('div');
+    btn.style.cssText='flex:1;display:flex;align-items:center;justify-content:center;background:'+p.color+'18;border-top:3px solid '+p.color+';font-size:12px;font-weight:900;color:'+p.color+';cursor:pointer;user-select:none;-webkit-user-select:none;transition:background .05s,transform .05s;';
+    btn.textContent=p.label;
+    btn.addEventListener('pointerdown',function(e){e.preventDefault();onTap(i);btn.style.background=p.color+'55';btn.style.transform='scale(.92)';});
+    btn.addEventListener('pointerup',function(){btn.style.background=p.color+'18';btn.style.transform='';});
+    btn.addEventListener('pointerleave',function(){btn.style.background=p.color+'18';btn.style.transform='';});
+    padRow.appendChild(btn);
+  });
+  area.appendChild(padRow);
+  reattachWidget(area);
+
+  // ── State ──
+  var combo=0,sc=0,ni=0,startT=null,running=false;
+  var HIT_Y=78; // % from top
+
+  // ── Tap handler ──
+  function onTap(li){
+    if(!running)return;
+    drumSound(li);
+    var hz=document.getElementById('hz'+li);
+    if(hz){hz.style.height='10px';gameTimeout(function(){hz.style.height='3px';},80);}
+    var now=Date.now()-startT,best=null,bd=99999;
+    notes.forEach(function(n){
+      if(n.lane!==li||n.hit||n.missed)return;
+      var d=Math.abs(n.t-now);
+      if(d<bd){bd=d;best=n;}
+    });
+    if(!best||bd>430){showJudge('EMPTY',li,'#667788');return;}
+    best.hit=true;
+    if(best.el){best.el.style.display='none';}
+    if(bd<75){combo++;sc+=Math.floor(100*(1+Math.floor(combo/5)));showJudge('PERFECT ✨',li,'#ffee00');addScore(5);}
+    else if(bd<190){combo++;sc+=50;showJudge('GOOD 👍',li,'#88ffcc');addScore(2);}
+    else{combo=0;sc+=10;showJudge('BAD',li,'#ff8844');}
+    document.getElementById('dr_cv').textContent=combo;
+    document.getElementById('dr_sv').textContent=sc;
+  }
+
+  function drumSound(i){
+    if(i===0){pn(55,.28,'sawtooth',.42);pn(48,.38,'sine',.22);}
+    else if(i===1){pn(220,.13,'triangle',.32);pn(310,.09,'square',.09);}
+    else if(i===2){pn(1050,.07,'square',.20);pn(1500,.05,'square',.08);}
+    else{pn(500,.18,'sine',.22);pn(700,.12,'sine',.10);}
+  }
+
+  function showJudge(txt,li,col){
+    var jEl=document.getElementById('dr_judge');
+    if(jEl){jEl.textContent=txt;jEl.style.color=col;jEl.style.transform='scale(1.18)';gameTimeout(function(){if(jEl.textContent===txt){jEl.textContent=' ';jEl.style.transform='';}},480);}
+    var f=document.createElement('div');
+    f.style.cssText='position:absolute;top:70%;left:50%;transform:translateX(-50%);font-size:11px;font-weight:900;color:'+col+';pointer-events:none;transition:transform .5s,opacity .5s;white-space:nowrap;z-index:5;';
+    f.textContent=txt.split(' ')[0];
+    lanes[li].appendChild(f);
+    gameTimeout(function(){f.style.transform='translateX(-50%) translateY(-32px)';f.style.opacity='0';},30);
+    gameTimeout(function(){if(f.parentNode)f.remove();},620);
+  }
+
+  // ── Game loop ──
+  gameInterval(function(){
+    if(!running||!startT)return;
+    var now=Date.now()-startT;
+    // Spawn notes
+    while(ni<notes.length){
+      var n=notes[ni];
+      if(n.t-fallMs<=now){spawnNote(n);ni++;}
+      else break;
+    }
+    // Move notes
+    notes.forEach(function(n){
+      if(!n.el||n.hit||n.missed)return;
+      var y=(now-n.spawnT)/fallMs*HIT_Y;
+      if(y>HIT_Y+6){
+        n.missed=true;combo=0;
+        if(n.el.parentNode)n.el.remove();n.el=null;
+        showJudge('MISS 💦',n.lane,'#ff4455');
+        document.getElementById('dr_cv').textContent=combo;
+        return;
+      }
+      n.el.style.top=y+'%';
+    });
+    // End check
+    if(ni>=notes.length&&notes.filter(function(n){return!n.hit&&!n.missed&&n.el;}).length===0){
+      running=false;
+      var hitN=notes.filter(function(n){return n.hit;}).length;
+      var pct=Math.round(hitN/totalNotes*100);
+      var rank=pct>=95?'S':pct>=80?'A':pct>=60?'B':pct>=40?'C':'D';
+      gameTimeout(function(){showResult('ドラム完奏！🥁 '+rank+'ランク ('+pct+'%)');},350);
+    }
+  },33);
+
+  function spawnNote(n){
+    var l=lanes[n.lane],p=PADS[n.lane];
+    var el=document.createElement('div');
+    el.style.cssText='position:absolute;top:0%;left:6%;width:88%;height:20px;border-radius:5px;background:linear-gradient(90deg,'+p.color+' 0%,'+p.color+'cc 100%);box-shadow:0 0 7px '+p.color+'99;pointer-events:none;';
+    l.appendChild(el);
+    n.el=el;
+    n.spawnT=n.t-fallMs;
+  }
+
+  // ── Countdown ──
+  var cdEl=document.createElement('div');
+  cdEl.style.cssText='position:absolute;top:0;left:0;right:0;bottom:0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:20;background:#08001acc;pointer-events:none;';
+  cdEl.innerHTML='<div style="font-size:16px;color:#cc88ff;margin-bottom:12px">🥁 プリキュアドラム</div><div id="cd_num" style="font-size:88px;font-weight:900;color:#fff;text-shadow:0 0 30px #ff88cc;"></div>';
+  area.appendChild(cdEl);
+  var cdNum=document.getElementById('cd_num');
+  cdNum.textContent='3';
+  gameTimeout(function(){cdNum.textContent='2';cdNum.style.color='#ffcc44';},1000);
+  gameTimeout(function(){cdNum.textContent='1';cdNum.style.color='#ff4488';},2000);
+  gameTimeout(function(){cdNum.textContent='GO!';cdNum.style.color='#44ffcc';cdNum.style.fontSize='60px';},3000);
+  gameTimeout(function(){cdEl.remove();startT=Date.now();running=true;},3600);
+}
+
 // ============================================================
 // リズムゲーム
 // ============================================================
 function engRhythm(area,cfg){
-  var len=cfg.len,bpm=cfg.bpm;
-  var ms=60000/bpm;
-  var TARGETS=[{em:'💖',freq:440},{em:'⭐',freq:550},{em:'🌸',freq:660},{em:'✨',freq:880}];
-  var pattern=[],playerSeq=[],showing=false,round=0;
-  area.style.display='flex';area.style.flexDirection='column';area.style.justifyContent='center';
-  var wrap=document.createElement('div');wrap.className='rhythm-wrap';
-  wrap.innerHTML='<div class="rhythm-info" id="rhInfo">みてまね！リズムゲーム🎵</div>'
-    +'<div style="font-size:13px;color:#cc99ff;text-align:center;min-height:20px" id="rhSeq">まもなくはじまります…</div>'
-    +'<div class="rhythm-targets">'+TARGETS.map(function(t,i){return '<div class="rh-target" data-i="'+i+'">'+t.em+'</div>';}).join('')+'</div>';
-  area.appendChild(wrap);reattachWidget(area);
-  function lightUp(i,cb){
-    var el=wrap.querySelectorAll('.rh-target')[i];
-    el.classList.add('lit');beep(TARGETS[i].freq,.22,'sine',.32);
-    gameTimeout(function(){el.classList.remove('lit');if(cb)gameTimeout(cb,ms*.28);},ms*.52);
-  }
-  function showPattern(){
-    showing=true;playerSeq=[];document.getElementById('rhInfo').textContent='みてね！👀';
-    var i=0;
-    function next(){
-      if(i>=pattern.length){showing=false;document.getElementById('rhInfo').textContent='おなじじゅんにおして！';return;}
-      lightUp(pattern[i],function(){i++;gameTimeout(next,ms*.2);});
-    }
-    gameTimeout(next,500);
-  }
-  function nextRound(){
-    round++;pattern=[];
-    for(var i=0;i<Math.min(len,round+1);i++)pattern.push(Math.floor(Math.random()*TARGETS.length));
-    showPattern();
-  }
-  wrap.querySelectorAll('.rh-target').forEach(function(el,i){
-    el.addEventListener('pointerdown',function(){
-      if(showing)return;lightUp(i,null);playerSeq.push(i);
-      var idx=playerSeq.length-1;
-      if(playerSeq[idx]!==pattern[idx]){sfxMiss();charMsg('wrong');document.getElementById('rhInfo').textContent='ざんねん！もういちど！';gameTimeout(showPattern,850);playerSeq=[];return;}
-      if(playerSeq.length===pattern.length){sfxSuccess();addScore(20);charMsg('correct');document.getElementById('rhInfo').textContent='すごい！🎉';
-        if(round>=4)gameTimeout(function(){showResult('リズムマスター！🎶');},620);else gameTimeout(nextRound,820);}
-    });
-  });
-  gameTimeout(nextRound,800);
-}
+  area.style.cssText='position:relative;background:#0a001a;overflow:hidden;display:flex;flex-direction:column;';
+  var TRACKS=[
+    {em:'💖',freq:523,color:'#ff88cc',label:'ど'},
+    {em:'⭐',freq:659,color:'#ffcc44',label:'み'},
+    {em:'🌸',freq:784,color:'#88ff99',label:'そ'},
+    {em:'✨',freq:880,color:'#88aaff',label:'ら'}
+  ];
+  var BPM=cfg.bpm||120,beat=60000/BPM,fallMs=1700;
+  var SONG=[
+    [0,0],[0.5,1],[1,2],[1.5,3],
+    [2,0],[2.5,0],[3,1],[3.5,2],
+    [4,3],[4.5,2],[5,1],[5.5,0],
+    [6,0],[6.5,1],[7,2],[7.5,3],
+    [8,0],[8.5,2],[9,1],[9.5,3],
+    [10,0],[10,2],[10.5,1],[11,3],
+    [12,0],[12.5,0],[13,1],[13,2],
+    [14,3],[14.5,2],[15,1],[15.5,0],
+    [16,2],[16.5,3],[17,0],[17.5,1],
+    [18,2],[18,0],[18.5,3],[19,1]
+  ];
+  var notes=SONG.map(function(s){return {lane:s[1],t:s[0]*beat,el:null,hit:false,missed:false,spawnT:0};});
+  var totalNotes=notes.length;
 
+  var topBar=document.createElement('div');
+  topBar.style.cssText='display:flex;justify-content:space-between;align-items:center;padding:4px 10px;background:#0a001a;border-bottom:1px solid #330055;flex-shrink:0;';
+  topBar.innerHTML='<div style="color:#ffcc00;font-weight:900;font-size:12px">COMBO<br><span id="rh_cv" style="font-size:22px;color:#ffee44">0</span></div>'
+    +'<div id="rh_judge" style="font-size:15px;font-weight:900;color:#fff;min-width:80px;text-align:center;transition:transform .1s"> </div>'
+    +'<div style="color:#aa88ff;font-size:12px;text-align:right">SCORE<br><span id="rh_sv" style="font-size:18px;color:#fff">0</span></div>';
+  area.appendChild(topBar);
+
+  var laneWrap=document.createElement('div');
+  laneWrap.style.cssText='flex:1;display:flex;position:relative;overflow:hidden;min-height:0;';
+  var lanes=[];
+  TRACKS.forEach(function(t,i){
+    var l=document.createElement('div');
+    l.style.cssText='flex:1;position:relative;overflow:hidden;background:linear-gradient(180deg,#0a001a 0%,#15002a 60%,#1e0038 100%);'+(i<3?'border-right:1px solid #220044;':'');
+    l.innerHTML='<div style="position:absolute;top:5px;left:0;right:0;text-align:center;font-size:18px;opacity:.35;pointer-events:none">'+t.em+'</div>'
+      +'<div id="rhz'+i+'" style="position:absolute;top:78%;left:0;right:0;height:3px;background:'+t.color+';box-shadow:0 0 10px '+t.color+',0 0 22px '+t.color+'44;transition:height .07s;pointer-events:none;"></div>'
+      +'<div style="position:absolute;top:calc(78% + 3px);left:0;right:0;bottom:0;background:'+t.color+'08;pointer-events:none;"></div>';
+    laneWrap.appendChild(l);
+    lanes.push(l);
+  });
+  area.appendChild(laneWrap);
+
+  var btnRow=document.createElement('div');
+  btnRow.style.cssText='display:flex;height:66px;flex-shrink:0;';
+  TRACKS.forEach(function(t,i){
+    var btn=document.createElement('div');
+    btn.style.cssText='flex:1;display:flex;align-items:center;justify-content:center;background:'+t.color+'18;border-top:3px solid '+t.color+';font-size:24px;cursor:pointer;user-select:none;-webkit-user-select:none;transition:background .05s,transform .05s;';
+    btn.textContent=t.em;
+    btn.addEventListener('pointerdown',function(e){e.preventDefault();onTap(i);btn.style.background=t.color+'55';btn.style.transform='scale(.92)';});
+    btn.addEventListener('pointerup',function(){btn.style.background=t.color+'18';btn.style.transform='';});
+    btn.addEventListener('pointerleave',function(){btn.style.background=t.color+'18';btn.style.transform='';});
+    btnRow.appendChild(btn);
+  });
+  area.appendChild(btnRow);
+  reattachWidget(area);
+
+  var combo=0,sc=0,ni=0,startT=null,running=false;
+  var HIT_Y=78;
+
+  function onTap(li){
+    if(!running)return;
+    pn(TRACKS[li].freq,.18,'sine',.32);
+    var hz=document.getElementById('rhz'+li);
+    if(hz){hz.style.height='10px';gameTimeout(function(){hz.style.height='3px';},80);}
+    var now=Date.now()-startT,best=null,bd=99999;
+    notes.forEach(function(n){
+      if(n.lane!==li||n.hit||n.missed)return;
+      var d=Math.abs(n.t-now);
+      if(d<bd){bd=d;best=n;}
+    });
+    if(!best||bd>430){showJudge2('EMPTY',li,'#667788');return;}
+    best.hit=true;if(best.el)best.el.style.display='none';
+    if(bd<75){combo++;sc+=Math.floor(100*(1+Math.floor(combo/5)));showJudge2('PERFECT ✨',li,'#ffee00');addScore(5);}
+    else if(bd<190){combo++;sc+=50;showJudge2('GOOD 👍',li,'#88ffcc');addScore(2);}
+    else{combo=0;sc+=10;showJudge2('BAD',li,'#ff8844');}
+    document.getElementById('rh_cv').textContent=combo;
+    document.getElementById('rh_sv').textContent=sc;
+  }
+
+  function showJudge2(txt,li,col){
+    var jEl=document.getElementById('rh_judge');
+    if(jEl){jEl.textContent=txt;jEl.style.color=col;jEl.style.transform='scale(1.18)';gameTimeout(function(){if(jEl.textContent===txt){jEl.textContent=' ';jEl.style.transform='';}},480);}
+    var f=document.createElement('div');
+    f.style.cssText='position:absolute;top:70%;left:50%;transform:translateX(-50%);font-size:11px;font-weight:900;color:'+col+';pointer-events:none;transition:transform .5s,opacity .5s;white-space:nowrap;z-index:5;';
+    f.textContent=txt.split(' ')[0];
+    lanes[li].appendChild(f);
+    gameTimeout(function(){f.style.transform='translateX(-50%) translateY(-32px)';f.style.opacity='0';},30);
+    gameTimeout(function(){if(f.parentNode)f.remove();},620);
+  }
+
+  gameInterval(function(){
+    if(!running||!startT)return;
+    var now=Date.now()-startT;
+    while(ni<notes.length){
+      var n=notes[ni];
+      if(n.t-fallMs<=now){spawnNote2(n);ni++;}
+      else break;
+    }
+    notes.forEach(function(n){
+      if(!n.el||n.hit||n.missed)return;
+      var y=(now-n.spawnT)/fallMs*HIT_Y;
+      if(y>HIT_Y+6){
+        n.missed=true;combo=0;
+        if(n.el.parentNode)n.el.remove();n.el=null;
+        showJudge2('MISS 💦',n.lane,'#ff4455');
+        document.getElementById('rh_cv').textContent=combo;
+        return;
+      }
+      n.el.style.top=y+'%';
+    });
+    if(ni>=notes.length&&notes.filter(function(n){return!n.hit&&!n.missed&&n.el;}).length===0){
+      running=false;
+      var hitN=notes.filter(function(n){return n.hit;}).length;
+      var pct=Math.round(hitN/totalNotes*100);
+      var rank=pct>=95?'S':pct>=80?'A':pct>=60?'B':pct>=40?'C':'D';
+      gameTimeout(function(){showResult('リズムマスター！🎵 '+rank+'ランク ('+pct+'%)');},350);
+    }
+  },33);
+
+  function spawnNote2(n){
+    var l=lanes[n.lane],t=TRACKS[n.lane];
+    var el=document.createElement('div');
+    el.style.cssText='position:absolute;top:0%;left:6%;width:88%;height:22px;border-radius:8px;background:linear-gradient(90deg,'+t.color+' 0%,'+t.color+'bb 100%);box-shadow:0 0 8px '+t.color+'88;display:flex;align-items:center;justify-content:center;font-size:14px;pointer-events:none;';
+    el.textContent=t.em;
+    l.appendChild(el);
+    n.el=el;
+    n.spawnT=n.t-fallMs;
+  }
+
+  var cdEl=document.createElement('div');
+  cdEl.style.cssText='position:absolute;top:0;left:0;right:0;bottom:0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:20;background:#0a001acc;pointer-events:none;';
+  cdEl.innerHTML='<div style="font-size:15px;color:#cc88ff;margin-bottom:12px">🎵 リズムにのろう！</div><div id="rh_cd" style="font-size:88px;font-weight:900;color:#fff;text-shadow:0 0 30px #ff88cc;"></div>';
+  area.appendChild(cdEl);
+  var cdNum=document.getElementById('rh_cd');
+  cdNum.textContent='3';
+  gameTimeout(function(){cdNum.textContent='2';cdNum.style.color='#ffcc44';},1000);
+  gameTimeout(function(){cdNum.textContent='1';cdNum.style.color='#ff4488';},2000);
+  gameTimeout(function(){cdNum.textContent='GO!';cdNum.style.color='#44ffcc';cdNum.style.fontSize='60px';},3000);
+  gameTimeout(function(){cdEl.remove();startT=Date.now();running=true;},3600);
+}
 // ============================================================
 // ふうせんゲーム
 // ============================================================
