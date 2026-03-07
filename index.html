@@ -2158,7 +2158,10 @@ function engPrequiz(area,cfg){
           addScore(20);score2+=20;charMsg('correct');gameTimeout(nextQ,700);
         }else{
           sfxMiss();btn.style.background='linear-gradient(135deg,#660000,#cc0044)';btn.style.borderColor='#ff0044';
-          charMsg('wrong');gameTimeout(function(){btn.style.background='linear-gradient(135deg,#2a005a,#440088)';btn.style.borderColor='#6633aa';},450);
+          charMsg('wrong');
+          // 正解ボタンを緑に
+          btns.querySelectorAll('button').forEach(function(b,bi){if(bi===q.ans){b.style.background='linear-gradient(135deg,#006600,#00cc44)';b.style.borderColor='#00ff66';}});
+          gameTimeout(nextQ,1000);
         }
       };
       btns.appendChild(btn);
