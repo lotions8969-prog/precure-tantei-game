@@ -1352,7 +1352,7 @@ function engCount(area,cfg){
   var qNum=0,totalQ=8;
   area.style.display='flex';area.style.flexDirection='column';area.style.justifyContent='center';
   function nextQ(){
-    area.innerHTML='';reattachWidget(area);
+    var _w=document.getElementById('charWidget');area.innerHTML='';if(_w)area.appendChild(_w);
     if(qNum>=totalQ){showResult('てんさいだね！🎉');return;}
     qNum++;
     var em=POOL[Math.floor(Math.random()*POOL.length)];
@@ -1416,7 +1416,7 @@ function engColor(area,cfg){
   var qNum=0,totalQ=8;
   area.style.display='flex';area.style.flexDirection='column';area.style.justifyContent='center';
   function nextQ(){
-    area.innerHTML='';reattachWidget(area);
+    var _w=document.getElementById('charWidget');area.innerHTML='';if(_w)area.appendChild(_w);
     if(qNum>=totalQ){showResult('いろのてんさい！🎉');return;}
     qNum++;
     var wrap=document.createElement('div');wrap.className='color-stage';
@@ -2231,7 +2231,7 @@ function eng2pQuiz(area,cfg){
   ].sort(function(){return Math.random()-.5;});
   area.style.display='flex';area.style.flexDirection='column';area.style.justifyContent='center';area.style.padding='12px';
   function nextQ(){
-    area.innerHTML='';
+    var _w=document.getElementById('charWidget');area.innerHTML='';if(_w)area.appendChild(_w);
     if(round>=rounds){show2PResult(s1,s2);return;}
     round++;
     var q=QUESTIONS[round%QUESTIONS.length];
@@ -2389,7 +2389,7 @@ function engPrequiz(area,cfg){
   var qNum=0,totalQ=8,score2=0;
   area.style.display='flex';area.style.flexDirection='column';area.style.justifyContent='center';area.style.padding='14px';
   function nextQ(){
-    area.innerHTML='';reattachWidget(area);
+    var _w=document.getElementById('charWidget');area.innerHTML='';if(_w)area.appendChild(_w);
     if(qNum>=totalQ){showResult('クイズマスター！🔍✨');return;}
     var q=QUESTIONS[qNum];qNum++;
     var prog=document.createElement('div');prog.style.cssText='font-size:12px;color:#cc99ff;text-align:center;margin-bottom:6px';
