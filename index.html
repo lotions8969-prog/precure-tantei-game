@@ -7,9 +7,9 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Hiragino Maru Gothic ProN','BIZ UDPGothic',sans-serif;
-  background:#090018;
-  background-image:radial-gradient(#ffffff09 1px,transparent 1px),radial-gradient(#ffffff05 1px,transparent 1px);
-  background-size:28px 28px,56px 56px;background-position:0 0,14px 14px;
+  background:#060014;
+  background-image:radial-gradient(#aa66ff08 1px,transparent 1px),radial-gradient(#ff66cc05 1px,transparent 1px),radial-gradient(#4488ff04 1px,transparent 1px);
+  background-size:22px 22px,44px 44px,66px 66px;background-position:0 0,11px 11px,22px 22px;
   color:#fff;min-height:100vh;overflow-x:hidden}
 
 /* ===== キャラ画像共通 ===== */
@@ -23,11 +23,19 @@ body{font-family:'Hiragino Maru Gothic ProN','BIZ UDPGothic',sans-serif;
 /* ===== HUB ===== */
 #hub{min-height:100vh;padding:0 0 40px;position:relative;z-index:1}
 .hub-header{
-  background:linear-gradient(180deg,#100035 0%,#2a0075 30%,#4a00aa 58%,#220060 100%);
-  padding:20px 16px 28px;text-align:center;
-  box-shadow:0 6px 40px #9900ffcc;
+  background:linear-gradient(180deg,#08001e 0%,#1e0055 20%,#3a0090 45%,#550088 65%,#1e0055 85%,#08001e 100%);
+  padding:22px 16px 32px;text-align:center;
+  box-shadow:0 8px 48px #aa00ffdd,0 0 80px #ff44cc44 inset;
   position:relative;overflow:hidden;z-index:2;
 }
+.hub-header::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 80% 60% at 50% 50%, #ff44cc11 0%, transparent 70%),
+    radial-gradient(circle 200px at 20% 50%, #9933ff22 0%, transparent 60%),
+    radial-gradient(circle 200px at 80% 50%, #ff66cc22 0%, transparent 60%);
+  animation:headerGlow 4s ease-in-out infinite alternate;pointer-events:none;z-index:0;
+}
+@keyframes headerGlow{from{opacity:.6}to{opacity:1}}
 /* 背景魔法陣リング */
 .hub-header::before{
   content:'';position:absolute;width:360px;height:360px;
@@ -45,23 +53,24 @@ body{font-family:'Hiragino Maru Gothic ProN','BIZ UDPGothic',sans-serif;
 }
 .hub-badge{
   display:inline-block;
-  background:linear-gradient(135deg,#ff44bb,#9922ff);
-  border-radius:24px;padding:5px 22px;font-size:13px;font-weight:900;
+  background:linear-gradient(135deg,#ff44bb,#9922ff,#44ccff);
+  background-size:200%;animation:gradMove 3s linear infinite;
+  border-radius:28px;padding:6px 24px;font-size:13px;font-weight:900;
   color:#fff;margin-bottom:10px;
-  box-shadow:0 0 18px #ff66ccaa,0 2px 6px #00000055;
-  letter-spacing:1px;position:relative;z-index:1;
+  box-shadow:0 0 24px #ff66cccc,0 0 48px #9933ff66,0 2px 8px #00000066;
+  letter-spacing:2px;position:relative;z-index:1;border:1px solid rgba(255,255,255,.3);
 }
 .hub-title{
-  font-size:clamp(22px,6.5vw,46px);font-weight:900;
-  background:linear-gradient(90deg,#ff88ff,#ffee44,#88ffff,#ff44cc,#ff88ff);
+  font-size:clamp(24px,7vw,52px);font-weight:900;
+  background:linear-gradient(90deg,#ff88ff,#ffee44,#88ffee,#ff88cc,#ffee44,#88ffff,#ff88ff);
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-  background-size:250%;animation:gradMove 3.5s linear infinite;
+  background-size:300%;animation:gradMove 4s linear infinite;
   line-height:1.15;position:relative;z-index:1;
-  text-shadow:none;
+  filter:drop-shadow(0 0 12px rgba(255,100,200,.6));
 }
-@keyframes gradMove{to{background-position:250%}}
-.hub-subtitle{font-size:12px;color:#cc99ff;margin-top:6px;position:relative;z-index:1;letter-spacing:.5px}
-.hub-tagline{font-size:11px;color:#ff99cc88;margin-top:4px;position:relative;z-index:1}
+@keyframes gradMove{to{background-position:300%}}
+.hub-subtitle{font-size:13px;color:#ddaaff;margin-top:8px;position:relative;z-index:1;letter-spacing:1px;font-weight:700}
+.hub-tagline{font-size:11px;color:#ff99ccaa;margin-top:4px;position:relative;z-index:1;letter-spacing:.5px}
 
 /* キャラクターカード（大型表示） */
 .hub-chars{display:flex;justify-content:center;gap:10px;margin-top:18px;flex-wrap:wrap;position:relative;z-index:1}
@@ -80,42 +89,52 @@ body{font-family:'Hiragino Maru Gothic ProN','BIZ UDPGothic',sans-serif;
 .hub-char-name{font-size:9px;font-weight:900;text-align:center;line-height:1.3;max-width:114px;color:#ffccff}
 @keyframes charB{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
 
-.cat-tabs{display:flex;flex-wrap:wrap;gap:6px;padding:12px 16px;justify-content:center;background:#150030}
-.cat-tab{padding:6px 14px;border-radius:20px;border:2px solid #6633aa;background:#2a0055;color:#cc99ff;font-size:13px;font-weight:700;cursor:pointer;transition:.2s}
-.cat-tab.active,.cat-tab:hover{background:#6633ff;color:#fff;border-color:#aa66ff}
-.games-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:14px;max-width:900px;margin:0 auto}
-@media(max-width:600px){.games-grid{grid-template-columns:repeat(3,1fr)}}
-@media(max-width:400px){.games-grid{grid-template-columns:repeat(2,1fr)}}
-.game-tile{background:linear-gradient(145deg,#2a005a,#440088);border:2px solid #6633aa;border-radius:14px;padding:12px 8px 10px;text-align:center;cursor:pointer;transition:.2s;position:relative}
-.game-tile:hover{transform:scale(1.05);border-color:#aa66ff;box-shadow:0 0 16px #9933ff88}
-.game-tile:active{transform:scale(.97)}
+.cat-tabs{display:flex;flex-wrap:wrap;gap:7px;padding:14px 16px;justify-content:center;background:linear-gradient(180deg,#0e0028,#150038);border-bottom:1px solid #440088}
+.cat-tab{padding:7px 14px;border-radius:24px;border:2px solid;font-size:12px;font-weight:900;cursor:pointer;transition:all .2s;white-space:nowrap;position:relative;overflow:hidden;letter-spacing:.3px}
+.cat-tab::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.18),transparent);opacity:0;transition:.2s}
+.cat-tab:hover::before,.cat-tab.active::before{opacity:1}
+.cat-tab:hover{transform:translateY(-2px) scale(1.06)}
+.cat-tab.active{transform:translateY(-1px);box-shadow:0 4px 16px currentColor}
+.games-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:14px;max-width:960px;margin:0 auto}
+.game-tile:nth-child(3n+1){animation:tileFloat 3.2s ease-in-out infinite}
+.game-tile:nth-child(3n+2){animation:tileFloat 3.8s ease-in-out infinite .4s}
+.game-tile:nth-child(3n){animation:tileFloat 4.4s ease-in-out infinite .8s}
+@media(max-width:640px){.games-grid{grid-template-columns:repeat(3,1fr);gap:8px}}
+@media(max-width:400px){.games-grid{grid-template-columns:repeat(2,1fr);gap:7px}}
+.game-tile{border-radius:18px;padding:14px 8px 11px;text-align:center;cursor:pointer;transition:all .22s cubic-bezier(.34,1.56,.64,1);position:relative;overflow:hidden;border:2px solid}
+.game-tile::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:conic-gradient(from 0deg,transparent 0%,rgba(255,255,255,.06) 30%,transparent 60%);animation:tileSpin 6s linear infinite;opacity:0;transition:opacity .3s}
+.game-tile:hover::before{opacity:1}
+.game-tile::after{content:'';position:absolute;inset:0;border-radius:18px;background:linear-gradient(135deg,rgba(255,255,255,.22) 0%,transparent 55%);pointer-events:none}
+.game-tile:hover{transform:translateY(-5px) scale(1.07)}
+.game-tile:active{transform:scale(.94)}
 .game-tile.hidden{display:none}
-.game-tile.hard-tile{background:linear-gradient(145deg,#3a0010,#660022);border-color:#cc2244}
-.game-tile.hard-tile:hover{border-color:#ff4466;box-shadow:0 0 16px #ff224488}
-.game-icon{font-size:30px;line-height:1;margin-bottom:5px}
-.game-name{font-size:10px;font-weight:700;color:#eeddff;line-height:1.3}
-.game-num{position:absolute;top:4px;left:6px;font-size:9px;color:#9966cc;font-weight:700}
-.game-hard-badge{position:absolute;top:4px;right:5px;background:linear-gradient(135deg,#ff2244,#880011);color:#fff;font-size:8px;font-weight:900;padding:1px 5px;border-radius:6px}
+.game-icon{font-size:34px;line-height:1;margin-bottom:6px;filter:drop-shadow(0 2px 4px rgba(0,0,0,.4));transition:transform .2s}
+.game-tile:hover .game-icon{transform:scale(1.15) rotate(-5deg)}
+.game-name{font-size:10px;font-weight:900;color:#fff;line-height:1.35;text-shadow:0 1px 4px rgba(0,0,0,.6)}
+.game-num{position:absolute;top:5px;left:7px;font-size:9px;font-weight:900;opacity:.7}
+.game-cat-badge{position:absolute;top:4px;right:5px;font-size:8px;font-weight:900;padding:1px 5px;border-radius:6px;color:#fff;opacity:.85}
+@keyframes tileSpin{to{transform:rotate(360deg)}}
+@keyframes tileFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
 
 /* ===== キャラクター選択モーダル ===== */
-#charSelectModal{display:none;position:fixed;inset:0;z-index:200;background:#000000cc;align-items:center;justify-content:center;padding:16px;overflow-y:auto}
+#charSelectModal{display:none;position:fixed;inset:0;z-index:200;background:radial-gradient(ellipse at 50% 50%,#220044cc,#000000ee);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:16px;overflow-y:auto}
 #charSelectModal.show{display:flex}
-.char-select-box{background:linear-gradient(145deg,#1a0040,#2a0055);border:3px solid #9933ff;border-radius:24px;padding:20px 16px 24px;max-width:460px;width:100%;box-shadow:0 0 40px #9933ff88}
+.char-select-box{background:linear-gradient(145deg,#0e0025,#1e003a,#2a0055);border:3px solid #aa44ff;border-radius:28px;padding:22px 18px 26px;max-width:460px;width:100%;box-shadow:0 0 60px #aa44ffaa,0 0 120px #ff44cc33,0 20px 60px rgba(0,0,0,.8);position:relative;overflow:hidden}
 .char-select-title{font-size:20px;font-weight:900;text-align:center;color:#ffccff;margin-bottom:4px}
 .char-select-sub{font-size:13px;text-align:center;color:#cc99ff;margin-bottom:10px}
 .char-select-game{font-size:14px;font-weight:700;text-align:center;color:#ffff88;margin-bottom:14px;background:#2a005a;border-radius:10px;padding:8px 10px;border:1px solid #6633aa}
 .char-cards{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
-.char-card{border-radius:16px;padding:12px 8px 10px;text-align:center;cursor:pointer;transition:all .2s;border:3px solid transparent;background:linear-gradient(145deg,#22004a,#380066);position:relative;overflow:hidden}
-.char-card:hover{transform:scale(1.03);background:linear-gradient(145deg,#2d0060,#4a0088)}
+.char-card{border-radius:20px;padding:14px 8px 12px;text-align:center;cursor:pointer;transition:all .2s cubic-bezier(.34,1.56,.64,1);border:3px solid transparent;background:linear-gradient(145deg,#18003a,#2e0055,#1a0040);position:relative;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,.5)}
+.char-card:hover{transform:translateY(-4px) scale(1.05);background:linear-gradient(145deg,#2d0060,#4a0088,#2d0060);box-shadow:0 8px 24px rgba(170,100,255,.4)}
 .char-card.active-char{transform:scale(1.04)}
 /* 選択された以外のカードを少し暗くしない → すべて同じ明るさ */
 .char-card-img-wrap{display:inline-block;background:#fff;border-radius:10px;overflow:hidden;line-height:0;margin-bottom:6px}
 .char-card-img-wrap img{width:72px;height:86px;object-fit:cover;mix-blend-mode:multiply;display:block}
 .char-card-name{font-size:12px;font-weight:900;line-height:1.3;margin-bottom:3px}
 .char-card-desc{font-size:10px;color:#ccbbee;line-height:1.4}
-.char-card .selected-badge{display:none;position:absolute;top:6px;right:6px;background:#ff66cc;color:#fff;font-size:10px;font-weight:900;padding:2px 6px;border-radius:8px}
+.char-card .selected-badge{display:none;position:absolute;top:6px;right:6px;background:linear-gradient(135deg,#ff44bb,#aa22ff);color:#fff;font-size:10px;font-weight:900;padding:3px 8px;border-radius:10px;box-shadow:0 0 10px #ff66cc88;animation:pulsBtn 1s infinite}
 .char-card.active-char .selected-badge{display:block}
-.char-select-start{display:block;width:100%;margin-top:14px;padding:14px;background:linear-gradient(135deg,#ff66cc,#9933ff);border:none;color:#fff;font-size:18px;font-weight:900;border-radius:16px;cursor:pointer;box-shadow:0 0 16px #ff66cc88;transition:.15s}
+.char-select-start{display:block;width:100%;margin-top:14px;padding:15px;background:linear-gradient(135deg,#ff44bb,#aa22ff,#44aaff);background-size:200%;animation:gradMove 3s linear infinite;border:2px solid rgba(255,255,255,.25);color:#fff;font-size:18px;font-weight:900;border-radius:20px;cursor:pointer;box-shadow:0 0 24px #ff66ccaa,0 0 48px #9933ff44;transition:.15s;letter-spacing:.5px}
 .char-select-start:disabled{background:#443355;color:#776688;cursor:not-allowed;box-shadow:none}
 .char-select-start:not(:disabled):hover{transform:scale(1.02)}
 .char-select-cancel{display:block;width:100%;margin-top:8px;padding:9px;background:transparent;border:2px solid #6633aa;color:#cc99ff;font-size:14px;font-weight:700;border-radius:12px;cursor:pointer}
@@ -123,9 +142,9 @@ body{font-family:'Hiragino Maru Gothic ProN','BIZ UDPGothic',sans-serif;
 
 /* ===== ゲーム画面 ===== */
 #gameScreen{display:none;min-height:100vh;flex-direction:column}
-.game-topbar{background:linear-gradient(135deg,#2d0066,#6600cc);padding:9px 14px;display:flex;align-items:center;gap:8px;box-shadow:0 4px 12px #9900ff66;flex-shrink:0}
-.back-btn{background:#ff66cc;border:none;color:#fff;font-size:18px;width:34px;height:34px;border-radius:50%;cursor:pointer;font-weight:900;flex-shrink:0;line-height:1}
-.back-btn:hover{background:#ff44aa}
+.game-topbar{background:linear-gradient(135deg,#1a003d,#4400aa,#6600cc,#4400aa);background-size:200%;animation:gradMove 6s linear infinite;padding:10px 14px;display:flex;align-items:center;gap:8px;box-shadow:0 4px 20px #9900ffaa,0 0 40px #ff44cc22;flex-shrink:0;border-bottom:1px solid #aa66ff44}
+.back-btn{background:linear-gradient(135deg,#ff44bb,#cc22aa);border:2px solid #ff88dd;color:#fff;font-size:18px;width:36px;height:36px;border-radius:50%;cursor:pointer;font-weight:900;flex-shrink:0;line-height:1;box-shadow:0 0 10px #ff66cc88;transition:.15s}
+.back-btn:hover{background:linear-gradient(135deg,#ff66cc,#ff22bb);transform:scale(1.1);box-shadow:0 0 16px #ff66ccbb}
 .game-title-bar{font-size:15px;font-weight:900;flex:1;text-align:center;background:linear-gradient(90deg,#ff88ff,#88ffff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .score-bar{font-size:14px;font-weight:700;color:#ffff88;flex-shrink:0;white-space:nowrap}
 #gameArea{flex:1;position:relative;overflow:hidden}
@@ -233,8 +252,8 @@ body{font-family:'Hiragino Maru Gothic ProN','BIZ UDPGothic',sans-serif;
 .result-char-img-wrap img{width:100px;height:120px;object-fit:cover;mix-blend-mode:multiply;display:block}
 .result-char-msg{background:#ffffffee;color:#220044;border-radius:16px 16px 16px 4px;padding:11px 14px;font-size:14px;font-weight:700;max-width:190px;line-height:1.6;box-shadow:0 3px 10px #00000044}
 .result-score{font-size:26px;font-weight:900;color:#ffff44}
-.result-btn{padding:12px 32px;background:linear-gradient(135deg,#ff66cc,#9933ff);border:none;color:#fff;font-size:18px;font-weight:900;border-radius:28px;cursor:pointer;box-shadow:0 0 18px #ff66cc88;transition:.15s}
-.result-btn:hover{transform:scale(1.05)}
+.result-btn{padding:13px 36px;background:linear-gradient(135deg,#ff44bb,#aa22ff,#44aaff);background-size:200%;animation:gradMove 3s linear infinite;border:2px solid rgba(255,255,255,.3);color:#fff;font-size:18px;font-weight:900;border-radius:32px;cursor:pointer;box-shadow:0 0 24px #ff66ccaa,0 0 48px #9933ff44;transition:.15s;letter-spacing:.5px}
+.result-btn:hover{transform:scale(1.07);box-shadow:0 0 32px #ff66cccc,0 0 64px #9933ff66}
 .result-btn.retry{background:linear-gradient(135deg,#33cc66,#006633)}
 .confetti{position:absolute;width:8px;height:8px;border-radius:2px;animation:confettiFall linear forwards;pointer-events:none}
 @keyframes confettiFall{from{transform:translateY(-10px) rotate(0deg);opacity:1}to{transform:translateY(100vh) rotate(720deg);opacity:0}}
@@ -539,183 +558,204 @@ function sfxTap(){beep(880,.05,'square',.18);}
 function sfxCard(){beep(660,.1,'sine',.28);}
 
 var bgmTimers=[];var bgmOn=false;
-function stopBGM(){bgmOn=false;bgmTimers.forEach(function(t){clearInterval(t);clearTimeout(t);});bgmTimers=[];}
+function stopBGM(){bgmOn=false;bgmTimers.forEach(function(t){if(t&&t._clear)t._clear();else{clearInterval(t);clearTimeout(t);}});bgmTimers=[];}
 function pn(f,d,t,v,dt){if(!bgmOn||!f)return;beep(f,d,t||'sine',v||.09,dt||0);}
 
 // ============================================================
-// BGM: メロディ+和音+バスの3層構造で本格的なサウンド
-// 各カテゴリ専用テーマ曲
+// アニメBGM: 多声部（メロディ+コード+ベース）
 // ============================================================
+// chord shorthand helpers - 4th octave chords
+var CHORD={
+  C:[523,659,784],Am:[440,523,659],F:[349,440,523],G:[392,494,587],
+  Dm:[294,349,440],Em:[330,392,494],Bm:[247,294,370],Db:[277,349,415],
+  Eb:[311,392,466],Ab:[208,261,311],Bb:[233,294,349],
+  C5:[523,659,784],Csus4:[523,698,784],Gadd9:[392,494,587,659],
+  Fmaj7:[349,440,523,659],Cadd9:[523,659,784,880]
+};
+var BASS={C:131,G:196,Am:220,F:174,Dm:147,Em:165,Bm:247,Eb:156,Ab:104,Bb:117};
 
-// 共通ビルダー: mel=メロディ配列, bas=バス配列(4拍ごと), tempo, mDur=音符長, mType=波形
-// h2=追加ハーモニー比率(例:1.498=5度上, 1.26=長3度上), bVol=バス音量
-function mkBGM(mel,bas,tempo,mDur,mType,h2,bVol){
+function mkAnime(mel,chs,bass,bpm,lead,extraFn){
+  var ms=Math.round(30000/bpm);// ms per 8th note at given BPM
   var i=0;
   bgmTimers.push(setInterval(function(){
     if(!bgmOn)return;
+    var s=ms/1000;
     var f=mel[i%mel.length];
-    pn(f,mDur,mType||'triangle',.11);        // メロディ
-    pn(f*.749,mDur*.82,'sine',.055);         // 完全4度下ハーモニー
-    if(h2)pn(f*h2,mDur*.76,'sine',.046);    // 追加ハーモニー
-    if(i%4===0)pn(bas[Math.floor(i/4)%bas.length],mDur*2.4,'sine',bVol||.10); // バス
+    // Lead melody
+    if(f){
+      pn(f,s*1.6,lead||'triangle',.10);
+      pn(f*2,s*1.0,'sine',.022);// octave sparkle
+      pn(f*1.498,s*1.2,'sine',.018);// 5th harmony
+    }
+    // Chord (every 2 8th notes = quarter note)
+    if(i%2===0){
+      var ch=chs[Math.floor(i/2)%chs.length];
+      ch.forEach(function(cf,ci){pn(cf,s*2.4,'sine',.025-ci*.004);});
+    }
+    // Bass (every 4 8th notes = half note)
+    if(i%4===0){
+      pn(bass[Math.floor(i/4)%bass.length],s*4.2,'sine',.11);
+      pn(bass[Math.floor(i/4)%bass.length]*1.498,s*3.8,'sine',.04);
+    }
+    // Extra pattern (percussion/accent)
+    if(extraFn)extraFn(i,s);
     i++;
-  },tempo));
+  },ms));
 }
+
+// Shimmer accent: bright high sparkle on offbeats
+function shimmer(i,s){if(i%4===2)pn(1760+880*Math.random(),s*.4,'sine',.008);}
+// Rhythm kick: punchy accent every 4th beat
+function kick(i,s){if(i%4===0)pn(65,s*.3,'sawtooth',.06);if(i%4===2)pn(82,s*.2,'sawtooth',.04);}
+// Hi-hat: every 2nd step
+function hihat(i,s){pn(3520,s*.06,'sawtooth',.012);}
 
 var BGM_TRACKS={
 
-  // さがす: ミステリー探偵テーマ (Am: A-C-E, G: G-B-D, F: F-A-C, E: E-G#-B)
-  // 4度下+5度上の3声でコード感を演出
+  // さがす: 謎解きアニメテーマ Am→F→C→G 明るい探偵感
   'さがす':function(){
-    var mel=[440,523,659,523, 494,587,784,587, 440,523,698,523, 415,494,659,494];
-    var bas=[220,196,174,165]; // A3,G3,F3,E3
-    mkBGM(mel,bas,460,.42,'triangle',1.498,.09);
+    var mel=[880,784,659,784,880,1047,880,784,659,523,659,784,880,784,659,523,
+             440,523,659,784,880,784,659,523,659,784,880,784,1047,880,784,659];
+    var chs=[CHORD.Am,CHORD.F,CHORD.C,CHORD.G];
+    var bass=[BASS.Am,BASS.F,BASS.C,BASS.G];
+    mkAnime(mel,chs,bass,112,'square',shimmer);
   },
 
-  // タップ: アクション8ビートポップ (C-F-G-C)
-  // 高速スクエア波+4分バス+8分キック
+  // タップ: 疾走感あるアクション C→Am→F→G
   'タップ':function(){
-    var mel=[523,659,784,659, 523,784,880,784, 698,880,1047,880, 784,659,523,659];
-    var bas=[131,174,131,196]; // C3,F3,C3,G3
-    mkBGM(mel,bas,210,.12,'square',null,.10);
-    // 8分バスキック追加 (裏拍)
-    var kick=[131,174,131,196],k=0;
-    bgmTimers.push(setInterval(function(){
-      if(!bgmOn)return;
-      pn(kick[k%4]*.5,.16,'sawtooth',.09);k++;
-    },420));
+    var mel=[784,880,1047,880,784,659,784,880,784,659,523,659,784,659,523,784,
+             880,1047,880,784,659,784,659,523,659,784,880,784,1047,880,784,659];
+    var chs=[CHORD.C,CHORD.Am,CHORD.F,CHORD.G];
+    var bass=[BASS.C,BASS.Am,BASS.F,BASS.G];
+    mkAnime(mel,chs,bass,155,'square',kick);
   },
 
-  // カード: エレガントな小品 (C-Am-F-G: 明るく上品)
-  // サイン波+長3度ハーモニーでピアノ的な響き
+  // カード: エレガントなピアノ調 C→G→Am→F ゆったり優雅
   'カード':function(){
-    var mel=[523,659,784,880, 784,659,523,440, 523,659,784,659, 523,440,392,440];
-    var bas=[131,220,174,196]; // C3,A3,F3,G3
-    mkBGM(mel,bas,375,.34,'sine',1.26,.09);
+    var mel=[659,784,880,784,659,523,659,784,784,659,523,440,523,659,784,659,
+             523,659,784,880,880,784,659,784,659,523,440,523,659,523,440,392];
+    var chs=[CHORD.C,CHORD.G,CHORD.Am,CHORD.F];
+    var bass=[BASS.C,BASS.G,BASS.Am,BASS.F];
+    mkAnime(mel,chs,bass,104,'triangle',shimmer);
   },
 
-  // かず: ようちえんカウントソング (F major: 明るく弾む)
-  // トライアングル+5度上ハーモニーで無邪気な音色
+  // かず: かわいいスキップ感 F→C→Dm→G 明るくはずむ
   'かず':function(){
-    var mel=[349,392,440,523, 440,523,698,523, 440,392,349,294, 349,440,523,440];
-    var bas=[174,131,196,174]; // F3,C3,G3,F3
-    mkBGM(mel,bas,350,.30,'triangle',1.498,.09);
+    var mel=[698,784,880,784,698,523,698,784,523,698,880,784,698,523,440,523,
+             784,880,1047,880,784,698,784,523,880,784,698,523,698,784,698,523];
+    var chs=[CHORD.F,CHORD.C,CHORD.Dm,CHORD.G];
+    var bass=[BASS.F,BASS.C,BASS.Dm,BASS.G];
+    mkAnime(mel,chs,bass,116,'triangle',shimmer);
   },
 
-  // いろ: キラキラシロフォン (Cペンタトニック: G-A-C-D-E)
-  // 高音サイン+オクターブ下+4度下の3層で煌めく音
+  // いろ: キラキラシロフォン風 Cmaj7→Am→Fmaj7→G
   'いろ':function(){
-    var mel=[784,1047,880,784, 659,784,1047,880, 523,784,1047,784, 659,880,1047,659];
-    var bas=[392,261,392,330]; // G4,C4,G4,E4
-    var i=0;
-    bgmTimers.push(setInterval(function(){
-      if(!bgmOn)return;
-      var f=mel[i%16];
-      pn(f,.13,'sine',.11);
-      pn(f*.5,.18,'sine',.07);    // オクターブ下
-      pn(f*.749,.13,'sine',.05);  // 4度下
-      if(i%4===0)pn(bas[Math.floor(i/4)%4],.55,'sine',.09);
-      i++;
-    },240));
+    var mel=[1047,880,784,880,1047,1174,1047,880,880,784,659,784,880,784,659,523,
+             784,880,1047,1174,1047,880,784,659,880,1047,1174,1047,880,784,659,784];
+    var chs=[CHORD.C,CHORD.Am,CHORD.F,CHORD.G];
+    var bass=[BASS.C,BASS.Am,BASS.F,BASS.G];
+    mkAnime(mel,chs,bass,120,'sine',shimmer);
   },
 
-  // おんがく: 勝利のファンファーレ (C major: 根音+長3度+完全5度の三和音)
-  // スクエア波で華やかなファンファーレ感
+  // おんがく: 勝利のファンファーレ C→F→G→C 華やか
   'おんがく':function(){
-    var mel=[523,659,784,880, 1047,880,784,659, 523,659,784,880, 784,659,523,392];
-    var bas=[131,174,196,131]; // C3,F3,G3,C3
-    var i=0;
-    bgmTimers.push(setInterval(function(){
-      if(!bgmOn)return;
-      var f=mel[i%16];
-      pn(f,.22,'square',.10);
-      pn(f*.749,.20,'sine',.07);   // 4度下
-      pn(f*1.26,.19,'sine',.06);   // 長3度上
-      pn(f*1.498,.18,'sine',.05);  // 完全5度上 → 三和音完成
-      if(i%4===0)pn(bas[Math.floor(i/4)%4],.45,'sawtooth',.10);
-      i++;
-    },310));
+    var mel=[523,659,784,880,1047,880,784,1047,880,784,659,784,880,784,659,523,
+             659,784,880,1047,1047,880,784,659,784,880,1047,880,784,659,523,659];
+    var chs=[CHORD.C,CHORD.F,CHORD.G,CHORD.C];
+    var bass=[BASS.C,BASS.F,BASS.G,BASS.C];
+    mkAnime(mel,chs,bass,126,'square',shimmer);
   },
 
-  // ふうせん: ふわふわワルツ (C major 3/4拍子)
-  // サイン波+4度ハーモニー+バス打鍵で本物のワルツ感
+  // ふうせん: ふんわりワルツ C→Am→F→G 3拍子感
   'ふうせん':function(){
-    var mel=[523,659,784, 880,784,659, 523,440,392, 440,523,659]; // 12音(4小節×3拍)
-    var bas=[131,174,131,196]; // C3,F3,C3,G3
-    var i=0;
-    bgmTimers.push(setInterval(function(){
-      if(!bgmOn)return;
-      var f=mel[i%12];
-      pn(f,.44,'sine',.10);
-      pn(f*.749,.38,'sine',.055);
-      if(i%3===0)pn(bas[Math.floor(i/3)%4],.88,'sine',.10); // 1拍目にバス
-      i++;
-    },435));
+    var mel=[784,659,523,659,784,880,784,523,698,523,440,523,698,784,698,523,
+             659,784,880,1047,880,784,659,523,659,784,880,784,659,523,440,523];
+    var chs=[CHORD.C,CHORD.Am,CHORD.F,CHORD.G];
+    var bass=[BASS.C,BASS.Am,BASS.F,BASS.G];
+    mkAnime(mel,chs,bass,118,'triangle',shimmer);
   },
 
-  // もぐら: ドタバタアクション (Dm: D-F-A, C, F, G)
-  // スクエア+ノコギリ波ベースでドタバタ感
+  // もぐら: ドタバタコミカル Dm→Am→Bb→C 速い！
   'もぐら':function(){
-    var mel=[294,330,349,440, 440,392,349,330, 294,349,440,392, 349,294,261,294];
-    var bas=[147,131,165,174]; // D3,C3,E3,F3
-    mkBGM(mel,bas,185,.10,'square',null,.10);
-    var bd=[147,131,165,174],k=0;
-    bgmTimers.push(setInterval(function(){
-      if(!bgmOn)return;
-      pn(bd[k%4]*.5,.20,'sawtooth',.11);k++;
-    },370));
+    var mel=[587,523,440,523,587,659,587,523,440,392,440,523,587,523,440,392,
+             523,587,659,698,659,587,523,440,587,659,698,659,587,523,440,523];
+    var chs=[CHORD.Dm,CHORD.Am,CHORD.Bb,CHORD.C];
+    var bass=[BASS.Dm,BASS.Am,BASS.Bb,BASS.C];
+    mkAnime(mel,chs,bass,148,'square',kick);
   },
 
-  // パズル: やさしいアルペジオ (C-Am-F-G 4小節を上昇・下降)
-  // ゆっくりサイン波+低音アクセントで考える雰囲気
+  // パズル: やさしいアルペジオ C→Am→Dm→G じっくり
   'パズル':function(){
-    var mel=[261,330,392,523, 659,523,392,330, 294,349,440,587, 523,440,349,261];
-    var bas=[131,220,174,196]; // C3,A3,F3,G3
-    mkBGM(mel,bas,530,.52,'sine',null,.09);
+    var mel=[523,659,784,659,523,440,523,659,523,440,392,440,523,659,523,440,
+             659,784,880,784,659,523,659,784,440,523,659,523,440,392,440,523];
+    var chs=[CHORD.C,CHORD.Am,CHORD.Dm,CHORD.G];
+    var bass=[BASS.C,BASS.Am,BASS.Dm,BASS.G];
+    mkAnime(mel,chs,bass,96,'triangle',shimmer);
   },
 
-  // その他: キュートポップ (G major: G-Em-C-D)
-  // サイン+長3度ハーモニーで明るくかわいい
+  // その他: キュートポップ G→D→Em→C かわいい
   'その他':function(){
-    var mel=[392,494,587,784, 659,784,880,784, 659,587,494,392, 587,784,880,784];
-    var bas=[196,165,261,294]; // G3,E3,C4,D4
-    mkBGM(mel,bas,295,.26,'sine',1.26,.09);
+    var mel=[784,880,1047,880,784,659,784,880,880,784,659,523,659,784,659,784,
+             587,784,880,784,587,523,587,784,784,659,523,659,784,659,523,784];
+    var chs=[CHORD.G,CHORD.C,CHORD.Em,CHORD.F];
+    var bass=[BASS.G,BASS.C,BASS.Em,BASS.F];
+    mkAnime(mel,chs,bass,118,'triangle',shimmer);
   },
 
-  // 2にんで: バトルテーマ (C major: 疾走感あるロック調)
-  // スクエア波+重いキック+2拍バスで対決感
+  // 2にんで: バトルテーマ C→F→G→Am 激しい対決
   '2にんで':function(){
-    var mel=[523,659,784,880, 784,659,523,659, 784,880,1047,880, 784,659,523,784];
-    var bas=[131,174,196,131]; // C3,F3,G3,C3
-    var i=0;
-    bgmTimers.push(setInterval(function(){
-      if(!bgmOn)return;
-      var f=mel[i%16];
-      pn(f,.14,'square',.12);
-      pn(f*.749,.13,'square',.08);
-      if(i%2===0)pn(bas[Math.floor(i/2)%4],.22,'sawtooth',.11); // 2拍ごとバス
-      if(i%8===0)pn(65,.18,'sawtooth',.13); // C2キック
-      i++;
-    },225));
+    var mel=[1047,880,784,880,1047,784,659,784,880,784,659,523,659,784,880,1047,
+             784,880,1047,1174,1047,880,784,659,880,1047,1174,1047,880,784,659,880];
+    var chs=[CHORD.C,CHORD.F,CHORD.G,CHORD.Am];
+    var bass=[BASS.C,BASS.F,BASS.G,BASS.Am];
+    mkAnime(mel,chs,bass,158,'square',kick);
+  },
+
+  // むずかしい: 緊迫マイナーテーマ Am→Em→F→E 緊張感
+  'むずかしい':function(){
+    var mel=[880,784,659,784,880,784,659,523,784,659,523,440,523,440,392,440,
+             659,784,880,784,659,523,659,784,440,523,659,784,880,784,659,523];
+    var chs=[CHORD.Am,CHORD.Em,CHORD.F,CHORD.G];
+    var bass=[BASS.Am,BASS.Em,BASS.F,BASS.G];
+    mkAnime(mel,chs,bass,134,'square',function(i,s){kick(i,s);if(i%8===6)pn(1760,s*.3,'sine',.012);});
+  },
+
+  // トランプ: スウィングジャズ風 C→Em→Am→G
+  'トランプ':function(){
+    var mel=[523,659,784,659,523,659,784,880,784,659,523,440,523,659,784,659,
+             784,880,1047,880,784,659,784,880,659,784,880,784,659,523,659,784];
+    var chs=[CHORD.C,CHORD.Em,CHORD.Am,CHORD.G];
+    var bass=[BASS.C,BASS.Em,BASS.Am,BASS.G];
+    mkAnime(mel,chs,bass,112,'triangle',shimmer);
+  },
+
+  // ロジック: ゆったり思考の音楽 Dm→Am→G→C
+  'ロジック':function(){
+    var mel=[587,523,440,523,587,659,587,523,494,523,587,523,494,440,392,440,
+             523,587,659,698,659,587,523,440,587,659,698,659,523,440,392,523];
+    var chs=[CHORD.Dm,CHORD.Am,CHORD.G,CHORD.C];
+    var bass=[BASS.Dm,BASS.Am,BASS.G,BASS.C];
+    mkAnime(mel,chs,bass,98,'triangle',shimmer);
+  },
+
+  // アクション: 超高速アクション C→F→Am→G 爆走
+  'アクション':function(){
+    var mel=[1047,880,1047,1174,1047,880,784,880,1047,880,784,659,784,880,1047,880,
+             784,880,1047,1174,1047,880,784,659,880,784,659,523,659,784,880,1047];
+    var chs=[CHORD.C,CHORD.F,CHORD.Am,CHORD.G];
+    var bass=[BASS.C,BASS.F,BASS.Am,BASS.G];
+    mkAnime(mel,chs,bass,162,'square',kick);
+  },
+
+  // ボード: 気高いボードゲーム Am→Em→F→C 落ち着いた
+  'ボード':function(){
+    var mel=[440,523,659,523,440,392,440,523,659,784,880,784,659,523,440,523,
+             523,659,784,880,880,784,659,523,659,784,880,784,659,523,440,659];
+    var chs=[CHORD.Am,CHORD.Em,CHORD.F,CHORD.C];
+    var bass=[BASS.Am,BASS.Em,BASS.F,BASS.C];
+    mkAnime(mel,chs,bass,106,'triangle',shimmer);
   }
 };
-BGM_TRACKS['むずかしい']=function(){
-  var mel=[330,294,330,392, 440,494,440,392, 330,392,440,523, 494,440,392,330];
-  var bas=[165,147,165,196];
-  var i=0;
-  bgmTimers.push(setInterval(function(){
-    if(!bgmOn)return;
-    var f=mel[i%16];
-    pn(f,.18,'square',.11);pn(f*.749,.16,'sine',.07);pn(f*1.498,.15,'triangle',.05);
-    if(i%4===0)pn(bas[Math.floor(i/4)%4],.40,'sawtooth',.10);
-    if(i%8===0)pn(82,.20,'sawtooth',.11);
-    i++;
-  },250));
-};
-BGM_TRACKS['トランプ']=function(){var mel=[523,659,523,440,523,659,784,659,523,440,392,440,523,659,784,523];var bas=[131,174,196,131];mkBGM(mel,bas,420,.36,'sine',1.26,.09);};
-BGM_TRACKS['ロジック']=function(){var mel=[392,440,494,523,440,392,349,392,523,440,392,349,294,349,392,440];var bas=[196,220,174,196];mkBGM(mel,bas,550,.50,'triangle',null,.09);};
-BGM_TRACKS['アクション']=function(){var mel=[523,659,784,880,1047,880,784,659,523,784,1047,784,659,784,880,659];var bas=[131,131,174,196];mkBGM(mel,bas,175,.09,'square',null,.12);};
-BGM_TRACKS['ボード']=function(){var mel=[294,330,392,440,392,349,294,330,392,440,494,440,392,330,294,330];var bas=[147,196,147,165];mkBGM(mel,bas,480,.44,'sine',1.498,.09);};
 BGM_TRACKS['default']=BGM_TRACKS['その他'];
 function startBGM(cat){if(bgmOn)return;bgmOn=true;(BGM_TRACKS[cat]||BGM_TRACKS['default'])();}
 
@@ -854,21 +894,42 @@ function confirmCharAndStart(){
 // ============================================================
 // HUB
 // ============================================================
+var CAT_META={
+  'すべて':{e:'🌟',c:'#aa66ff',bg:'linear-gradient(135deg,#330066,#550099)'},
+  'さがす':{e:'🔍',c:'#4488ff',bg:'linear-gradient(135deg,#001844,#003388)'},
+  'タップ':{e:'👆',c:'#ff3399',bg:'linear-gradient(135deg,#44001a,#880033)'},
+  'カード':{e:'🃏',c:'#ffaa00',bg:'linear-gradient(135deg,#332200,#664400)'},
+  'かず':{e:'🔢',c:'#44dd88',bg:'linear-gradient(135deg,#003322,#006644)'},
+  'いろ':{e:'🎨',c:'#ff66cc',bg:'linear-gradient(135deg,#330022,#660044)'},
+  'おんがく':{e:'🎵',c:'#44aaff',bg:'linear-gradient(135deg,#001833,#003366)'},
+  'ふうせん':{e:'🎈',c:'#ff8833',bg:'linear-gradient(135deg,#331100,#662200)'},
+  'もぐら':{e:'🐹',c:'#88cc33',bg:'linear-gradient(135deg,#1a2200,#334400)'},
+  'パズル':{e:'🧩',c:'#aa44ff',bg:'linear-gradient(135deg,#220044,#440088)'},
+  'その他':{e:'✨',c:'#ff44cc',bg:'linear-gradient(135deg,#330033,#660066)'},
+  '2にんで':{e:'👥',c:'#ff4422',bg:'linear-gradient(135deg,#330a00,#661400)'},
+  'むずかしい':{e:'🔥',c:'#ff2244',bg:'linear-gradient(135deg,#330011,#660022)'},
+  'トランプ':{e:'♠',c:'#ff3355',bg:'linear-gradient(135deg,#330011,#660033)'},
+  'ロジック':{e:'💡',c:'#00ccee',bg:'linear-gradient(135deg,#002233,#004455)'},
+  'アクション':{e:'⚡',c:'#ffaa00',bg:'linear-gradient(135deg,#332200,#553300)'},
+  'ボード':{e:'♟',c:'#88dd44',bg:'linear-gradient(135deg,#112200,#224400)'}
+};
 function buildHub(){
-  document.getElementById('hubSubtitle').textContent=GAMES.length+'このゲームであそぼう！';
+  document.getElementById('hubSubtitle').textContent='🎮 '+GAMES.length+'このゲームであそぼう！ 🎮';
   var tabsEl=document.getElementById('catTabs');
   tabsEl.innerHTML=CATS.map(function(c){
-    var badge=c==='むずかしい'?' 🔥':'';
-    return '<div class="cat-tab'+(c===currentCat?' active':'')+'" onclick="filterCat(\''+c+'\')" style="'+(c==='むずかしい'?'border-color:#cc2244;color:'+(currentCat===c?'#fff':'#ff6688'):'')+'">'+c+badge+'</div>';
+    var m=CAT_META[c]||{e:'🎯',c:'#9933ff',bg:'#1a0035'};
+    var isActive=c===currentCat;
+    var bg=isActive?m.bg:'#1a0035';var clr=isActive?'#fff':m.c;
+    var shadow=isActive?'0 0 14px '+m.c+'99,0 0 28px '+m.c+'44':'none';
+    return '<div class="cat-tab'+(isActive?' active':'')+'" onclick="filterCat(\''+c+'\')" style="background:'+bg+';border-color:'+m.c+';color:'+clr+';box-shadow:'+shadow+'">'+m.e+' '+c+'</div>';
   }).join('');
   var gridEl=document.getElementById('gamesGrid');
   gridEl.innerHTML=GAMES.map(function(g){
     var hidden=(currentCat!=='すべて'&&g.cat!==currentCat)?' hidden':'';
-    var isHard=g.cat==='むずかしい';
-    var hardBadge=isHard?'<div class="game-hard-badge">難</div>':'';
-    return '<div class="game-tile'+(isHard?' hard-tile':'')+hidden+'" onclick="openCharSelect('+(g.id-1)+')">'
-      +'<div class="game-num">'+g.id+'</div>'
-      +hardBadge
+    var m=CAT_META[g.cat]||{e:'🎯',c:'#9933ff',bg:'linear-gradient(135deg,#2a005a,#440088)'};
+    var gc=m.c;
+    return '<div class="game-tile'+hidden+'" onclick="openCharSelect('+(g.id-1)+')" style="background:'+m.bg+';border-color:'+gc+';box-shadow:0 2px 10px '+gc+'33" onmouseenter="this.style.boxShadow=\'0 6px 28px '+gc+'99,0 0 0 1px '+gc+'\'" onmouseleave="this.style.boxShadow=\'0 2px 10px '+gc+'33\'">'
+      +'<div class="game-num" style="color:'+gc+'aa">'+g.id+'</div>'
       +'<div class="game-icon">'+g.icon+'</div>'
       +'<div class="game-name">'+g.name+'</div></div>';
   }).join('');
@@ -3163,7 +3224,7 @@ window.addEventListener('resize',function(){
 // ============================================================
 // ハブ画面の魔法パーティクル
 // ============================================================
-var SP_EMOJIS=['✨','💫','⭐','🌟','💖','🔮','🌸','💎','🦋','🌈','💜','🔮','💐','🎀'];
+var SP_EMOJIS=['✨','💫','⭐','🌟','💖','🔮','🌸','💎','🦋','🌈','💜','💐','🎀','🎵','💝','🌺','⚡','🎪','🎨','🏵️','💞','🌙','💗','🎀'];
 setInterval(function(){
   if(document.getElementById('gameScreen').style.display!=='none')return;
   var el=document.createElement('div');
@@ -3177,7 +3238,7 @@ setInterval(function(){
   el.textContent=SP_EMOJIS[Math.floor(Math.random()*SP_EMOJIS.length)];
   document.body.appendChild(el);
   setTimeout(function(){if(el.parentNode)el.remove();},10000);
-},600);
+},380);
 </script>
 </body>
 </html>
