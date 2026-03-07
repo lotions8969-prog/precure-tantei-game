@@ -699,22 +699,18 @@ var BGM_TRACKS={
     },225));
   }
 };
-  // むずかしい: 緊張感のある冒険テーマ (Em minor + tension)
-  'むずかしい':function(){
-    var mel=[330,294,330,392, 440,494,440,392, 330,392,440,523, 494,440,392,330];
-    var bas=[165,147,165,196]; // E3,D3,E3,G3
-    var i=0;
-    bgmTimers.push(setInterval(function(){
-      if(!bgmOn)return;
-      var f=mel[i%16];
-      pn(f,.18,'square',.11);
-      pn(f*.749,.16,'sine',.07);
-      pn(f*1.498,.15,'triangle',.05);
-      if(i%4===0)pn(bas[Math.floor(i/4)%4],.40,'sawtooth',.10);
-      if(i%8===0)pn(82,.20,'sawtooth',.11); // deep kick
-      i++;
-    },250));
-  }
+BGM_TRACKS['むずかしい']=function(){
+  var mel=[330,294,330,392, 440,494,440,392, 330,392,440,523, 494,440,392,330];
+  var bas=[165,147,165,196];
+  var i=0;
+  bgmTimers.push(setInterval(function(){
+    if(!bgmOn)return;
+    var f=mel[i%16];
+    pn(f,.18,'square',.11);pn(f*.749,.16,'sine',.07);pn(f*1.498,.15,'triangle',.05);
+    if(i%4===0)pn(bas[Math.floor(i/4)%4],.40,'sawtooth',.10);
+    if(i%8===0)pn(82,.20,'sawtooth',.11);
+    i++;
+  },250));
 };
 BGM_TRACKS['トランプ']=function(){var mel=[523,659,523,440,523,659,784,659,523,440,392,440,523,659,784,523];var bas=[131,174,196,131];mkBGM(mel,bas,420,.36,'sine',1.26,.09);};
 BGM_TRACKS['ロジック']=function(){var mel=[392,440,494,523,440,392,349,392,523,440,392,349,294,349,392,440];var bas=[196,220,174,196];mkBGM(mel,bas,550,.50,'triangle',null,.09);};
@@ -2371,7 +2367,7 @@ function engG2048(area,cfg){
     var g=document.createElement('div');g.style.cssText='display:grid;grid-template-columns:repeat(4,1fr);gap:5px;background:#331155;padding:8px;border-radius:12px;border:3px solid #9933ff';
     board.forEach(function(v){
       var cell=document.createElement('div');var bg=COLORS[v]||'#ff9500';
-      cell.style.cssText='width:clamp(58px,14vw,76px);height:clamp(58px,14vw,76px);border-radius:8px;background:'+bg+';display:flex;align-items:center;justify-content:center;font-size:clamp(16px,4vw,22px);font-weight:900;color:'+(v>=8?'#fff':'#776e65');';
+      cell.style.cssText='width:clamp(58px,14vw,76px);height:clamp(58px,14vw,76px);border-radius:8px;background:'+bg+';display:flex;align-items:center;justify-content:center;font-size:clamp(16px,4vw,22px);font-weight:900;color:'+(v>=8?'#fff':'#776e65');
       cell.textContent=v||'';g.appendChild(cell);
     });
     wrap.appendChild(g);
@@ -2380,7 +2376,7 @@ function engG2048(area,cfg){
     var btns=document.createElement('div');btns.style.cssText='display:grid;grid-template-columns:repeat(3,1fr);gap:6px;max-width:160px';
     [['','↑',''],['←','↓','→']].forEach(function(row){row.forEach(function(lbl){
       var b=document.createElement('button');b.style.cssText='padding:10px;background:'+(lbl?'#440088':'transparent')+';border:'+(lbl?'2px solid #9933ff':'none')+';color:#fff;font-size:18px;border-radius:8px;cursor:'+(lbl?'pointer':'default');
-      b.textContent=lbl;if(lbl)b.onclick=function(){var m={↑:'up',↓:'down',←:'left',→:'right'};move(m[lbl]);};btns.appendChild(b);
+      b.textContent=lbl;if(lbl)b.onclick=function(){var m={'↑':'up','↓':'down','←':'left','→':'right'};move(m[lbl]);};btns.appendChild(b);
     });});
     wrap.appendChild(btns);
     reattachWidget(area);
@@ -2572,7 +2568,7 @@ function engSokoban(area,cfg){
     var dpad=document.createElement('div');dpad.style.cssText='display:grid;grid-template-columns:repeat(3,1fr);gap:5px;max-width:140px';
     [['','↑',''],['←','↓','→']].forEach(function(row){row.forEach(function(lbl){
       var b=document.createElement('button');b.style.cssText='padding:10px;background:'+(lbl?'#440088':'transparent')+';border:'+(lbl?'2px solid #9933ff':'none')+';color:#fff;font-size:18px;border-radius:8px;cursor:'+(lbl?'pointer':'default');
-      b.textContent=lbl;if(lbl){var moves2={↑:[0,-1],↓:[0,1],←:[-1,0],→:[1,0]};b.onclick=function(){doMove(moves2[lbl][0],moves2[lbl][1]);};}dpad.appendChild(b);
+      b.textContent=lbl;if(lbl){var moves2={'↑':[0,-1],'↓':[0,1],'←':[-1,0],'→':[1,0]};b.onclick=function(){doMove(moves2[lbl][0],moves2[lbl][1]);};}dpad.appendChild(b);
     });});
     wrap.appendChild(dpad);
     reattachWidget(area);
@@ -2640,7 +2636,7 @@ function engSnake(area,cfg){
   var dpad=document.createElement('div');dpad.style.cssText='display:grid;grid-template-columns:repeat(3,1fr);gap:4px;max-width:120px';
   [['','↑',''],['←','↓','→']].forEach(function(row){row.forEach(function(lbl){
     var b=document.createElement('button');b.style.cssText='padding:8px;background:'+(lbl?'#440088':'transparent')+';border:'+(lbl?'2px solid #9933ff':'none')+';color:#fff;font-size:16px;border-radius:6px;cursor:'+(lbl?'pointer':'default');
-    b.textContent=lbl;if(lbl){var vm={↑:{x:0,y:-1},↓:{x:0,y:1},←:{x:-1,y:0},→:{x:1,y:0}};b.onclick=function(){var d=vm[lbl];if(d.x!==-dir.x||d.y!==-dir.y)dir=d;};}dpad.appendChild(b);
+    b.textContent=lbl;if(lbl){var vm={'↑':{x:0,y:-1},'↓':{x:0,y:1},'←':{x:-1,y:0},'→':{x:1,y:0}};b.onclick=function(){var d=vm[lbl];if(d.x!==-dir.x||d.y!==-dir.y)dir=d;};}dpad.appendChild(b);
   });});
   wrap.appendChild(dpad);
   reattachWidget(area);
@@ -2876,7 +2872,7 @@ function engCrossy(area,cfg){
   var kh=function(e){var m={ArrowUp:[0,-1],ArrowDown:[0,1],ArrowLeft:[-1,0],ArrowRight:[1,0]};if(m[e.key]){e.preventDefault();move(m[e.key][0],m[e.key][1]);}};
   document.addEventListener('keydown',kh);gameTimers.push({_clear:function(){document.removeEventListener('keydown',kh);}});
   var dpad=document.createElement('div');dpad.style.cssText='display:grid;grid-template-columns:repeat(3,1fr);gap:4px;max-width:120px';
-  [['','↑',''],['←','↓','→']].forEach(function(row){row.forEach(function(lbl){var b=document.createElement('button');b.style.cssText='padding:8px;background:'+(lbl?'#440088':'transparent')+';border:'+(lbl?'2px solid #9933ff':'none')+';color:#fff;font-size:16px;border-radius:6px;cursor:'+(lbl?'pointer':'default');b.textContent=lbl;if(lbl){var vm={↑:[0,-1],↓:[0,1],←:[-1,0],→:[1,0]};b.onclick=function(){move(vm[lbl][0],vm[lbl][1]);};}dpad.appendChild(b);});});
+  [['','↑',''],['←','↓','→']].forEach(function(row){row.forEach(function(lbl){var b=document.createElement('button');b.style.cssText='padding:8px;background:'+(lbl?'#440088':'transparent')+';border:'+(lbl?'2px solid #9933ff':'none')+';color:#fff;font-size:16px;border-radius:6px;cursor:'+(lbl?'pointer':'default');b.textContent=lbl;if(lbl){var vm={'↑':[0,-1],'↓':[0,1],'←':[-1,0],'→':[1,0]};b.onclick=function(){move(vm[lbl][0],vm[lbl][1]);};}dpad.appendChild(b);});});
   wrap.appendChild(dpad);
   gameInterval(update,80);render();reattachWidget(area);
 }
@@ -3006,7 +3002,7 @@ function engWordle(area,cfg){
       var rowDiv=document.createElement('div');rowDiv.style.cssText='display:flex;gap:3px';
       row.forEach(function(key){
         var kb2=document.createElement('button');var wide=key==='ENTER'||key==='⌫';
-        kb2.style.cssText='padding:8px '+(wide?'10px':'6px')+';background:#3a3a3c;border:none;color:#fff;font-size:13px;font-weight:900;border-radius:6px;cursor:pointer;min-width:'+(wide?'52px':'32px');';
+        kb2.style.cssText='padding:8px '+(wide?'10px':'6px')+';background:#3a3a3c;border:none;color:#fff;font-size:13px;font-weight:900;border-radius:6px;cursor:pointer;min-width:'+(wide?'52px':'32px');
         // color used letters
         var usedGreen=guesses.some(function(g){return g.split('').some(function(c,i){return c===key&&target[i]===key;});});
         var usedYellow=!usedGreen&&guesses.some(function(g){return g.includes(key)&&target.includes(key);});
