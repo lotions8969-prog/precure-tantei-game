@@ -327,6 +327,12 @@ body{font-family:'Hiragino Maru Gothic ProN','BIZ UDPGothic',sans-serif;
     <div class="char-select-sub" id="modalSub">いっしょにあそぶプリキュアをえらんでね！</div>
     <div class="char-select-game" id="modalGameName"></div>
     <div id="modal2pInfo" style="display:none;font-size:13px;color:#ffccff;text-align:center;margin-bottom:8px;font-weight:700"></div>
+    <div id="modalRulesWrap" style="margin-bottom:10px">
+      <button id="modalRulesBtn" onclick="toggleRules()" style="width:100%;padding:7px 14px;background:#1a0040;border:2px solid #6633aa;color:#cc99ff;font-size:13px;font-weight:900;border-radius:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:.15s">
+        <span>❓</span><span id="modalRulesBtnText">ルールを見る</span><span id="modalRulesArrow">▼</span>
+      </button>
+      <div id="modalRulesBody" style="display:none;background:#0e0028;border:2px solid #6633aa;border-top:none;border-radius:0 0 12px 12px;padding:12px 14px;font-size:13px;color:#ddbbff;line-height:1.8;white-space:pre-wrap;font-weight:600"></div>
+    </div>
     <div class="char-cards" id="charCards"></div>
     <button class="char-select-start" id="charStartBtn" disabled onclick="confirmCharAndStart()">このこといっしょにあそぶ！</button>
     <button class="char-select-cancel" onclick="closeCharSelect()">もどる &#8592;</button>
@@ -860,12 +866,207 @@ function selectChar(idx){
   btn.style.background='linear-gradient(135deg,'+ch.color+',#7700ff)';
   if(AC.state==='suspended')AC.resume();
 }
+// ============================================================
+// ゲームルール定義
+// ============================================================
+var GAME_RULES={
+  'find':    '🔍 かくれているアイテムを全部タップして見つけよう！\nすべて見つけたらクリア！',
+  'tap':     '👆 よいものが出たらすぐタップ！\nわるいものをタップするとミス。\nミスが多すぎるとゲームオーバー。',
+  'card':    '🃏 カードを2枚めくって同じペアを見つけよう！\n全部そろえたらクリア！',
+  'count':   '🔢 問題をよく見て、正しい答えを選ぼう！',
+  'color':   '🎨 指示に合った色・形を選ぼう！',
+  'piano':   '🎹 ピアノのキーをたたいて音を楽しもう！\n鍵盤を押すと音が鳴るよ。',
+  'rhythm':  '🥁 光ったボタンの順番を覚えて同じ順番でタップ！\n長いほど難しい。',
+  'balloon': '🎈 ふわふわ上がってくる風船をタップして割ろう！\n逃がしたらミス。',
+  'whack':   '🐹 穴から出てくるキャラをすばやくタップ！\n逃がしたらミス。できるだけ早く叩こう。',
+  'puzzle':  '🧩 バラバラになったパズルをスライドして完成させよう！\n空きマスに向かって動かせる。',
+  'sort':    '📏 アイテムを正しい大きさの順番に並べよう！\nタップして選んで入れ替えよう。',
+  'stamp':   '🖌️ スタンプや色を選んでキャンバスに絵を描こう！\n自由に楽しんでね。',
+  'speedmath':'⚡ 計算問題がどんどん出てくる！\nすばやく正しい答えを選ぼう。時間制限あり。',
+  'prequiz': '📖 プリキュアに関するクイズに答えよう！\n4択から正しいものを選んで。',
+  '2pTap':   '👥 2人でタップ対決！\n自分のエリアにアイテムが出たらタップ。\n多く集めた方が勝ち！',
+  '2pCard':  '👥 2人でカード対決！\nペアを見つけたら1点。\n多くペアを集めた方が勝ち！',
+  '2pWhack': '👥 2人でもぐらたたき対決！\n多く叩いた方が勝ち！',
+  '2pQuiz':  '👥 2人でクイズ対決！\n多く正解した方が勝ち！',
+  '2pBalloon':'👥 2人で風船対決！\n多く割った方が勝ち！',
+  'blackjack':
+    '🃏 ブラックジャックのルール\n\n' +
+    '・カードの合計を21に近づけよう\n' +
+    '・21を超えると「バースト」で負け\n' +
+    '・ヒット = もう1枚引く\n' +
+    '・スタンド = これ以上引かない\n' +
+    '・ディーラーは合計17以上になるまで引く\n' +
+    '・A(エース) = 11 または 1\n' +
+    '・J/Q/K = 10として数える',
+  'pageone':
+    '🂡 ページワンのルール\n\n' +
+    '・場のカードと同じマーク(♠♥♦♣)か同じ数字を出す\n' +
+    '・8はなんでも出せる（マーク変更カード）\n' +
+    '・出せなければ山から1枚引く\n' +
+    '・手札が1枚になったら「ページワン！」が自動表示\n' +
+    '・手札をなくしたら勝ち！',
+  'sevenbridge':
+    '🀄 セブンブリッジのルール\n\n' +
+    '・最初に7を出して各マークの場をスタート\n' +
+    '・7から上(8→9→…→K)か下(6→5→…→A)に続けて出す\n' +
+    '・出せるカードがなければパス（山から引く）\n' +
+    '・手札をなくしたら勝ち！',
+  'cardspeed':
+    '⚡ スピードのルール\n\n' +
+    '・場の左右2枚のカードに±1のカードを出せる\n' +
+    '（例：5の上には4か6を出せる）\n' +
+    '・A↔Kもつながる（循環）\n' +
+    '・カードをタップして選び、左/右ボタンで出す\n' +
+    '・出せないときは「新しいカード」を押す\n' +
+    '・手札をなくしたら勝ち！',
+  'solitaire':
+    '🎴 ソリティア（クロンダイク）のルール\n\n' +
+    '・場の7列に赤黒交互・降順でカードを重ねる\n' +
+    '（例：黒の8の上には赤の7を置ける）\n' +
+    '・Kは空の列に置ける\n' +
+    '・4つの台にAから順に同マークで積み上げたらクリア\n' +
+    '・山札をクリックして1枚ずつ引ける\n' +
+    '・山札がなくなったらめくった山を戻せる',
+  'lightsout':
+    '💡 ライツアウトのルール\n\n' +
+    '・パネルをタップするとそのマスと上下左右が切り替わる\n' +
+    '・全部消灯（暗く）したらクリア！\n' +
+    '・連鎖反応に注意して論理的に考えよう',
+  'g2048':
+    '🔢 2048のルール\n\n' +
+    '・矢印キーまたは画面スワイプでタイルを動かす\n' +
+    '・同じ数字のタイルがぶつかると合体して2倍に！\n' +
+    '・2048のタイルを作ったら勝ち\n' +
+    '・タイルがいっぱいで動けなくなったらゲームオーバー',
+  'minesweeper':
+    '💣 マインスイーパーのルール\n\n' +
+    '・数字 = そのマスの周囲8マスにある爆弾の数\n' +
+    '・爆弾を踏まずに全マスを開けたらクリア！\n' +
+    '・右クリック or 長押し = 旗を立てる（爆弾の印）\n' +
+    '・最初のタップは爆弾に当たらない安全設計',
+  'sudoku':
+    '📊 数独のルール\n\n' +
+    '・縦9マス、横9マス、太線内の3×3ブロックに\n' +
+    '  それぞれ1〜9の数字を1つずつ入れる\n' +
+    '・同じ行・列・ブロックに同じ数字は入れられない\n' +
+    '・マスをタップして選び、数字ボタンで入力\n' +
+    '・「消」ボタンで数字を消せる',
+  'sokoban':
+    '📦 倉庫番のルール\n\n' +
+    '・矢印キーまたはボタンでキャラクターを動かす\n' +
+    '・📦（箱）を押して⭕（目標地点）に全部入れたらクリア！\n' +
+    '・箱は押せるが引っ張ることはできない\n' +
+    '・全5ステージに挑戦しよう！',
+  'snake':
+    '🐍 ヘビゲームのルール\n\n' +
+    '・矢印キーまたはボタンでヘビを操作\n' +
+    '・🍎（りんご）を食べるとヘビが伸びて得点！\n' +
+    '・自分の体や画面外に当たったらゲームオーバー\n' +
+    '・画面端は反対側につながっているよ',
+  'pong':
+    '🏓 ポンのルール\n\n' +
+    '・マウス/タッチでパドルを上下に動かす\n' +
+    '・またはスマホは↑↓ボタンで操作\n' +
+    '・相手コートにボールを入れたら1点\n' +
+    '・7点先取した方が勝ち！\n' +
+    '・当てる位置でボールの角度が変わる',
+  'breakout':
+    '🧱 ブロック崩しのルール\n\n' +
+    '・マウス/タッチでパドルを左右に動かす\n' +
+    '・またはスマホは◀▶ボタンで操作\n' +
+    '・ボールを打ち返してブロックを全部壊したらクリア！\n' +
+    '・ボールを落とすと残機が1つ減る（3回でゲームオーバー）',
+  'fruitmerge':
+    '🍉 スイカゲーム風のルール\n\n' +
+    '・「↓」ボタンで列を選んでフルーツを落とす\n' +
+    '・同じフルーツが隣同士でくっつくと合体して\n  より大きなフルーツに変身！\n' +
+    '・合体するたびにスコアが入る\n' +
+    '・フルーツが積み上がりすぎるとゲームオーバー',
+  'crossy':
+    '🐔 クロッシーロード風のルール\n\n' +
+    '・矢印キーまたはボタンでひよこを操作\n' +
+    '・🚗車を避けながら道路を渡ろう！\n' +
+    '・上の列まで進むたびに得点！\n' +
+    '・🌲の列は安全ゾーン\n' +
+    '・🚗に当たるとゲームオーバー',
+  'reversi':
+    '⚫ オセロのルール\n\n' +
+    '・あなたは⚫（黒）、CPUは⚪（白）\n' +
+    '・相手の石を自分の石で縦・横・斜めに挟んで取る\n' +
+    '・挟んだ石は全部自分の色に変わる\n' +
+    '・有効な手があれば必ず置かなければならない\n' +
+    '・全マス埋まったとき石が多い方が勝ち！',
+  'gomoku':
+    '🔵 五目並べのルール\n\n' +
+    '・あなたから先に石を置く（黒●）\n' +
+    '・縦・横・斜めのいずれかに先に5つ並べた方が勝ち！\n' +
+    '・CPUも同じルールで対戦\n' +
+    '・13×13のボードで対決しよう',
+  'wordle':
+    '🔤 ワードル（Wordle）のルール\n\n' +
+    '・5文字の英単語を6回以内に当てよう！\n' +
+    '・Enter/ENTERで答えを確定\n\n' +
+    '🟩 = その文字は正しい位置にある\n' +
+    '🟨 = その文字は含まれるが位置が違う\n' +
+    '⬛ = その文字は含まれない\n\n' +
+    '・キーボードまたは画面のボタンで入力できる',
+  'shanghai':
+    '🀱 上海（麻雀ソリティア）のルール\n\n' +
+    '・同じ絵の牌を2枚同時に選んで消そう\n' +
+    '・「フリー」な牌だけ選べる\n' +
+    '　= 上に牌が乗っていない AND 左右どちらかが空いている\n' +
+    '・全部消したらクリア！\n' +
+    '・詰まったら残念ながらゲームオーバー',
+  'simon':
+    '🔔 サイモン（Simon Says）のルール\n\n' +
+    '・4つの色ボタンが順番に光る\n' +
+    '・同じ順番でボタンを押そう！\n' +
+    '・正解するたびに1つずつ長くなる\n' +
+    '・間違えたらゲームオーバー\n' +
+    '・20回連続正解でマスター達成！'
+};
+
+function toggleRules(){
+  var body=document.getElementById('modalRulesBody');
+  var btn=document.getElementById('modalRulesBtn');
+  var txt=document.getElementById('modalRulesBtnText');
+  var arr=document.getElementById('modalRulesArrow');
+  var isOpen=body.style.display!=='none';
+  body.style.display=isOpen?'none':'block';
+  txt.textContent=isOpen?'ルールを見る':'ルールを閉じる';
+  arr.textContent=isOpen?'▼':'▲';
+  btn.style.borderRadius=isOpen?'12px':'12px 12px 0 0';
+  btn.style.borderColor=isOpen?'#6633aa':'#aa66ff';
+  btn.style.color=isOpen?'#cc99ff':'#fff';
+}
+
 function openCharSelect(gameIdx){
   if(AC.state==='suspended')AC.resume();
   pendingGameIdx=gameIdx;
   is2P=GAMES[gameIdx].engine.indexOf('2p')===0;
   p2SelectMode=1;
   document.getElementById('modalGameName').textContent=GAMES[gameIdx].icon+' '+GAMES[gameIdx].name;
+  // ルール表示
+  var eng=GAMES[gameIdx].engine;
+  var rulesText=GAME_RULES[eng]||'';
+  var rulesWrap=document.getElementById('modalRulesWrap');
+  var rulesBody=document.getElementById('modalRulesBody');
+  var rulesBtn=document.getElementById('modalRulesBtn');
+  var rulesTxt=document.getElementById('modalRulesBtnText');
+  var rulesArr=document.getElementById('modalRulesArrow');
+  if(rulesText){
+    rulesWrap.style.display='block';
+    rulesBody.textContent=rulesText;
+    // デフォルトは閉じた状態にリセット
+    rulesBody.style.display='none';
+    rulesTxt.textContent='ルールを見る';
+    rulesArr.textContent='▼';
+    rulesBtn.style.borderRadius='12px';
+    rulesBtn.style.borderColor='#6633aa';
+    rulesBtn.style.color='#cc99ff';
+  }else{
+    rulesWrap.style.display='none';
+  }
   if(is2P){
     document.getElementById('modalTitle').textContent='👥 2にんでえらんでね！';
     document.getElementById('modalSub').textContent='1Pと2Pのプリキュアをえらんでね！';
