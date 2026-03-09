@@ -1431,7 +1431,7 @@ function engColor(area,cfg){
         var btn=document.createElement('div');btn.className='color-btn';btn.style.background=COLORS[c2];
         btn.onclick=function(){
           if(c2===ti){sfxSuccess();btn.style.outline='4px solid #fff';addScore(15);charMsg('correct');gameTimeout(nextQ,650);}
-          else{sfxMiss();charMsg('wrong');}
+          else{sfxMiss();btn.style.outline='3px solid #ff4444';charMsg('wrong');gameTimeout(function(){btn.style.outline='';},420);}
         };
         cc.appendChild(btn);
       });
@@ -2164,6 +2164,7 @@ function eng2pCard(area,cfg){
     grid.appendChild(card);
   });
   area.appendChild(grid);
+  reattachWidget(area);
 }
 
 // ============================================================
